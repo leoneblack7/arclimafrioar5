@@ -22,6 +22,8 @@ export const Banner = () => {
         const activeBanners = parsedBanners.filter((banner: Banner) => banner.active);
         console.log("Banner - Banners ativos:", activeBanners);
         setBanners(activeBanners);
+      } else {
+        console.log("Banner - Nenhum banner encontrado no localStorage");
       }
     } catch (error) {
       console.error('Erro ao carregar banners:', error);
