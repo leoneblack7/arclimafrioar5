@@ -91,10 +91,10 @@ export default function ProductDetail() {
                 })}
               </div>
               <p className="text-sm text-gray-500">
-                Ou 10x de {(product.price / 10).toLocaleString('pt-BR', { 
+                Ou 12x de {(product.price / 12).toLocaleString('pt-BR', { 
                   style: 'currency', 
                   currency: 'BRL' 
-                })}
+                })} sem juros
               </p>
               <div className="flex gap-4">
                 <Button 
