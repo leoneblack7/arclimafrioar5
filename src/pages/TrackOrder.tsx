@@ -19,6 +19,7 @@ export default function TrackOrder() {
   const [cpf, setCpf] = useState("");
   const [trackingHistory, setTrackingHistory] = useState<TrackingStatus[]>([]);
   const [isTracking, setIsTracking] = useState(false);
+  const [initialTrackDate, setInitialTrackDate] = useState<Date | null>(null);
 
   const generateTrackingHistory = (orderDate: Date) => {
     const addDays = (date: Date, days: number) => {
@@ -115,12 +116,12 @@ export default function TrackOrder() {
     setIsTracking(true);
     
     if (cpf.length === 11) {
-      // Simulate finding an order with the CPF
-      // Using a fixed date 30 days ago for demonstration
-      const orderDate = new Date();
-      orderDate.setDate(orderDate.getDate() - 30);
+      // If this is the first time tracking, set the initial date
+      if (!initialTrackDate) {
+        setInitialTrackDate(new Date());
+      }
       
-      const history = generateTrackingHistory(orderDate);
+      const history = generateTrackingHistory(initialTrackDate || new Date());
       setTrackingHistory(history);
     } else {
       toast({
