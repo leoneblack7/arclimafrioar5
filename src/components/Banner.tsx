@@ -9,14 +9,36 @@ interface Banner {
   active: boolean;
 }
 
-const defaultBanner: Banner = {
-  id: 'default-banner',
-  image_url: 'https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7',
-  active: true
-};
+const defaultBanners: Banner[] = [
+  {
+    id: 'default-banner-1',
+    image_url: 'https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7',
+    active: true
+  },
+  {
+    id: 'default-banner-2',
+    image_url: 'https://images.unsplash.com/photo-1518770660439-4636190af475',
+    active: true
+  },
+  {
+    id: 'default-banner-3',
+    image_url: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e',
+    active: true
+  },
+  {
+    id: 'default-banner-4',
+    image_url: 'https://images.unsplash.com/photo-1516455590571-18256e5bb9ff',
+    active: true
+  },
+  {
+    id: 'default-banner-5',
+    image_url: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4',
+    active: true
+  }
+];
 
 export const Banner = () => {
-  const [banners, setBanners] = useState<Banner[]>([defaultBanner]);
+  const [banners, setBanners] = useState<Banner[]>(defaultBanners);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right');
 
@@ -26,24 +48,24 @@ export const Banner = () => {
       const storedBanners = localStorage.getItem('banners');
       console.log("Banner - Dados do localStorage:", storedBanners);
       
-      let activeBanners = [defaultBanner];
-      
       if (storedBanners) {
         const parsedBanners = JSON.parse(storedBanners);
         console.log("Banner - Banners parseados:", parsedBanners);
         
         // Filtra apenas os banners ativos
-        const additionalActiveBanners = parsedBanners.filter((banner: Banner) => banner.active);
+        const activeBanners = parsedBanners.filter((banner: Banner) => banner.active);
         
-        // Combina o banner padrão com os banners adicionais ativos
-        activeBanners = [defaultBanner, ...additionalActiveBanners];
+        if (activeBanners.length > 0) {
+          console.log("Banner - Usando banners do localStorage");
+          setBanners(activeBanners);
+        } else {
+          console.log("Banner - Usando banners padrão pois não há ativos");
+          setBanners(defaultBanners);
+        }
       }
-      
-      console.log("Banner - Banners ativos finais:", activeBanners);
-      setBanners(activeBanners);
     } catch (error) {
       console.error('Erro ao carregar banners:', error);
-      setBanners([defaultBanner]);
+      setBanners(defaultBanners);
     }
   };
 
@@ -74,7 +96,6 @@ export const Banner = () => {
     setCurrentIndex(index);
   };
 
-  // Adiciona o event listener para as teclas
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'ArrowLeft') {
@@ -98,7 +119,7 @@ export const Banner = () => {
   return (
     <div 
       className="relative w-full h-[300px] overflow-hidden mt-16"
-      tabIndex={0} // Adiciona tabIndex para permitir foco no elemento
+      tabIndex={0}
       aria-label="Banner carousel"
     >
       {banners.map((banner, index) => (

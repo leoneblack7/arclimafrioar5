@@ -9,42 +9,54 @@ interface Banner {
   active: boolean;
 }
 
-const defaultBanner: Banner = {
-  id: 'default-banner',
-  image_url: 'https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7',
-  active: true
-};
+const defaultBanners: Banner[] = [
+  {
+    id: 'default-banner-1',
+    image_url: 'https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7',
+    active: true
+  },
+  {
+    id: 'default-banner-2',
+    image_url: 'https://images.unsplash.com/photo-1518770660439-4636190af475',
+    active: true
+  },
+  {
+    id: 'default-banner-3',
+    image_url: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e',
+    active: true
+  },
+  {
+    id: 'default-banner-4',
+    image_url: 'https://images.unsplash.com/photo-1516455590571-18256e5bb9ff',
+    active: true
+  },
+  {
+    id: 'default-banner-5',
+    image_url: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4',
+    active: true
+  }
+];
 
 export const BannerManager = () => {
-  const [banners, setBanners] = useState<Banner[]>([defaultBanner]);
+  const [banners, setBanners] = useState<Banner[]>(defaultBanners);
 
   const loadBanners = () => {
     try {
       console.log("BannerManager - Iniciando carregamento dos banners");
       const storedBanners = localStorage.getItem('banners');
       if (!storedBanners) {
-        console.log("BannerManager - Inicializando com banner padrão");
-        localStorage.setItem('banners', JSON.stringify([defaultBanner]));
-        setBanners([defaultBanner]);
+        console.log("BannerManager - Inicializando com banners padrão");
+        localStorage.setItem('banners', JSON.stringify(defaultBanners));
+        setBanners(defaultBanners);
         return;
       }
       const parsedBanners = JSON.parse(storedBanners);
       console.log("BannerManager - Banners carregados:", parsedBanners);
-      
-      // Verifica se o banner padrão já existe nos banners carregados
-      const hasDefaultBanner = parsedBanners.some((banner: Banner) => banner.id === 'default-banner');
-      
-      // Se não existir, adiciona o banner padrão à lista
-      if (!hasDefaultBanner) {
-        parsedBanners.unshift(defaultBanner);
-      }
-      
       setBanners(parsedBanners);
-      localStorage.setItem('banners', JSON.stringify(parsedBanners));
     } catch (error) {
       console.error('Erro ao carregar banners:', error);
       toast.error('Erro ao carregar os banners');
-      setBanners([defaultBanner]); // Garante que o banner padrão seja exibido em caso de erro
+      setBanners(defaultBanners);
     }
   };
 
@@ -70,8 +82,8 @@ export const BannerManager = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      if (id === 'default-banner') {
-        toast.error("Não é possível excluir o banner padrão");
+      if (id.startsWith('default-banner')) {
+        toast.error("Não é possível excluir os banners padrão");
         return;
       }
 
