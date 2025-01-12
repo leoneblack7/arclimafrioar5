@@ -9,30 +9,11 @@ import Checkout from "@/pages/Checkout";
 import TrackOrder from "@/pages/TrackOrder";
 import About from "@/pages/About";
 
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated } = useAuth();
-  
-  if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
-  }
-
-  return <>{children}</>;
-};
-
 export const AppRoutes = () => {
-  const { isAuthenticated } = useAuth();
-
   return (
     <Routes>
       <Route path="/" element={<Index />} />
-      <Route 
-        path="/admin" 
-        element={
-          <ProtectedRoute>
-            <Admin />
-          </ProtectedRoute>
-        } 
-      />
+      <Route path="/admin" element={<Admin />} />
       <Route path="/produtos" element={<Products />} />
       <Route path="/produto/:id" element={<ProductDetail />} />
       <Route path="/carrinho" element={<Cart />} />
