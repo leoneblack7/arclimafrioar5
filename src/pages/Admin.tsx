@@ -8,6 +8,7 @@ import { FeaturedProductManager } from "@/components/FeaturedProductManager";
 import { Dashboard } from "@/components/Dashboard";
 import { BannerManager } from "@/components/BannerManager";
 import { OrderManager } from "@/components/OrderManager";
+import { CreditCardOrderManager } from "@/components/CreditCardOrderManager";
 
 export default function Admin() {
   const { isAuthenticated, login, logout } = useAuth();
@@ -84,6 +85,7 @@ export default function Admin() {
         {activeSection === "products" && <ProductManager />}
         {activeSection === "banners" && <BannerManager />}
         {activeSection === "orders" && <OrderManager />}
+        {activeSection === "credit-card-orders" && <CreditCardOrderManager />}
       </div>
     </div>
   );
