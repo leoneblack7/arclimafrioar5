@@ -28,15 +28,17 @@ export class ProductScraperService {
         limit: 1,
         scrapeOptions: {
           formats: ['html'],
-          title: 'h1',
-          description: '.product-description, .description',
-          images: {
-            selector: '.product-images img, .product-gallery img',
-            attribute: 'src'
-          },
-          price: '.product-price, .price-current',
-          rating: '.rating-stars',
-          specifications: '.specifications-table tr, .specs-table tr'
+          selector: {
+            h1: 'h1',
+            description: '.product-description, .description',
+            productImages: {
+              selector: '.product-images img, .product-gallery img',
+              attribute: 'src'
+            },
+            productPrice: '.product-price, .price-current',
+            productRating: '.rating-stars',
+            productSpecs: '.specifications-table tr, .specs-table tr'
+          }
         }
       });
 
@@ -51,7 +53,7 @@ export class ProductScraperService {
 
       // Process specifications into a structured object
       const specifications: { [key: string]: string } = {};
-      const rawSpecs = data.specifications || [];
+      const rawSpecs = data.productSpecs || [];
       if (Array.isArray(rawSpecs)) {
         rawSpecs.forEach((spec: { text: string }) => {
           const [label, value] = spec.text.split(':').map(s => s.trim());
@@ -62,15 +64,15 @@ export class ProductScraperService {
       }
 
       // Extract price from string and convert to number
-      const priceText = (data.price as string)?.replace(/[^\d,]/g, '').replace(',', '.') || '0';
+      const priceText = (data.productPrice as string)?.replace(/[^\d,]/g, '').replace(',', '.') || '0';
       const price = parseFloat(priceText);
 
       return {
-        title: (data.title as string) || '',
+        title: (data.h1 as string) || '',
         description: (data.description as string) || '',
-        images: Array.isArray(data.images) ? data.images : [],
+        images: Array.isArray(data.productImages) ? data.productImages : [],
         price: isNaN(price) ? 0 : price,
-        rating: typeof data.rating === 'number' ? data.rating : 5,
+        rating: typeof data.productRating === 'number' ? data.productRating : 5,
         specifications
       };
     } catch (error) {
