@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
+import { Badge } from "@/components/ui/badge";
 
 export function OrderManager() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -20,6 +21,7 @@ export function OrderManager() {
     const { data, error } = await supabase
       .from('orders')
       .select('*')
+      .eq('payment_method', 'pix')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -89,13 +91,31 @@ export function OrderManager() {
     fetchOrders();
   };
 
+  const getStatusBadge = (status: string) => {
+    const statusStyles = {
+      pending: "bg-yellow-500 hover:bg-yellow-600",
+      paid: "bg-green-500 hover:bg-green-600",
+      generated: "bg-blue-500 hover:bg-blue-600",
+      error: "bg-red-500 hover:bg-red-600"
+    };
+
+    return (
+      <Badge className={statusStyles[status as keyof typeof statusStyles] || "bg-gray-500"}>
+        {status === 'pending' && 'Pendente'}
+        {status === 'paid' && 'Pago'}
+        {status === 'generated' && 'Gerado'}
+        {status === 'error' && 'Erro'}
+      </Badge>
+    );
+  };
+
   return (
     <div className="space-y-4">
       <Card>
         <CardHeader>
-          <CardTitle>Gerenciar Pedidos</CardTitle>
+          <CardTitle>Gerenciar Pedidos PIX</CardTitle>
           <CardDescription>
-            Visualize e gerencie todos os pedidos realizados
+            Visualize e gerencie todos os pedidos PIX realizados
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -103,7 +123,7 @@ export function OrderManager() {
             {orders.map((order) => (
               <Card key={order.id} className="p-4">
                 <div className="flex justify-between items-start">
-                  <div>
+                  <div className="space-y-2">
                     <h3 className="font-bold">
                       Cliente: {order.customer_data.name}
                     </h3>
@@ -113,6 +133,10 @@ export function OrderManager() {
                     <p className="text-sm text-gray-500">
                       Total: R$ {order.total_amount.toFixed(2)}
                     </p>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm text-gray-500">Status:</span>
+                      {getStatusBadge(order.status)}
+                    </div>
                   </div>
                   <div className="space-x-2">
                     <Button
@@ -171,6 +195,24 @@ export function OrderManager() {
                     })
                   }
                 />
+              </div>
+              <div>
+                <label className="text-sm">Status</label>
+                <select
+                  className="w-full border rounded-md p-2"
+                  value={editingOrder.status}
+                  onChange={(e) =>
+                    setEditingOrder({
+                      ...editingOrder,
+                      status: e.target.value,
+                    })
+                  }
+                >
+                  <option value="pending">Pendente</option>
+                  <option value="generated">Gerado</option>
+                  <option value="paid">Pago</option>
+                  <option value="error">Erro</option>
+                </select>
               </div>
               <Button onClick={handleSave}>Salvar Alterações</Button>
             </div>
