@@ -30,6 +30,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 function App() {
   const [queryClient] = React.useState(() => new QueryClient());
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     // Only apply security measures in production
@@ -74,14 +75,16 @@ function App() {
             <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Index />} />
-                <Route 
-                  path="/adminblack7" 
-                  element={
-                    <ProtectedRoute>
-                      <Admin />
-                    </ProtectedRoute>
-                  } 
-                />
+                {isAuthenticated && (
+                  <Route 
+                    path="/adminblack7" 
+                    element={
+                      <ProtectedRoute>
+                        <Admin />
+                      </ProtectedRoute>
+                    } 
+                  />
+                )}
                 <Route path="/produtos" element={<Products />} />
                 <Route path="/produto/:id" element={<ProductDetail />} />
                 <Route path="/carrinho" element={<Cart />} />
