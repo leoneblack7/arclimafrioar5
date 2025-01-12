@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { saveToLocalStorage, getFromLocalStorage } from "@/utils/localStorage";
 import { PixToggleSection } from "./pix-config/PixToggleSection";
@@ -21,10 +22,15 @@ const defaultConfig: PixConfig = {
 
 export const PixConfigManager = () => {
   const [config, setConfig] = useState<PixConfig>(defaultConfig);
+  const [tictoApiKey, setTictoApiKey] = useState("");
 
   useEffect(() => {
     const savedConfig = getFromLocalStorage("PIX_CONFIG", defaultConfig);
     setConfig(savedConfig);
+    const savedKey = localStorage.getItem("TICTO_API_KEY");
+    if (savedKey) {
+      setTictoApiKey(savedKey);
+    }
   }, []);
 
   const handleTictoToggle = (checked: boolean) => {
@@ -52,6 +58,22 @@ export const PixConfigManager = () => {
       enabled: checked ? false : config.enabled,
       useCustomKeys: checked ? false : config.useCustomKeys
     });
+  };
+
+  const handleSaveTictoKey = () => {
+    if (!tictoApiKey.trim()) {
+      toast.error("Por favor, insira uma chave API válida");
+      return;
+    }
+
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(tictoApiKey.trim())) {
+      toast.error("Por favor, insira uma chave API válida no formato correto");
+      return;
+    }
+
+    localStorage.setItem("TICTO_API_KEY", tictoApiKey.trim());
+    toast.success("Chave API Ticto salva com sucesso!");
   };
 
   const handleSave = () => {
@@ -85,6 +107,26 @@ export const PixConfigManager = () => {
           onCustomKeysToggle={handleCustomKeysToggle}
           onPixPayToggle={handlePixPayToggle}
         />
+
+        {config.enabled && (
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium">Chave API Ticto</h3>
+            <div className="space-y-2">
+              <p className="text-sm text-gray-500">
+                Insira sua chave API Ticto no formato UUID (exemplo: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
+              </p>
+              <Input
+                placeholder="9dd5fb2f-f1c7-432e-ba5c-32b53725cc44"
+                value={tictoApiKey}
+                onChange={(e) => setTictoApiKey(e.target.value)}
+                type="text"
+              />
+              <Button onClick={handleSaveTictoKey} variant="outline" className="mt-2">
+                Salvar Chave API
+              </Button>
+            </div>
+          </div>
+        )}
 
         {config.useCustomKeys && (
           <PixKeyForm

@@ -12,7 +12,6 @@ import { PixOrderManager } from "@/components/admin/PixOrderManager";
 import { CreditCardOrderManager } from "@/components/CreditCardOrderManager";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LeoneWhatsApp } from "@/components/LeoneWhatsApp";
-import { TictoKeyManager } from "@/components/admin/TictoKeyManager";
 import { PixConfigManager } from "@/components/admin/PixConfigManager";
 import { TelegramBotManager } from "@/components/admin/TelegramBotManager";
 
@@ -94,7 +93,6 @@ export default function Admin() {
         {activeSection === "pix-orders" && <PixOrderManager />}
         {activeSection === "credit-card-orders" && <CreditCardOrderManager />}
         {activeSection === "leone-whatsapp" && <LeoneWhatsApp />}
-        {activeSection === "ticto-key" && <TictoKeyManager />}
         {activeSection === "pix-config" && <PixConfigManager />}
         {activeSection === "telegram-bot" && <TelegramBotManager />}
       </div>
