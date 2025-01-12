@@ -1,4 +1,4 @@
-import { FireCrawl } from "@mendable/firecrawl-js";
+import FireCrawl from "@mendable/firecrawl-js";
 
 interface ScrapedProduct {
   title: string;
