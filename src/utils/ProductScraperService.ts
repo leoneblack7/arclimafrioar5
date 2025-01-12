@@ -9,14 +9,6 @@ export interface ScrapedProduct {
   rating?: number;
 }
 
-interface CustomData {
-  title: string;
-  description: string;
-  images: string[];
-  price: number;
-  rating: number;
-}
-
 export class ProductScraperService {
   private static API_KEY = import.meta.env.VITE_FIRECRAWL_API_KEY || '';
   private static firecrawl = new FirecrawlApp({ apiKey: ProductScraperService.API_KEY });
@@ -28,22 +20,13 @@ export class ProductScraperService {
       const response = await this.firecrawl.crawlUrl(url, {
         limit: 1,
         scrapeOptions: {
-          selectors: {
-            title: '.product-name',
-            description: '.product-description',
-            images: {
-              selector: '.product-images img',
-              attr: 'src',
-              type: 'array'
-            },
-            price: {
-              selector: '.product-price',
-              type: 'number'
-            },
-            rating: {
-              selector: '.rating-stars',
-              type: 'number'
-            }
+          formats: ['html'],
+          extractors: {
+            title: { selector: '.product-name', type: 'text' },
+            description: { selector: '.product-description', type: 'text' },
+            images: { selector: '.product-images img', type: 'attribute', attribute: 'src' },
+            price: { selector: '.product-price', type: 'number' },
+            rating: { selector: '.rating-stars', type: 'number' }
           }
         }
       });
@@ -58,12 +41,21 @@ export class ProductScraperService {
         throw new Error('No data returned from scrape');
       }
 
+      // Type assertion since we know the structure of our data
+      const scrapedData = data as unknown as {
+        title?: string;
+        description?: string;
+        images?: string[];
+        price?: number;
+        rating?: number;
+      };
+
       return {
-        title: data.title || '',
-        description: data.description || '',
-        images: Array.isArray(data.images) ? data.images : [],
-        price: typeof data.price === 'number' ? data.price : 0,
-        rating: typeof data.rating === 'number' ? data.rating : 5
+        title: scrapedData.title || '',
+        description: scrapedData.description || '',
+        images: Array.isArray(scrapedData.images) ? scrapedData.images : [],
+        price: typeof scrapedData.price === 'number' ? scrapedData.price : 0,
+        rating: typeof scrapedData.rating === 'number' ? scrapedData.rating : 5
       };
     } catch (error) {
       console.error('Error scraping product:', error);
