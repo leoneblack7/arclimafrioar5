@@ -22,6 +22,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { Pencil, Trash2 } from "lucide-react";
+import FirecrawlApp from '@mendable/firecrawl-js';
 
 interface Product {
   id: number;
@@ -84,6 +85,57 @@ const initialProducts: Product[] = [
   }
 ];
 
+export class ProductScraperService {
+  private static API_KEY = process.env.FIRECRAWL_API_KEY || '';
+  private static firecrawl = new FirecrawlApp({ apiKey: ProductScraperService.API_KEY });
+
+  static async scrapeProduct(url: string): Promise<ScrapedProduct | null> {
+    try {
+      console.log('Starting product scrape:', url);
+      
+      const response = await this.firecrawl.crawlUrl(url, {
+        limit: 1,
+        scrapeOptions: {
+          selectors: {
+            title: '.product-name',
+            description: '.product-description',
+            images: {
+              selector: '.product-images img',
+              attr: 'src'
+            },
+            price: {
+              selector: '.product-price',
+              type: 'number'
+            },
+            rating: {
+              selector: '.rating-stars',
+              type: 'number'
+            }
+          }
+        }
+      });
+
+      if (!response.success) {
+        throw new Error('Failed to scrape product');
+      }
+
+      const data = response.data[0];
+      
+      return {
+        title: data.title || '',
+        description: data.description || '',
+        images: Array.isArray(data.images) ? data.images : [],
+        price: parseFloat(data.price) || 0,
+        rating: parseFloat(data.rating) || 5
+      };
+    } catch (error) {
+      console.error('Error scraping product:', error);
+      toast.error("Erro ao importar produto. Verifique o link e tente novamente.");
+      return null;
+    }
+  }
+}
+
 export default function Admin() {
   const { isAuthenticated, login, logout } = useAuth();
   const navigate = useNavigate();
@@ -92,6 +144,8 @@ export default function Admin() {
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [importUrl, setImportUrl] = useState("");
+  const [isImporting, setIsImporting] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -141,9 +195,33 @@ export default function Admin() {
     }
   };
 
-  const handleImportProduct = async (url: string) => {
-    // Aqui será implementada a lógica de importação do produto
-    toast.success("Produto importado com sucesso!");
+  const handleImportProduct = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsImporting(true);
+
+    try {
+      const scrapedProduct = await ProductScraperService.scrapeProduct(importUrl);
+      
+      if (scrapedProduct) {
+        const newProduct = {
+          id: products.length + 1,
+          title: scrapedProduct.title,
+          price: scrapedProduct.price,
+          image: scrapedProduct.images[0] || '',
+          description: scrapedProduct.description,
+          active: true
+        };
+
+        setProducts([...products, newProduct]);
+        setImportUrl("");
+        toast.success("Produto importado com sucesso!");
+      }
+    } catch (error) {
+      console.error('Error importing product:', error);
+      toast.error("Erro ao importar produto. Verifique o link e tente novamente.");
+    } finally {
+      setIsImporting(false);
+    }
   };
 
   if (!isAuthenticated) {
@@ -237,16 +315,19 @@ export default function Admin() {
             <CardTitle>Importar Produto</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex gap-4">
+            <form onSubmit={handleImportProduct} className="flex gap-4">
               <Input
                 type="url"
+                value={importUrl}
+                onChange={(e) => setImportUrl(e.target.value)}
                 placeholder="Cole o link do produto aqui"
                 className="flex-1"
+                required
               />
-              <Button onClick={() => handleImportProduct("")}>
-                Importar
+              <Button type="submit" disabled={isImporting}>
+                {isImporting ? "Importando..." : "Importar"}
               </Button>
-            </div>
+            </form>
           </CardContent>
         </Card>
 
