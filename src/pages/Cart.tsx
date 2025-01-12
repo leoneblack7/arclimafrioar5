@@ -4,9 +4,10 @@ import { CartPayment } from "@/components/cart/CartPayment";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 import { getFromLocalStorage, saveToLocalStorage } from "@/utils/localStorage";
+import { generateOrderId } from "@/utils/orderUtils";
 
 const Cart = () => {
-  const { cartItems, total, clearCart } = useCart();
+  const { items, total, clearCart } = useCart();
   const [paymentMethod, setPaymentMethod] = useState<"pix" | "credit">("pix");
   const navigate = useNavigate();
 
@@ -16,7 +17,7 @@ const Cart = () => {
       const order = {
         id: generateOrderId(),
         timestamp: Date.now(),
-        product: cartItems,
+        product: items,
         customer: { document: "01387246607" }, // Test CPF
         total,
         payment_method: 'pix',
@@ -39,7 +40,7 @@ const Cart = () => {
       {/* Render cart items and total */}
       <CartPayment
         total={total}
-        disabled={cartItems.length === 0}
+        disabled={items.length === 0}
         paymentMethod={paymentMethod}
         onPaymentMethodChange={setPaymentMethod}
         onCheckout={handleCheckout}
