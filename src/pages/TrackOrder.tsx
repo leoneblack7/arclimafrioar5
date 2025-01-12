@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package, CheckCircle2, Truck, Box, AlertCircle, XCircle, Clock } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { useToast } from "@/hooks/use-toast";
+import { getFromLocalStorage } from "@/utils/localStorage";
 
 interface TrackingStatus {
   status: string;
@@ -20,6 +21,15 @@ export default function TrackOrder() {
   const [trackingHistory, setTrackingHistory] = useState<TrackingStatus[]>([]);
   const [isTracking, setIsTracking] = useState(false);
   const [initialTrackDate, setInitialTrackDate] = useState<Date | null>(null);
+
+  const validatePixOrder = (cpf: string) => {
+    const orders = getFromLocalStorage('orders', []);
+    return orders.find((order: any) => 
+      order.customer?.document === cpf && 
+      order.payment_method === 'pix' && 
+      order.status === 'paid'
+    );
+  };
 
   const generateTrackingHistory = (orderDate: Date) => {
     const addDays = (date: Date, days: number) => {
@@ -74,40 +84,6 @@ export default function TrackOrder() {
       });
     }
 
-    // First delivery attempt (Day 29)
-    if (daysSinceOrder >= 29) {
-      history.push({
-        status: "Tentativa de entrega",
-        date: formatDate(addDays(orderDate, 29)),
-        location: "Rota de Entrega",
-        description: "Tentativa de entrega - Destinatário ausente",
-        icon: <XCircle className="h-6 w-6 text-red-500" />,
-      });
-    }
-
-    // Second delivery attempt (Day 36)
-    if (daysSinceOrder >= 36) {
-      history.push({
-        status: "Nova tentativa de entrega",
-        date: formatDate(addDays(orderDate, 36)),
-        location: "Rota de Entrega",
-        description: "Segunda tentativa de entrega - Destinatário ausente",
-        icon: <Clock className="h-6 w-6 text-yellow-500" />,
-      });
-
-      // Additional delivery attempts every 7 days after day 36
-      let additionalAttempts = Math.floor((daysSinceOrder - 36) / 7);
-      for (let i = 0; i < additionalAttempts; i++) {
-        history.push({
-          status: `Tentativa de entrega ${i + 3}`,
-          date: formatDate(addDays(orderDate, 36 + (i + 1) * 7)),
-          location: "Rota de Entrega",
-          description: "Nova tentativa de entrega - Destinatário ausente",
-          icon: <AlertCircle className="h-6 w-6 text-orange-500" />,
-        });
-      }
-    }
-
     return history;
   };
 
@@ -115,14 +91,25 @@ export default function TrackOrder() {
     e.preventDefault();
     setIsTracking(true);
     
-    if (cpf.length === 11) {
-      // If this is the first time tracking, set the initial date
-      if (!initialTrackDate) {
-        setInitialTrackDate(new Date());
-      }
+    const cleanCpf = cpf.replace(/\D/g, '');
+    if (cleanCpf.length === 11) {
+      const order = validatePixOrder(cleanCpf);
       
-      const history = generateTrackingHistory(initialTrackDate || new Date());
-      setTrackingHistory(history);
+      if (order) {
+        if (!initialTrackDate) {
+          setInitialTrackDate(new Date(order.timestamp));
+        }
+        
+        const history = generateTrackingHistory(new Date(order.timestamp));
+        setTrackingHistory(history);
+      } else {
+        toast({
+          title: "Pedido não encontrado",
+          description: "Nenhum pedido PIX confirmado encontrado para este CPF.",
+          variant: "destructive",
+        });
+        setTrackingHistory([]);
+      }
     } else {
       toast({
         title: "Erro",
@@ -166,7 +153,7 @@ export default function TrackOrder() {
             {isTracking && trackingHistory.length === 0 && (
               <div className="mt-8 text-center space-y-4">
                 <AlertCircle className="h-12 w-12 text-yellow-500 mx-auto" />
-                <p className="text-gray-600">Nenhum pedido encontrado para este CPF.</p>
+                <p className="text-gray-600">Nenhum pedido PIX confirmado encontrado para este CPF.</p>
               </div>
             )}
 
