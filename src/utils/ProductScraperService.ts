@@ -1,4 +1,4 @@
-import FirecrawlApp, { FirecrawlDocument } from '@mendable/firecrawl-js';
+import FirecrawlApp from '@mendable/firecrawl-js';
 import { toast } from "sonner";
 
 export interface ScrapedProduct {
@@ -25,7 +25,7 @@ export class ProductScraperService {
     try {
       console.log('Starting product scrape:', url);
       
-      const response = await this.firecrawl.crawlUrl<CustomData>(url, {
+      const response = await this.firecrawl.crawlUrl(url, {
         limit: 1,
         scrapeOptions: {
           selectors: {
@@ -54,6 +54,10 @@ export class ProductScraperService {
 
       const data = response.data[0];
       
+      if (!data) {
+        throw new Error('No data returned from scrape');
+      }
+
       return {
         title: data.title || '',
         description: data.description || '',
