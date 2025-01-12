@@ -7,6 +7,12 @@ interface CartItem {
 
 export const sendTictoWebhookV2 = async (items: CartItem[], customerData?: any) => {
   try {
+    const apiKey = localStorage.getItem("TICTO_API_KEY");
+    if (!apiKey) {
+      console.error("Chave API Ticto não encontrada");
+      return null;
+    }
+
     const totalAmount = items.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
     
     const payload = {
@@ -27,7 +33,7 @@ export const sendTictoWebhookV2 = async (items: CartItem[], customerData?: any) 
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${import.meta.env.VITE_TICTO_API_KEY}`
+        'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify(payload)
     });
