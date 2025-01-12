@@ -7,6 +7,7 @@ import { ProductsSection } from "@/components/home/ProductsSection";
 import { CTASection } from "@/components/home/CTASection";
 import { Footer } from "@/components/home/Footer";
 import { supabase } from "@/integrations/supabase/client";
+import { Product, DatabaseProduct } from "@/types/product";
 
 const Index = () => {
   const { data: products, isLoading } = useQuery({
@@ -22,7 +23,14 @@ const Index = () => {
         return [];
       }
       
-      return data || [];
+      return (data || []).map((item: DatabaseProduct) => ({
+        id: item.id,
+        title: item.title,
+        price: item.price,
+        image: item.image_url,
+        description: item.description,
+        active: item.active || false
+      }));
     }
   });
 

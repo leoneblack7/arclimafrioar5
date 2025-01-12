@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "./ui/button";
 import { Plus } from "lucide-react";
 import { Dialog } from "./ui/dialog";
@@ -8,15 +8,7 @@ import { ProductsTable } from "./admin/ProductsTable";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-
-interface Product {
-  id: string;
-  title: string;
-  price: number;
-  image_url: string;
-  description: string;
-  active: boolean;
-}
+import { Product, DatabaseProduct } from "@/types/product";
 
 export const ProductManager = () => {
   const queryClient = useQueryClient();
@@ -35,34 +27,44 @@ export const ProductManager = () => {
         throw error;
       }
       
-      return data || [];
+      return (data || []).map((item: DatabaseProduct) => ({
+        id: item.id,
+        title: item.title,
+        price: item.price,
+        image: item.image_url,
+        description: item.description,
+        active: item.active || false
+      }));
     }
   });
 
   const handleNewProduct = () => {
-    const newProduct: Partial<Product> = {
+    const newProduct: Product = {
+      id: "",
       title: "Novo Produto",
       price: 0,
-      image_url: "/placeholder.svg",
+      image: "/placeholder.svg",
       description: "Descrição do novo produto",
       active: true
     };
-    setEditingProduct(newProduct as Product);
+    setEditingProduct(newProduct);
     setIsDialogOpen(true);
   };
 
   const handleSaveProduct = async (updatedProduct: Product) => {
     try {
+      const productData = {
+        title: updatedProduct.title,
+        price: updatedProduct.price,
+        image_url: updatedProduct.image,
+        description: updatedProduct.description,
+        active: updatedProduct.active
+      };
+
       if (updatedProduct.id) {
         const { error } = await supabase
           .from('products')
-          .update({
-            title: updatedProduct.title,
-            price: updatedProduct.price,
-            image_url: updatedProduct.image_url,
-            description: updatedProduct.description,
-            active: updatedProduct.active
-          })
+          .update(productData)
           .eq('id', updatedProduct.id);
 
         if (error) throw error;
@@ -70,13 +72,7 @@ export const ProductManager = () => {
       } else {
         const { error } = await supabase
           .from('products')
-          .insert([{
-            title: updatedProduct.title,
-            price: updatedProduct.price,
-            image_url: updatedProduct.image_url,
-            description: updatedProduct.description,
-            active: updatedProduct.active
-          }]);
+          .insert([productData]);
 
         if (error) throw error;
         toast.success("Produto adicionado com sucesso!");
