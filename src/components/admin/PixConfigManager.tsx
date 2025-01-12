@@ -5,14 +5,18 @@ import { toast } from "sonner";
 import { saveToLocalStorage, getFromLocalStorage } from "@/utils/localStorage";
 import { PixToggleSection } from "./pix-config/PixToggleSection";
 import { PixKeyForm } from "./pix-config/PixKeyForm";
+import { PixPayForm } from "./pix-config/PixPayForm";
 import { PixConfig } from "@/types/pix";
 
 const defaultConfig: PixConfig = {
   enabled: false,
   useCustomKeys: false,
+  usePixPay: false,
   pixKey: "",
   pixName: "",
   pixCity: "",
+  pixPayClientId: "",
+  pixPayClientSecret: "",
 };
 
 export const PixConfigManager = () => {
@@ -27,7 +31,8 @@ export const PixConfigManager = () => {
     setConfig({
       ...config,
       enabled: checked,
-      useCustomKeys: checked ? false : config.useCustomKeys
+      useCustomKeys: checked ? false : config.useCustomKeys,
+      usePixPay: checked ? false : config.usePixPay
     });
   };
 
@@ -35,7 +40,17 @@ export const PixConfigManager = () => {
     setConfig({
       ...config,
       useCustomKeys: checked,
-      enabled: checked ? false : config.enabled
+      enabled: checked ? false : config.enabled,
+      usePixPay: checked ? false : config.usePixPay
+    });
+  };
+
+  const handlePixPayToggle = (checked: boolean) => {
+    setConfig({
+      ...config,
+      usePixPay: checked,
+      enabled: checked ? false : config.enabled,
+      useCustomKeys: checked ? false : config.useCustomKeys
     });
   };
 
@@ -47,6 +62,8 @@ export const PixConfigManager = () => {
       message = "Integração Ticto PIX está ativada";
     } else if (config.useCustomKeys) {
       message = "Chaves PIX personalizadas estão ativadas";
+    } else if (config.usePixPay) {
+      message = "Integração PixPay.pro está ativada";
     } else {
       message = "Nenhuma integração PIX está ativada";
     }
@@ -66,10 +83,18 @@ export const PixConfigManager = () => {
           config={config}
           onTictoToggle={handleTictoToggle}
           onCustomKeysToggle={handleCustomKeysToggle}
+          onPixPayToggle={handlePixPayToggle}
         />
 
         {config.useCustomKeys && (
           <PixKeyForm
+            config={config}
+            onConfigChange={setConfig}
+          />
+        )}
+
+        {config.usePixPay && (
+          <PixPayForm
             config={config}
             onConfigChange={setConfig}
           />
