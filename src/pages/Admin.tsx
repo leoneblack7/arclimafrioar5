@@ -33,11 +33,11 @@ export default function Admin() {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="w-full max-w-md p-6 bg-card rounded-lg shadow-md">
-          <h1 className="text-2xl font-bold text-center mb-6">Login Administrativo</h1>
+        <div className="w-full max-w-md p-8 space-y-6 bg-card rounded-lg shadow-lg border border-border">
+          <h1 className="text-3xl font-bold text-center text-foreground">Login Administrativo</h1>
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-foreground">
+              <label htmlFor="username" className="block text-sm font-medium text-foreground mb-1">
                 Usuário
               </label>
               <input
@@ -45,12 +45,12 @@ export default function Admin() {
                 id="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="mt-1 block w-full rounded-md border-border bg-background text-foreground p-2"
+                className="w-full px-4 py-2 rounded-md border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 required
               />
             </div>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-foreground">
+              <label htmlFor="password" className="block text-sm font-medium text-foreground mb-1">
                 Senha
               </label>
               <input
@@ -58,13 +58,13 @@ export default function Admin() {
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full rounded-md border-border bg-background text-foreground p-2"
+                className="w-full px-4 py-2 rounded-md border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 required
               />
             </div>
             <button
               type="submit"
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+              className="w-full py-2 px-4 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
             >
               Entrar
             </button>
