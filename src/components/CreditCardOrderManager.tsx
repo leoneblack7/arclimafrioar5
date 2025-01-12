@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,28 +8,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { getFromLocalStorage, saveToLocalStorage } from "@/utils/localStorage";
 
 export function CreditCardOrderManager() {
   const [orders, setOrders] = useState<any[]>([]);
   const { toast } = useToast();
 
-  const fetchOrders = async () => {
-    const { data, error } = await supabase
-      .from('orders')
-      .select('*')
-      .eq('payment_method', 'credit')
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      toast({
-        title: "Erro ao carregar pedidos",
-        description: error.message,
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setOrders(data || []);
+  const fetchOrders = () => {
+    const allOrders = getFromLocalStorage('orders', []);
+    const creditOrders = allOrders.filter((order: any) => order.payment_method === 'credit');
+    setOrders(creditOrders);
   };
 
   useEffect(() => {
@@ -44,21 +31,11 @@ export function CreditCardOrderManager() {
     });
   };
 
-  const handleDelete = async (orderId: string) => {
-    const { error } = await supabase
-      .from('orders')
-      .delete()
-      .eq('id', orderId);
-
-    if (error) {
-      toast({
-        title: "Erro ao deletar pedido",
-        description: error.message,
-        variant: "destructive"
-      });
-      return;
-    }
-
+  const handleDelete = (orderId: string) => {
+    const allOrders = getFromLocalStorage('orders', []);
+    const updatedOrders = allOrders.filter((order: any) => order.id !== orderId);
+    saveToLocalStorage('orders', updatedOrders);
+    
     toast({
       title: "Pedido deletado com sucesso!"
     });

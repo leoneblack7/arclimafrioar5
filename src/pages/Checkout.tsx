@@ -2,11 +2,11 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { CustomerForm } from "@/components/checkout/CustomerForm";
 import { PaymentMethodSelector } from "@/components/checkout/PaymentMethodSelector";
 import { CreditCardForm } from "@/components/checkout/CreditCardForm";
+import { saveToLocalStorage, getFromLocalStorage } from "@/utils/localStorage";
 
 export default function Checkout() {
   const { items, total, clearCart } = useCart();
@@ -41,15 +41,13 @@ export default function Checkout() {
         payment_method: paymentMethod,
         credit_card_data: paymentMethod === "credit" ? creditCardData : null,
         status: "pending",
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
+        id: Date.now().toString() // Gerando um ID único
       };
 
-      // Primeiro salvamos os dados do pedido
-      const { error: saveError } = await supabase
-        .from('orders')
-        .insert([orderData]);
-
-      if (saveError) throw saveError;
+      // Salvando no localStorage
+      const existingOrders = getFromLocalStorage('orders', []);
+      saveToLocalStorage('orders', [...existingOrders, orderData]);
 
       if (paymentMethod === "credit") {
         // Simulamos um erro no processamento do pagamento
