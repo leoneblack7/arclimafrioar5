@@ -1,14 +1,13 @@
 import { useParams } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
-import { ProductPrice } from "@/components/product/ProductPrice";
-import { ProductSpecifications } from "@/components/product/ProductSpecifications";
-import { ProductActions } from "@/components/product/ProductActions";
 import { useQuery } from "@tanstack/react-query";
 import { getFromLocalStorage } from "@/utils/localStorage";
+import { Heart } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ProductGallery } from "@/components/product/ProductGallery";
+import { ProductSpecs } from "@/components/product/ProductSpecs";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -45,30 +44,19 @@ export default function ProductDetail() {
       <div className="min-h-screen bg-gray-50">
         <Navbar />
         <div className="container mx-auto px-4 pt-24">
-          <Card>
-            <CardContent className="p-8 text-center">
-              <h1 className="text-2xl font-bold text-gray-900">Produto não encontrado</h1>
-              <Button onClick={() => navigate("/produtos")} className="mt-4">
-                Voltar para Produtos
-              </Button>
-            </CardContent>
-          </Card>
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-gray-900">Produto não encontrado</h1>
+            <Button onClick={() => navigate("/produtos")} className="mt-4">
+              Voltar para Produtos
+            </Button>
+          </div>
         </div>
       </div>
     );
   }
 
-  const handleAddToCart = () => {
-    addItem({
-      id: product.id,
-      title: product.title,
-      price: product.price,
-      image: product.image
-    });
-  };
-
   const handleBuyNow = () => {
-    handleAddToCart();
+    addItem(product);
     navigate("/checkout");
   };
 
@@ -76,38 +64,58 @@ export default function ProductDetail() {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <div className="container mx-auto px-4 pt-24">
-        <Card>
-          <CardContent className="p-8">
-            <div className="grid md:grid-cols-2 gap-8">
-              <div className="space-y-4">
-                <img
-                  src={product.image}
-                  alt={product.title}
-                  className="w-full rounded-lg object-cover aspect-square"
-                />
-                <div className="grid grid-cols-4 gap-2">
-                  {[...Array(4)].map((_, index) => (
-                    <img
-                      key={index}
-                      src={product.image}
-                      alt={`${product.title} - Imagem ${index + 1}`}
-                      className="w-full rounded-lg object-cover aspect-square cursor-pointer hover:opacity-80 transition-opacity"
-                    />
-                  ))}
-                </div>
+        <div className="grid md:grid-cols-2 gap-8">
+          <ProductGallery images={[product.image]} />
+          <div className="space-y-6">
+            <div className="flex justify-between items-start">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">{product.title}</h1>
+                <p className="text-sm text-gray-500">Código: {product.id}</p>
               </div>
-              <div className="space-y-6">
-                <h1 className="text-3xl font-bold text-gray-900">{product.title}</h1>
-                <ProductPrice price={product.price} className="text-2xl" />
-                <div className="prose max-w-none">
-                  <p className="text-gray-600">{product.description}</p>
-                </div>
-                <ProductSpecifications className="h-12" />
-                <ProductActions onAddToCart={handleAddToCart} onBuyNow={handleBuyNow} />
+              <Button variant="ghost" size="icon">
+                <Heart className="h-6 w-6" />
+              </Button>
+            </div>
+            
+            <ProductSpecs />
+
+            <div className="space-y-2">
+              <div className="text-3xl font-bold text-primary">
+                {product.price.toLocaleString('pt-BR', { 
+                  style: 'currency', 
+                  currency: 'BRL' 
+                })}
+              </div>
+              <p className="text-sm text-gray-500">
+                Ou 10x de {(product.price / 10).toLocaleString('pt-BR', { 
+                  style: 'currency', 
+                  currency: 'BRL' 
+                })}
+              </p>
+              <Button 
+                className="w-full bg-orange-500 hover:bg-orange-600 mt-4" 
+                size="lg"
+                onClick={handleBuyNow}
+              >
+                COMPRAR AGORA
+              </Button>
+            </div>
+
+            <div className="border rounded-lg p-4">
+              <p className="text-sm font-medium mb-2">Calcule o valor do Frete e Prazo de entrega</p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Digite seu CEP"
+                  className="flex-1 border rounded px-3 py-2 text-sm"
+                />
+                <Button variant="outline" size="sm">
+                  Calcular
+                </Button>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );
