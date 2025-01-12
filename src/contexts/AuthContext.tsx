@@ -57,13 +57,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return true;
     }
     
-    // Check for additional users
-    const savedUsername = getFromLocalStorage("current_username", "leone");
-    if (username === savedUsername && password === "2601") {
+    // Check additional users
+    const additionalUsers = getFromLocalStorage('additional_users', []);
+    const user = additionalUsers.find((u: any) => u.username === username && u.password === password);
+    
+    if (user) {
       localStorage.setItem("auth_token", "admin_token");
       localStorage.setItem("last_login", new Date().toISOString());
       setIsAuthenticated(true);
       setCurrentUsername(username);
+      saveToLocalStorage("current_username", username);
       toast({
         title: "Login realizado com sucesso!",
         description: "Bem-vindo ao painel administrativo.",
@@ -89,21 +92,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const currentSavedUsername = getFromLocalStorage("current_username", "leone");
-    if (oldUsername === currentSavedUsername) {
-      saveToLocalStorage("current_username", newUsername);
+    const additionalUsers = getFromLocalStorage('additional_users', []);
+    const updatedUsers = additionalUsers.map((user: any) => 
+      user.username === oldUsername ? { ...user, username: newUsername } : user
+    );
+    
+    saveToLocalStorage('additional_users', updatedUsers);
+    
+    if (currentUsername === oldUsername) {
       setCurrentUsername(newUsername);
-      toast({
-        title: "Usuário alterado com sucesso!",
-        description: `Nome de usuário alterado de ${oldUsername} para ${newUsername}.`,
-      });
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Erro na alteração",
-        description: "Usuário antigo não corresponde ao usuário atual.",
-      });
+      saveToLocalStorage("current_username", newUsername);
     }
+    
+    toast({
+      title: "Usuário alterado com sucesso!",
+      description: `Nome de usuário alterado de ${oldUsername} para ${newUsername}.`,
+    });
   };
 
   const logout = () => {
