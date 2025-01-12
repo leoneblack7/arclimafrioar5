@@ -3,15 +3,7 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-
-interface Product {
-  id: number;
-  title: string;
-  price: number;
-  image: string;
-  description: string;
-  active: boolean;
-}
+import { Product } from "@/types/product";
 
 interface ProductsTableProps {
   products: Product[];
@@ -29,7 +21,6 @@ export const ProductsTable = ({ products, onEdit, onDelete, onToggleActive }: Pr
   };
 
   const formatProductCode = (id: number) => {
-    // Garante que o código tenha pelo menos 5 dígitos
     return String(id).padStart(5, '0');
   };
 
