@@ -34,12 +34,26 @@ const featuredProducts = [
     image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7",
     description: "Sistema multi split para até 3 ambientes, com tecnologia inverter e controle individual",
   },
+  {
+    id: 5,
+    title: "Ar Condicionado Cassete 36000 BTUs",
+    price: 5999.99,
+    image: "https://images.unsplash.com/photo-1518770660439-4636190af475",
+    description: "Ideal para ambientes comerciais, com distribuição uniforme do ar e instalação no teto",
+  },
+  {
+    id: 6,
+    title: "Split Piso Teto 48000 BTUs",
+    price: 7299.99,
+    image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e",
+    description: "Versátil e potente, perfeito para grandes ambientes comerciais ou industriais",
+  }
 ];
 
 const Index = () => {
   const { data: products, isLoading } = useQuery({
     queryKey: ["products"],
-    queryFn: () => Promise.resolve(featuredProducts), // Temporary mock fetch
+    queryFn: () => Promise.resolve(featuredProducts),
   });
 
   return (
@@ -109,7 +123,7 @@ const Index = () => {
           {isLoading ? (
             <div className="text-center">Carregando produtos...</div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {products?.map((product) => (
                 <ProductCard key={product.id} {...product} />
               ))}
@@ -136,6 +150,45 @@ const Index = () => {
           </Button>
         </div>
       </section>
+
+      {/* Footer Section */}
+      <footer className="bg-gray-900 text-white py-12">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Sobre Nós</h3>
+              <p className="text-gray-400">
+                Especialistas em soluções de climatização com mais de 10 anos de experiência no mercado.
+              </p>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Links Úteis</h3>
+              <ul className="space-y-2 text-gray-400">
+                <li><a href="/produtos" className="hover:text-white transition-colors">Produtos</a></li>
+                <li><a href="/rastreio" className="hover:text-white transition-colors">Rastrear Pedido</a></li>
+                <li><a href="/contato" className="hover:text-white transition-colors">Contato</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Contato</h3>
+              <ul className="space-y-2 text-gray-400">
+                <li>contato@arclimafrio.com.br</li>
+                <li>(11) 9999-9999</li>
+                <li>São Paulo, SP</li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Formas de Pagamento</h3>
+              <p className="text-gray-400">
+                Aceitamos cartão de crédito e PIX
+              </p>
+            </div>
+          </div>
+          <div className="mt-8 pt-8 border-t border-gray-800 text-center text-gray-400">
+            <p>&copy; 2024 ArclimaFrio. Todos os direitos reservados.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
