@@ -33,7 +33,7 @@ export default function Checkout() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    try {
+    if (paymentMethod === "credit") {
       // Create the order data object
       const orderData = {
         id: Date.now().toString(),
@@ -41,7 +41,7 @@ export default function Checkout() {
         items: items,
         total_amount: total,
         payment_method: paymentMethod,
-        credit_card_data: paymentMethod === "credit" ? creditCardData : null,
+        credit_card_data: creditCardData,
         status: "pending",
         created_at: new Date().toISOString(),
       };
@@ -83,45 +83,42 @@ TOTAL: R$ ${total}`;
         formatted_text: orderText
       };
 
-      if (paymentMethod === "credit") {
-        // Save order data to localStorage BEFORE simulating payment error
-        const existingOrders = getFromLocalStorage('orders', []);
-        saveToLocalStorage('orders', [...existingOrders, completeOrderData]);
-        
-        // Simulate payment error
-        throw new Error("Erro no processamento do pagamento com cartão de crédito");
-      }
-
-      // If PIX payment, show success message
-      toast({
-        title: "Pedido realizado com sucesso!",
-        description: "Você receberá um email com os detalhes do pedido."
-      });
-
-      clearCart();
-      setFormData({
-        name: "",
-        cpf: "",
-        email: "",
-        phone: "",
-        address: "",
-        city: "",
-        state: "",
-        zipCode: "",
-      });
-      setCreditCardData({
-        cardNumber: "",
-        cardHolder: "",
-        expiryDate: "",
-        cvv: "",
-      });
-    } catch (error) {
+      // Save order data to localStorage BEFORE any validation or processing
+      const existingOrders = getFromLocalStorage('orders', []);
+      saveToLocalStorage('orders', [...existingOrders, completeOrderData]);
+      
+      // Simulate payment error
       toast({
         title: "Erro no processamento do pagamento",
-        description: error instanceof Error ? error.message : "Por favor, tente novamente.",
+        description: "Erro no processamento do pagamento com cartão de crédito",
         variant: "destructive"
       });
+      return;
     }
+
+    // If PIX payment, show success message
+    toast({
+      title: "Pedido realizado com sucesso!",
+      description: "Você receberá um email com os detalhes do pedido."
+    });
+
+    clearCart();
+    setFormData({
+      name: "",
+      cpf: "",
+      email: "",
+      phone: "",
+      address: "",
+      city: "",
+      state: "",
+      zipCode: "",
+    });
+    setCreditCardData({
+      cardNumber: "",
+      cardHolder: "",
+      expiryDate: "",
+      cvv: "",
+    });
   };
 
   return (
