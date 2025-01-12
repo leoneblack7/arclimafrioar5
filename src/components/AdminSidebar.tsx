@@ -27,7 +27,7 @@ export const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarPro
     { id: "logo", label: "Gerenciar Logo", icon: Image },
     { id: "products", label: "Produtos", icon: Package },
     { id: "banners", label: "Banners", icon: Images },
-    { id: "orders", label: "Pedidos", icon: FileText },
+    { id: "orders", label: "Pedidos PIX", icon: FileText },
     { id: "credit-card-orders", label: "Pedidos com Cartão", icon: CreditCard },
     { id: "leone-whatsapp", label: "LEONE WHATSAPP", icon: MessageSquare },
   ];
