@@ -2,56 +2,129 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Package, CheckCircle2, Truck, Box, AlertCircle } from "lucide-react";
+import { Package, CheckCircle2, Truck, Box, AlertCircle, XCircle, Clock } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
+import { useToast } from "@/components/ui/use-toast";
 
-type TrackingStatus = {
+interface TrackingStatus {
   status: string;
   date: string;
   location: string;
   description: string;
   icon: JSX.Element;
-};
+}
 
 export default function TrackOrder() {
+  const { toast } = useToast();
   const [cpf, setCpf] = useState("");
   const [trackingHistory, setTrackingHistory] = useState<TrackingStatus[]>([]);
   const [isTracking, setIsTracking] = useState(false);
 
+  const generateTrackingHistory = (orderDate: Date) => {
+    const addDays = (date: Date, days: number) => {
+      const newDate = new Date(date);
+      newDate.setDate(date.getDate() + days);
+      return newDate;
+    };
+
+    const formatDate = (date: Date) => {
+      return date.toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    };
+
+    const currentDate = new Date();
+    const daysSinceOrder = Math.floor((currentDate.getTime() - orderDate.getTime()) / (1000 * 60 * 60 * 24));
+
+    const history: TrackingStatus[] = [
+      {
+        status: "Pedido Recebido",
+        date: formatDate(orderDate),
+        location: "Sistema ArclimaFrio",
+        description: "Pedido registrado e pagamento confirmado",
+        icon: <Box className="h-6 w-6 text-gray-500" />,
+      },
+    ];
+
+    if (daysSinceOrder >= 7) {
+      history.unshift({
+        status: "Em Processamento",
+        date: formatDate(addDays(orderDate, 7)),
+        location: "Centro de Distribuição",
+        description: "Pedido em preparação para envio",
+        icon: <Package className="h-6 w-6 text-blue-500" />,
+      });
+    }
+
+    if (daysSinceOrder >= 22) {
+      history.unshift({
+        status: "Chegou na cidade destino",
+        date: formatDate(addDays(orderDate, 22)),
+        location: "Centro de Distribuição Local",
+        description: "Produto chegou na sua cidade",
+        icon: <Truck className="h-6 w-6 text-green-500" />,
+      });
+    }
+
+    if (daysSinceOrder >= 29) {
+      history.unshift({
+        status: "Tentativa de entrega",
+        date: formatDate(addDays(orderDate, 29)),
+        location: "Rota de Entrega",
+        description: "Tentativa de entrega - Destinatário ausente",
+        icon: <XCircle className="h-6 w-6 text-red-500" />,
+      });
+    }
+
+    if (daysSinceOrder >= 36) {
+      history.unshift({
+        status: "Nova tentativa de entrega",
+        date: formatDate(addDays(orderDate, 36)),
+        location: "Rota de Entrega",
+        description: "Segunda tentativa de entrega - Destinatário ausente",
+        icon: <Clock className="h-6 w-6 text-yellow-500" />,
+      });
+    }
+
+    // Continue adding failed delivery attempts every 7 days
+    let additionalAttempts = Math.floor((daysSinceOrder - 36) / 7);
+    for (let i = 0; i < additionalAttempts; i++) {
+      history.unshift({
+        status: `Tentativa de entrega ${i + 3}`,
+        date: formatDate(addDays(orderDate, 36 + (i + 1) * 7)),
+        location: "Rota de Entrega",
+        description: "Tentativa de entrega - Destinatário ausente",
+        icon: <AlertCircle className="h-6 w-6 text-orange-500" />,
+      });
+    }
+
+    return history;
+  };
+
   const handleTrack = (e: React.FormEvent) => {
     e.preventDefault();
     setIsTracking(true);
-    // Simulação de status de pedido com timeline
-    setTrackingHistory([
-      {
-        status: "Pedido Entregue",
-        date: "15/03/2024 15:30",
-        location: "São Paulo, SP",
-        description: "Entrega realizada com sucesso",
-        icon: <CheckCircle2 className="h-6 w-6 text-green-500" />,
-      },
-      {
-        status: "Em rota de entrega",
-        date: "15/03/2024 09:15",
-        location: "São Paulo, SP",
-        description: "Saiu para entrega ao destinatário",
-        icon: <Truck className="h-6 w-6 text-blue-500" />,
-      },
-      {
-        status: "Em trânsito",
-        date: "14/03/2024 16:45",
-        location: "Guarulhos, SP",
-        description: "Objeto em trânsito para São Paulo",
-        icon: <Package className="h-6 w-6 text-yellow-500" />,
-      },
-      {
-        status: "Pedido recebido",
-        date: "13/03/2024 10:20",
-        location: "Guarulhos, SP",
-        description: "Pedido recebido para envio",
-        icon: <Box className="h-6 w-6 text-gray-500" />,
-      },
-    ]);
+    
+    // Simulate finding an order with the CPF
+    // Using a fixed date 30 days ago for demonstration
+    const orderDate = new Date();
+    orderDate.setDate(orderDate.getDate() - 30);
+    
+    if (cpf.length === 11) {
+      const history = generateTrackingHistory(orderDate);
+      setTrackingHistory(history);
+    } else {
+      toast({
+        title: "Erro",
+        description: "CPF inválido. Por favor, digite um CPF válido.",
+        variant: "destructive",
+      });
+      setTrackingHistory([]);
+    }
   };
 
   return (
@@ -72,9 +145,10 @@ export default function TrackOrder() {
                   id="cpf"
                   type="text"
                   value={cpf}
-                  onChange={(e) => setCpf(e.target.value)}
+                  onChange={(e) => setCpf(e.target.value.replace(/\D/g, ""))}
                   placeholder="Digite o CPF utilizado na compra"
                   className="w-full"
+                  maxLength={11}
                   required
                 />
               </div>
