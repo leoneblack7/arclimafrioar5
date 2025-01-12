@@ -14,12 +14,12 @@ export const BannerManager = () => {
   const [banners, setBanners] = useState<Banner[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    console.log("Carregando banners no BannerManager...");
+  const loadBanners = () => {
+    console.log("BannerManager - Carregando banners...");
     const savedBanners = localStorage.getItem("siteBanners");
     if (savedBanners) {
       const parsedBanners = JSON.parse(savedBanners);
-      console.log("Banners carregados:", parsedBanners);
+      console.log("BannerManager - Banners carregados:", parsedBanners);
       setBanners(parsedBanners);
     } else {
       const defaultBanner: Banner = {
@@ -29,8 +29,17 @@ export const BannerManager = () => {
       };
       setBanners([defaultBanner]);
       localStorage.setItem("siteBanners", JSON.stringify([defaultBanner]));
-      console.log("Banner padrão adicionado:", defaultBanner);
+      console.log("BannerManager - Banner padrão adicionado:", defaultBanner);
     }
+  };
+
+  useEffect(() => {
+    loadBanners();
+    window.addEventListener('storage', loadBanners);
+    
+    return () => {
+      window.removeEventListener('storage', loadBanners);
+    };
   }, []);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,6 +60,7 @@ export const BannerManager = () => {
         const updatedBanners = [...banners, newBanner];
         setBanners(updatedBanners);
         localStorage.setItem("siteBanners", JSON.stringify(updatedBanners));
+        window.dispatchEvent(new Event('storage'));
         toast.success("Banner adicionado com sucesso!");
       };
       reader.readAsDataURL(file);
@@ -65,6 +75,7 @@ export const BannerManager = () => {
     const updatedBanners = banners.filter(banner => banner.id !== id);
     setBanners(updatedBanners);
     localStorage.setItem("siteBanners", JSON.stringify(updatedBanners));
+    window.dispatchEvent(new Event('storage'));
     toast.success("Banner removido com sucesso!");
   };
 
@@ -74,6 +85,7 @@ export const BannerManager = () => {
     );
     setBanners(updatedBanners);
     localStorage.setItem("siteBanners", JSON.stringify(updatedBanners));
+    window.dispatchEvent(new Event('storage'));
     toast.success(newStatus ? "Banner ativado com sucesso!" : "Banner desativado com sucesso!");
   };
 

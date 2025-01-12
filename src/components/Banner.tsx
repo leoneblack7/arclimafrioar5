@@ -12,10 +12,10 @@ export const Banner = () => {
   const [banners, setBanners] = useState<Banner[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  useEffect(() => {
+  const loadBanners = () => {
     try {
       const savedBanners = localStorage.getItem("siteBanners");
-      console.log("Banner - Dados do localStorage:", savedBanners);
+      console.log("Banner - Carregando banners:", savedBanners);
       
       if (savedBanners) {
         const parsedBanners = JSON.parse(savedBanners);
@@ -27,14 +27,27 @@ export const Banner = () => {
       console.error('Erro ao carregar banners:', error);
       toast.error('Erro ao carregar os banners');
     }
+  };
+
+  useEffect(() => {
+    loadBanners();
+    window.addEventListener('storage', loadBanners);
+    
+    return () => {
+      window.removeEventListener('storage', loadBanners);
+    };
   }, []);
 
   const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % banners.length);
+    if (banners.length > 1) {
+      setCurrentIndex((prev) => (prev + 1) % banners.length);
+    }
   };
 
   const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - 1 + banners.length) % banners.length);
+    if (banners.length > 1) {
+      setCurrentIndex((prev) => (prev - 1 + banners.length) % banners.length);
+    }
   };
 
   useEffect(() => {
