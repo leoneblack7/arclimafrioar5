@@ -15,20 +15,21 @@ interface CustomerData {
 export const sendTictoWebhookV2 = async (items: CartItem[], customerData?: CustomerData) => {
   try {
     const apiKey = localStorage.getItem("TICTO_API_KEY");
-    console.log("API Key encontrada:", !!apiKey); // Log para debug
+    console.log("Iniciando processamento do pagamento PIX");
+    console.log("Itens:", items);
+    console.log("API Key presente:", !!apiKey);
 
     if (!apiKey) {
-      console.error("Chave API Ticto não encontrada. Por favor, configure a chave no painel administrativo.");
-      throw new Error("Chave API Ticto não encontrada");
+      throw new Error("Chave API Ticto não encontrada. Configure a chave no painel administrativo.");
     }
 
-    // Calcula o valor total baseado no preço e quantidade do item
+    // Calcula o valor total baseado no preço do item
     const totalAmount = items.reduce((sum, item) => {
       const quantity = item.quantity || 1;
       return sum + (item.price * quantity);
     }, 0);
 
-    console.log("Valor total calculado:", totalAmount); // Log para debug
+    console.log("Valor total do pedido:", totalAmount);
 
     const payload = {
       payment_method: 'pix',
@@ -49,7 +50,7 @@ export const sendTictoWebhookV2 = async (items: CartItem[], customerData?: Custo
       }
     };
 
-    console.log('Enviando requisição para Ticto:', payload); // Log para debug
+    console.log('Payload da requisição:', payload);
 
     const response = await fetch('https://webhook.ticto.dev/v2/checkout', {
       method: 'POST',
@@ -67,10 +68,10 @@ export const sendTictoWebhookV2 = async (items: CartItem[], customerData?: Custo
     }
 
     const data = await response.json();
-    console.log('Resposta Ticto:', data); // Log para debug
+    console.log('Resposta bem-sucedida da Ticto:', data);
     return data;
   } catch (error) {
-    console.error('Erro ao enviar webhook Ticto:', error);
-    throw error; // Propaga o erro para ser tratado pelo componente
+    console.error('Erro ao processar pagamento:', error);
+    throw error;
   }
 };
