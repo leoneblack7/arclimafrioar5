@@ -75,11 +75,11 @@ export const BannerManager = () => {
 
     const updatedBanners = [...banners, newBanner];
     localStorage.setItem('banners', JSON.stringify(updatedBanners));
+    setBanners(updatedBanners);
     window.dispatchEvent(new Event('bannersUpdated'));
     
     console.log("BannerManager - Banner adicionado com sucesso");
     toast.success("Banner adicionado e ativado com sucesso!");
-    loadBanners();
   };
 
   const handleDelete = async (id: string) => {
@@ -93,11 +93,11 @@ export const BannerManager = () => {
       const updatedBanners = banners.filter(banner => banner.id !== id);
       
       localStorage.setItem('banners', JSON.stringify(updatedBanners));
+      setBanners(updatedBanners);
       window.dispatchEvent(new Event('bannersUpdated'));
       
       console.log("BannerManager - Banner excluído com sucesso");
       toast.success("Banner removido com sucesso!");
-      loadBanners();
     } catch (error) {
       console.error('Erro ao remover banner:', error);
       toast.error("Erro ao remover o banner");
@@ -110,12 +110,13 @@ export const BannerManager = () => {
       const updatedBanners = banners.map(banner =>
         banner.id === id ? { ...banner, active: newStatus } : banner
       );
+      
       localStorage.setItem('banners', JSON.stringify(updatedBanners));
+      setBanners(updatedBanners);
       window.dispatchEvent(new Event('bannersUpdated'));
       
       console.log("BannerManager - Status atualizado com sucesso");
       toast.success(newStatus ? "Banner ativado com sucesso!" : "Banner desativado com sucesso!");
-      loadBanners();
     } catch (error) {
       console.error('Erro ao atualizar status do banner:', error);
       toast.error("Erro ao atualizar o status do banner");
