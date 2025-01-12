@@ -13,6 +13,7 @@ import { CreditCardOrderManager } from "@/components/CreditCardOrderManager";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LeoneWhatsApp } from "@/components/LeoneWhatsApp";
 import { TictoKeyManager } from "@/components/admin/TictoKeyManager";
+import { PixConfigManager } from "@/components/admin/PixConfigManager";
 
 export default function Admin() {
   const { isAuthenticated, login, logout } = useAuth();
@@ -93,6 +94,7 @@ export default function Admin() {
         {activeSection === "credit-card-orders" && <CreditCardOrderManager />}
         {activeSection === "leone-whatsapp" && <LeoneWhatsApp />}
         {activeSection === "ticto-key" && <TictoKeyManager />}
+        {activeSection === "pix-config" && <PixConfigManager />}
       </div>
       <ThemeToggle />
     </div>
