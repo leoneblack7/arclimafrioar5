@@ -16,10 +16,12 @@ export const Banner = () => {
     try {
       console.log("Banner - Iniciando carregamento dos banners");
       const storedBanners = localStorage.getItem('banners');
-      const parsedBanners = storedBanners ? JSON.parse(storedBanners) : [];
-      const activeBanners = parsedBanners.filter((banner: Banner) => banner.active);
-      console.log("Banner - Banners ativos carregados:", activeBanners);
-      setBanners(activeBanners);
+      if (storedBanners) {
+        const parsedBanners = JSON.parse(storedBanners);
+        const activeBanners = parsedBanners.filter((banner: Banner) => banner.active);
+        console.log("Banner - Banners ativos carregados:", activeBanners);
+        setBanners(activeBanners);
+      }
     } catch (error) {
       console.error('Erro ao carregar banners:', error);
     }
