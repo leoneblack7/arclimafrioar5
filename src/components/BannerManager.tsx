@@ -19,6 +19,15 @@ export const BannerManager = () => {
     const savedBanners = localStorage.getItem("siteBanners");
     if (savedBanners) {
       setBanners(JSON.parse(savedBanners));
+    } else {
+      // Adicionar banner de exemplo se não houver banners
+      const defaultBanner: Banner = {
+        id: 1,
+        imageUrl: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
+        active: true
+      };
+      setBanners([defaultBanner]);
+      localStorage.setItem("siteBanners", JSON.stringify([defaultBanner]));
     }
   }, []);
 
