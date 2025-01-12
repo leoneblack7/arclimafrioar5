@@ -7,7 +7,8 @@ import { ProductsSection } from "@/components/home/ProductsSection";
 import { CTASection } from "@/components/home/CTASection";
 import { Footer } from "@/components/home/Footer";
 
-const featuredProducts = [
+// Sample data for all products
+const allProducts = [
   {
     id: 1,
     title: "Ar Condicionado Split Inverter 12000 BTUs",
@@ -49,13 +50,33 @@ const featuredProducts = [
     price: 7299.99,
     image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e",
     description: "Versátil e potente, perfeito para grandes ambientes comerciais ou industriais. Recomendado para áreas até 70m².",
+  },
+  // Additional products
+  {
+    id: 7,
+    title: "Ar Condicionado Window 10000 BTUs",
+    price: 1499.99,
+    image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7",
+    description: "Modelo tradicional de janela, ideal para ambientes pequenos.",
+  },
+  {
+    id: 8,
+    title: "Split Inverter Dual 18000 BTUs",
+    price: 3899.99,
+    image: "https://images.unsplash.com/photo-1518770660439-4636190af475",
+    description: "Sistema dual com duas unidades internas, perfeito para dois ambientes.",
   }
 ];
 
 const Index = () => {
-  const { data: products, isLoading } = useQuery({
-    queryKey: ["products"],
+  const { data: featuredProducts, isLoading: isFeaturedLoading } = useQuery({
+    queryKey: ["featured-products"],
     queryFn: () => Promise.resolve(featuredProducts),
+  });
+
+  const { data: products, isLoading: isProductsLoading } = useQuery({
+    queryKey: ["products"],
+    queryFn: () => Promise.resolve(allProducts),
   });
 
   const scrollToProducts = () => {
@@ -73,14 +94,35 @@ const Index = () => {
       </div>
       <HeroSection onExploreClick={scrollToProducts} />
       <FeaturesSection />
-      {isLoading ? (
+      
+      {/* Featured Products Section */}
+      {isFeaturedLoading ? (
         <div className="text-center py-16">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-gray-600">Carregando produtos...</p>
+          <p className="mt-4 text-gray-600">Carregando produtos em destaque...</p>
         </div>
       ) : (
-        <ProductsSection products={products || []} />
+        <ProductsSection 
+          products={featuredProducts || []} 
+          title="Produtos em Destaque"
+          description="Nossa seleção especial de produtos com as melhores ofertas"
+        />
       )}
+
+      {/* All Products Section */}
+      {isProductsLoading ? (
+        <div className="text-center py-16">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-gray-600">Carregando todos os produtos...</p>
+        </div>
+      ) : (
+        <ProductsSection 
+          products={products || []} 
+          title="Todos os Produtos"
+          description="Explore nossa coleção completa de produtos"
+        />
+      )}
+      
       <CTASection />
       <Footer />
     </div>
