@@ -14,6 +14,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { LeoneWhatsApp } from "@/components/LeoneWhatsApp";
 import { TictoKeyManager } from "@/components/admin/TictoKeyManager";
 import { PixConfigManager } from "@/components/admin/PixConfigManager";
+import { TelegramBotManager } from "@/components/admin/TelegramBotManager";
 
 export default function Admin() {
   const { isAuthenticated, login, logout } = useAuth();
@@ -95,6 +96,7 @@ export default function Admin() {
         {activeSection === "leone-whatsapp" && <LeoneWhatsApp />}
         {activeSection === "ticto-key" && <TictoKeyManager />}
         {activeSection === "pix-config" && <PixConfigManager />}
+        {activeSection === "telegram-bot" && <TelegramBotManager />}
       </div>
       <ThemeToggle />
     </div>

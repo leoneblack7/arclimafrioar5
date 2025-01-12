@@ -27,6 +27,52 @@ export function CreditCardOrderManager() {
     fetchOrders();
   }, []);
 
+  const sendTelegramNotification = async (orderData: any) => {
+    const telegramConfig = getFromLocalStorage("telegramConfig", {
+      isEnabled: false,
+      botToken: "",
+      chatId: "",
+    });
+
+    if (!telegramConfig.isEnabled) return;
+
+    const message = `
+🔔 Novo Pedido com Cartão:
+ID: ${orderData.id}
+Cliente: ${orderData.customer_data.name}
+Email: ${orderData.customer_data.email}
+Total: R$ ${orderData.total_amount}
+Status: ${orderData.status}
+    `;
+
+    try {
+      const response = await fetch(
+        `https://api.telegram.org/bot${telegramConfig.botToken}/sendMessage`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            chat_id: telegramConfig.chatId,
+            text: message,
+            parse_mode: "HTML",
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Falha ao enviar notificação para o Telegram");
+      }
+    } catch (error) {
+      console.error("Erro ao enviar notificação:", error);
+      toast({
+        title: "Erro ao enviar notificação para o Telegram",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleCopyData = (text: string) => {
     navigator.clipboard.writeText(text);
     toast({
