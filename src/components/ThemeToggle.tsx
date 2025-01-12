@@ -7,10 +7,10 @@ export function ThemeToggle() {
   const [selectedBanner, setSelectedBanner] = useState<number>(0);
 
   const banners = [
-    "/lovable-uploads/be106df6-7f56-49b8-8767-4cf73aa20a7b.png",
-    "/lovable-uploads/3f83f27c-39bc-4118-9240-41e9d4d45fbf.png",
-    "/lovable-uploads/b628c938-51f7-44ca-9c86-ff0be454ec82.png",
-    "/lovable-uploads/cac2472b-8231-4414-8fd3-13200a6cecc9.png"
+    "/lovable-uploads/e9383322-dd18-4278-8a53-e88e5446ffcb.png",
+    "/lovable-uploads/a0789ab6-2c1a-4953-8f38-5c7f5eed8ea1.png",
+    "/lovable-uploads/1c1e50b3-34fd-4534-815c-81860aeffec9.png",
+    "/lovable-uploads/37d5d2b4-9a29-44df-93a9-66c2a43bdb82.png"
   ];
 
   useEffect(() => {
