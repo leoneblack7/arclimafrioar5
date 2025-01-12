@@ -21,10 +21,16 @@ function App() {
   const [queryClient] = React.useState(() => new QueryClient());
 
   useEffect(() => {
-    // Anti-phishing measures
-    if (window.top !== window.self) {
-      // Prevent clickjacking by not allowing the site to be embedded in iframes
-      window.top.location = window.self.location;
+    // Only apply anti-phishing measures in production
+    if (process.env.NODE_ENV === 'production') {
+      if (window.top !== window.self) {
+        // Check if we're in the Lovable preview iframe
+        const isLovablePreview = window.location.hostname.includes('lovableproject.com');
+        if (!isLovablePreview) {
+          // Only redirect if not in Lovable preview
+          window.top.location = window.self.location;
+        }
+      }
     }
 
     // Add security headers via meta tags
@@ -35,7 +41,7 @@ function App() {
 
     const metaXFrame = document.createElement('meta');
     metaXFrame.httpEquiv = 'X-Frame-Options';
-    metaXFrame.content = 'DENY';
+    metaXFrame.content = 'SAMEORIGIN'; // Changed from DENY to SAMEORIGIN to allow Lovable preview
     document.head.appendChild(metaXFrame);
 
     const metaXContent = document.createElement('meta');
