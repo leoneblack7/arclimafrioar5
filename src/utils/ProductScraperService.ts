@@ -29,23 +29,13 @@ export class ProductScraperService {
         limit: 1,
         scrapeOptions: {
           formats: ['html'],
-          selectors: {
+          include: {
             title: 'h1',
             description: '.product-description, .description',
-            images: {
-              selector: '.product-images img, .product-gallery img',
-              attr: 'src'
-            },
+            images: '.product-images img, .product-gallery img',
             price: '.product-price, .price-current',
             rating: '.rating-stars',
-            specifications: {
-              selector: '.specifications-table tr, .specs-table tr',
-              list: true,
-              data: {
-                label: 'th, td:first-child',
-                value: 'td:last-child'
-              }
-            }
+            specifications: '.specifications-table tr, .specs-table tr'
           }
         }
       });
