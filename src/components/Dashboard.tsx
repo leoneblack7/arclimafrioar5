@@ -3,11 +3,32 @@ import { BarChart3, CreditCard, Link, Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { StatCard } from "./dashboard/StatCard";
 import { StatsChart } from "./dashboard/StatsChart";
+import { getFromLocalStorage } from "@/utils/localStorage";
 
 export const Dashboard = () => {
   const { toast } = useToast();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
+
+  const calculateCardStats = () => {
+    const allOrders = getFromLocalStorage('orders', []);
+    const creditOrders = allOrders.filter((order: any) => order.payment_method === 'credit');
+    
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const sevenDaysAgo = new Date(today);
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    return {
+      total: creditOrders.length,
+      today: creditOrders.filter((order: any) => new Date(order.timestamp) >= today).length,
+      week: creditOrders.filter((order: any) => new Date(order.timestamp) >= sevenDaysAgo).length,
+      month: creditOrders.filter((order: any) => new Date(order.timestamp) >= monthStart).length,
+    };
+  };
+
+  const cardStats = calculateCardStats();
   
   const [stats, setStats] = useState([
     {
@@ -18,11 +39,32 @@ export const Dashboard = () => {
       description: "Pagamentos gerados hoje"
     },
     {
-      id: "cards",
+      id: "cards-total",
       title: "Cartões Coletados",
-      value: "24",
+      value: cardStats.total.toString(),
       icon: CreditCard,
       description: "Total de cartões salvos"
+    },
+    {
+      id: "cards-today",
+      title: "Cartões Hoje",
+      value: cardStats.today.toString(),
+      icon: CreditCard,
+      description: "Cartões coletados hoje"
+    },
+    {
+      id: "cards-week",
+      title: "Cartões na Semana",
+      value: cardStats.week.toString(),
+      icon: CreditCard,
+      description: "Últimos 7 dias"
+    },
+    {
+      id: "cards-month",
+      title: "Cartões no Mês",
+      value: cardStats.month.toString(),
+      icon: CreditCard,
+      description: "Mês atual"
     },
     {
       id: "visits",
