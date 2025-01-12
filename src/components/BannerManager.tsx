@@ -10,20 +10,43 @@ interface Banner {
   active: boolean;
 }
 
+const DEFAULT_BANNER: Banner = {
+  id: 1,
+  imageUrl: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
+  active: true
+};
+
 export const BannerManager = () => {
   const [banners, setBanners] = useState<Banner[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const loadBanners = () => {
-    const savedBanners = localStorage.getItem("siteBanners");
-    if (savedBanners) {
-      const parsedBanners = JSON.parse(savedBanners);
-      setBanners(parsedBanners);
+    try {
+      const savedBanners = localStorage.getItem("siteBanners");
+      console.log("BannerManager - Carregando banners:", savedBanners);
+      
+      if (savedBanners) {
+        const parsedBanners = JSON.parse(savedBanners);
+        setBanners(parsedBanners);
+      } else {
+        // Se não houver banners salvos, adiciona o banner padrão
+        setBanners([DEFAULT_BANNER]);
+        localStorage.setItem("siteBanners", JSON.stringify([DEFAULT_BANNER]));
+        console.log("BannerManager - Banner padrão adicionado");
+      }
+    } catch (error) {
+      console.error('Erro ao carregar banners:', error);
+      toast.error('Erro ao carregar os banners');
     }
   };
 
   useEffect(() => {
     loadBanners();
+    window.addEventListener('storage', loadBanners);
+    
+    return () => {
+      window.removeEventListener('storage', loadBanners);
+    };
   }, []);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
