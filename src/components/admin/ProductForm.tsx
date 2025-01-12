@@ -34,7 +34,7 @@ export const ProductForm = ({ product, onSave, onCancel }: ProductFormProps) => 
   };
 
   return (
-    <DialogContent className="sm:max-w-[600px]">
+    <DialogContent className="sm:max-w-[800px]">
       <DialogHeader>
         <DialogTitle>
           {product.id ? "Editar Produto" : "Novo Produto"}
@@ -61,7 +61,11 @@ export const ProductForm = ({ product, onSave, onCancel }: ProductFormProps) => 
           <Textarea
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            className="min-h-[300px] font-mono text-sm"
           />
+          <div className="text-sm text-gray-500">
+            A descrição suporta formatação HTML para melhor apresentação do produto.
+          </div>
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium">Imagem</label>
