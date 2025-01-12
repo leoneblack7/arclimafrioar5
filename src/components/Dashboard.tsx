@@ -32,6 +32,13 @@ export const Dashboard = () => {
   
   const [stats, setStats] = useState([
     {
+      id: "visits-no-purchase",
+      title: "Visitas sem Compra",
+      value: "124",
+      icon: Link,
+      description: "Visitas sem finalizar compra hoje"
+    },
+    {
       id: "pix",
       title: "Pagamentos PIX",
       value: "32",
