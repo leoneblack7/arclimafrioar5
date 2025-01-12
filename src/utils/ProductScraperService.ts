@@ -7,6 +7,14 @@ export interface ScrapedProduct {
   images: string[];
   price: number;
   rating?: number;
+  specifications?: {
+    voltage?: string;
+    capacity?: string;
+    smartWifi?: string;
+    dimensions?: string;
+    warranty?: string;
+    [key: string]: string | undefined;
+  };
 }
 
 export class ProductScraperService {
@@ -21,12 +29,26 @@ export class ProductScraperService {
         limit: 1,
         scrapeOptions: {
           formats: ['html'],
-          extractors: {
-            title: { selector: '.product-name', type: 'text' },
-            description: { selector: '.product-description', type: 'text' },
-            images: { selector: '.product-images img', type: 'attribute', attribute: 'src' },
-            price: { selector: '.product-price', type: 'number' },
-            rating: { selector: '.rating-stars', type: 'number' }
+          selectors: {
+            // Main product information
+            title: 'h1',
+            price: '.product-price, .price-current',
+            images: {
+              selector: '.product-images img, .product-gallery img',
+              attr: 'src'
+            },
+            description: '.product-description, .description',
+            rating: '.rating-stars',
+            
+            // Technical specifications
+            specifications: {
+              selector: '.specifications-table tr, .specs-table tr',
+              type: 'list',
+              data: {
+                label: 'th, td:first-child',
+                value: 'td:last-child'
+              }
+            }
           }
         }
       });
@@ -41,21 +63,30 @@ export class ProductScraperService {
         throw new Error('No data returned from scrape');
       }
 
-      // Type assertion since we know the structure of our data
-      const scrapedData = data as unknown as {
-        title?: string;
-        description?: string;
-        images?: string[];
-        price?: number;
-        rating?: number;
-      };
+      // Type assertion for the scraped data
+      const scrapedData = data as any;
+      
+      // Process specifications into a structured object
+      const specifications: { [key: string]: string } = {};
+      if (Array.isArray(scrapedData.specifications)) {
+        scrapedData.specifications.forEach((spec: { label: string; value: string }) => {
+          if (spec.label && spec.value) {
+            specifications[spec.label.trim()] = spec.value.trim();
+          }
+        });
+      }
+
+      // Extract price from string and convert to number
+      const priceString = scrapedData.price?.replace(/[^\d,]/g, '').replace(',', '.') || '0';
+      const price = parseFloat(priceString);
 
       return {
         title: scrapedData.title || '',
         description: scrapedData.description || '',
         images: Array.isArray(scrapedData.images) ? scrapedData.images : [],
-        price: typeof scrapedData.price === 'number' ? scrapedData.price : 0,
-        rating: typeof scrapedData.rating === 'number' ? scrapedData.rating : 5
+        price: isNaN(price) ? 0 : price,
+        rating: typeof scrapedData.rating === 'number' ? scrapedData.rating : 5,
+        specifications
       };
     } catch (error) {
       console.error('Error scraping product:', error);
