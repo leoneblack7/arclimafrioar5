@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { AdminSidebar } from "@/components/AdminSidebar";
 import { LogoManager } from "@/components/LogoManager";
 import { ProductManager } from "@/components/ProductManager";
+import { FeaturedProductManager } from "@/components/FeaturedProductManager";
 import { Dashboard } from "@/components/Dashboard";
 import { BannerManager } from "@/components/BannerManager";
 
@@ -77,6 +78,7 @@ export default function Admin() {
       <AdminSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
       <div className="ml-64 p-8">
         {activeSection === "dashboard" && <Dashboard />}
+        {activeSection === "featured" && <FeaturedProductManager />}
         {activeSection === "logo" && <LogoManager />}
         {activeSection === "products" && <ProductManager />}
         {activeSection === "banners" && <BannerManager />}

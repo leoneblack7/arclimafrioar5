@@ -2,14 +2,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { ProductScraperService } from "@/utils/ProductScraperService";
+import React, { useState } from 'react';
 
 interface ProductImportFormProps {
   onImport: (product: any) => void;
 }
 
 export const ProductImportForm = ({ onImport }: ProductImportFormProps) => {
-  const [importUrl, setImportUrl] = React.useState("");
-  const [isImporting, setIsImporting] = React.useState(false);
+  const [importUrl, setImportUrl] = useState("");
+  const [isImporting, setIsImporting] = useState(false);
 
   const handleImportProduct = async (e: React.FormEvent) => {
     e.preventDefault();
