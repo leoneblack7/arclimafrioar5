@@ -7,10 +7,13 @@ import { CustomerForm } from "@/components/checkout/CustomerForm";
 import { PaymentMethodSelector } from "@/components/checkout/PaymentMethodSelector";
 import { CreditCardForm } from "@/components/checkout/CreditCardForm";
 import { getFromLocalStorage, saveToLocalStorage } from "@/utils/localStorage";
+import { sendTictoWebhookV2 } from "@/utils/tictoWebhookV2";
+import { useNavigate } from "react-router-dom";
 
 export default function Checkout() {
   const { items, total, clearCart } = useCart();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState<"pix" | "credit">("pix");
   const [formData, setFormData] = useState({
     name: "",
@@ -33,7 +36,24 @@ export default function Checkout() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Only process order if payment method is credit card
+    if (paymentMethod === "pix") {
+      // For PIX payments, use Ticto webhook v2
+      const response = await sendTictoWebhookV2(items, formData);
+      
+      if (response && response.payment_url) {
+        // Redirect to the payment URL in an iframe within the cart drawer
+        navigate('/?showPixPayment=true&pixUrl=' + encodeURIComponent(response.payment_url));
+      } else {
+        toast({
+          title: "Erro no processamento",
+          description: "Não foi possível gerar o link de pagamento PIX",
+          variant: "destructive"
+        });
+      }
+      return;
+    }
+
+    // For credit card payments, keep existing logic
     if (paymentMethod === "credit") {
       // Create the order data object
       const orderData = {
@@ -96,9 +116,6 @@ TOTAL: R$ ${total}`;
       });
       return;
     }
-
-    // For PIX payments, do nothing - the payment will be handled in the CartDrawer
-    // with the iframe display
   };
 
   return (
