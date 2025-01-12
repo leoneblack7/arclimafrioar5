@@ -1,21 +1,11 @@
 import { useState, useEffect } from "react";
-import { Button } from "./ui/button";
-import { Plus } from "lucide-react";
-import { Dialog } from "./ui/dialog";
-import { ProductForm } from "./admin/ProductForm";
-import { ProductImportForm } from "./admin/ProductImportForm";
-import { ProductsTable } from "./admin/ProductsTable";
 import { toast } from "sonner";
 import { saveToLocalStorage, getFromLocalStorage } from "@/utils/localStorage";
-
-interface Product {
-  id: number;
-  title: string;
-  price: number;
-  image: string;
-  description: string;
-  active: boolean;
-}
+import { Product } from "@/types/product";
+import { ProductImportForm } from "./admin/ProductImportForm";
+import { ProductsTable } from "./admin/ProductsTable";
+import { FeaturedHeader } from "./featured/FeaturedHeader";
+import { FeaturedDialogForm } from "./featured/FeaturedDialogForm";
 
 export const FeaturedProductManager = () => {
   const [products, setProducts] = useState<Product[]>(() => {
@@ -135,32 +125,23 @@ export const FeaturedProductManager = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-foreground dark:text-foreground">Produtos em Destaque</h2>
-        <Button 
-          onClick={handleNewProduct} 
-          className="flex items-center gap-2"
-          disabled={products.length >= 6}
-        >
-          <Plus className="h-4 w-4" />
-          Novo Produto em Destaque
-        </Button>
-      </div>
+      <FeaturedHeader 
+        onNewProduct={handleNewProduct}
+        productsCount={products.length}
+      />
       
       <ProductImportForm onImport={handleImportProduct} />
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        {editingProduct && (
-          <ProductForm
-            product={editingProduct}
-            onSave={handleSaveProduct}
-            onCancel={() => {
-              setIsDialogOpen(false);
-              setEditingProduct(null);
-            }}
-          />
-        )}
-      </Dialog>
+      <FeaturedDialogForm
+        isOpen={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        editingProduct={editingProduct}
+        onSave={handleSaveProduct}
+        onCancel={() => {
+          setIsDialogOpen(false);
+          setEditingProduct(null);
+        }}
+      />
 
       <ProductsTable
         products={products}
