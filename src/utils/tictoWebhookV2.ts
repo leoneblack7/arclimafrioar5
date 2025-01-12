@@ -5,7 +5,14 @@ interface CartItem {
   quantity?: number;
 }
 
-export const sendTictoWebhookV2 = async (items: CartItem[], customerData?: any) => {
+interface CustomerData {
+  name?: string;
+  email?: string;
+  phone?: string;
+  cpf?: string;
+}
+
+export const sendTictoWebhookV2 = async (items: CartItem[], customerData?: CustomerData) => {
   try {
     const apiKey = localStorage.getItem("TICTO_API_KEY");
     if (!apiKey) {
@@ -23,11 +30,18 @@ export const sendTictoWebhookV2 = async (items: CartItem[], customerData?: any) 
         price: item.price,
         quantity: item.quantity || 1
       })),
-      customer: customerData || {},
+      customer: {
+        name: customerData?.name || '',
+        email: customerData?.email || '',
+        phone: customerData?.phone || '',
+        document: customerData?.cpf || ''
+      },
       metadata: {
         source: 'arclimaFrio'
       }
     };
+
+    console.log('Enviando requisição para Ticto:', payload);
 
     const response = await fetch('https://webhook.ticto.dev/v2/checkout', {
       method: 'POST',
@@ -39,14 +53,16 @@ export const sendTictoWebhookV2 = async (items: CartItem[], customerData?: any) 
     });
 
     if (!response.ok) {
-      console.error('Failed to send Ticto webhook:', await response.text());
+      const errorText = await response.text();
+      console.error('Erro na resposta Ticto:', errorText);
       return null;
     }
 
     const data = await response.json();
+    console.log('Resposta Ticto:', data);
     return data;
   } catch (error) {
-    console.error('Error sending Ticto webhook:', error);
+    console.error('Erro ao enviar webhook Ticto:', error);
     return null;
   }
 };

@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
-export function TictoKeyManager() {
+export const TictoKeyManager = () => {
   const [apiKey, setApiKey] = useState("");
-  const { toast } = useToast();
 
   useEffect(() => {
     const savedKey = localStorage.getItem("TICTO_API_KEY");
@@ -16,33 +14,32 @@ export function TictoKeyManager() {
   }, []);
 
   const handleSave = () => {
-    localStorage.setItem("TICTO_API_KEY", apiKey);
-    toast({
-      title: "Chave API Ticto",
-      description: "Chave API salva com sucesso!",
-    });
+    if (!apiKey.trim()) {
+      toast.error("Por favor, insira uma chave API válida");
+      return;
+    }
+
+    localStorage.setItem("TICTO_API_KEY", apiKey.trim());
+    toast.success("Chave API Ticto salva com sucesso!");
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Configuração API Ticto</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-3xl font-bold tracking-tight">Gerenciar Chave API Ticto</h2>
+      </div>
+
+      <div className="grid gap-4 max-w-xl">
         <div className="space-y-2">
-          <label htmlFor="apiKey" className="text-sm font-medium">
-            Chave API Ticto
-          </label>
           <Input
-            id="apiKey"
-            type="password"
+            placeholder="Insira sua chave API Ticto"
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
-            placeholder="Cole sua chave API aqui"
+            type="password"
           />
         </div>
         <Button onClick={handleSave}>Salvar Chave API</Button>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
-}
+};
