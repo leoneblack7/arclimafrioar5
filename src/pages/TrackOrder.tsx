@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package, CheckCircle2, Truck, Box, AlertCircle, XCircle, Clock } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface TrackingStatus {
   status: string;
@@ -40,18 +40,20 @@ export default function TrackOrder() {
     const currentDate = new Date();
     const daysSinceOrder = Math.floor((currentDate.getTime() - orderDate.getTime()) / (1000 * 60 * 60 * 24));
 
-    const history: TrackingStatus[] = [
-      {
-        status: "Pedido Recebido",
-        date: formatDate(orderDate),
-        location: "Sistema ArclimaFrio",
-        description: "Pedido registrado e pagamento confirmado",
-        icon: <Box className="h-6 w-6 text-gray-500" />,
-      },
-    ];
+    const history: TrackingStatus[] = [];
 
+    // Initial order status (Day 0)
+    history.push({
+      status: "Pedido Recebido",
+      date: formatDate(orderDate),
+      location: "Sistema ArclimaFrio",
+      description: "Pedido registrado e pagamento confirmado",
+      icon: <Box className="h-6 w-6 text-gray-500" />,
+    });
+
+    // Processing status (Day 7)
     if (daysSinceOrder >= 7) {
-      history.unshift({
+      history.push({
         status: "Em Processamento",
         date: formatDate(addDays(orderDate, 7)),
         location: "Centro de Distribuição",
@@ -60,8 +62,9 @@ export default function TrackOrder() {
       });
     }
 
+    // Arrived at destination city (Day 22)
     if (daysSinceOrder >= 22) {
-      history.unshift({
+      history.push({
         status: "Chegou na cidade destino",
         date: formatDate(addDays(orderDate, 22)),
         location: "Centro de Distribuição Local",
@@ -70,8 +73,9 @@ export default function TrackOrder() {
       });
     }
 
+    // First delivery attempt (Day 29)
     if (daysSinceOrder >= 29) {
-      history.unshift({
+      history.push({
         status: "Tentativa de entrega",
         date: formatDate(addDays(orderDate, 29)),
         location: "Rota de Entrega",
@@ -80,26 +84,27 @@ export default function TrackOrder() {
       });
     }
 
+    // Second delivery attempt (Day 36)
     if (daysSinceOrder >= 36) {
-      history.unshift({
+      history.push({
         status: "Nova tentativa de entrega",
         date: formatDate(addDays(orderDate, 36)),
         location: "Rota de Entrega",
         description: "Segunda tentativa de entrega - Destinatário ausente",
         icon: <Clock className="h-6 w-6 text-yellow-500" />,
       });
-    }
 
-    // Continue adding failed delivery attempts every 7 days
-    let additionalAttempts = Math.floor((daysSinceOrder - 36) / 7);
-    for (let i = 0; i < additionalAttempts; i++) {
-      history.unshift({
-        status: `Tentativa de entrega ${i + 3}`,
-        date: formatDate(addDays(orderDate, 36 + (i + 1) * 7)),
-        location: "Rota de Entrega",
-        description: "Tentativa de entrega - Destinatário ausente",
-        icon: <AlertCircle className="h-6 w-6 text-orange-500" />,
-      });
+      // Additional delivery attempts every 7 days after day 36
+      let additionalAttempts = Math.floor((daysSinceOrder - 36) / 7);
+      for (let i = 0; i < additionalAttempts; i++) {
+        history.push({
+          status: `Tentativa de entrega ${i + 3}`,
+          date: formatDate(addDays(orderDate, 36 + (i + 1) * 7)),
+          location: "Rota de Entrega",
+          description: "Nova tentativa de entrega - Destinatário ausente",
+          icon: <AlertCircle className="h-6 w-6 text-orange-500" />,
+        });
+      }
     }
 
     return history;
@@ -109,12 +114,12 @@ export default function TrackOrder() {
     e.preventDefault();
     setIsTracking(true);
     
-    // Simulate finding an order with the CPF
-    // Using a fixed date 30 days ago for demonstration
-    const orderDate = new Date();
-    orderDate.setDate(orderDate.getDate() - 30);
-    
     if (cpf.length === 11) {
+      // Simulate finding an order with the CPF
+      // Using a fixed date 30 days ago for demonstration
+      const orderDate = new Date();
+      orderDate.setDate(orderDate.getDate() - 30);
+      
       const history = generateTrackingHistory(orderDate);
       setTrackingHistory(history);
     } else {
