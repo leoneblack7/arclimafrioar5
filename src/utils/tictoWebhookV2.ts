@@ -17,7 +17,8 @@ export const sendTictoWebhookV2 = async (items: CartItem[], customerData?: Custo
     const apiKey = localStorage.getItem("TICTO_API_KEY");
     console.log("Iniciando processamento do pagamento PIX");
     console.log("Itens:", items);
-    console.log("API Key presente:", !!apiKey);
+    console.log("Chave API:", apiKey ? "Presente" : "Ausente");
+    console.log("Valor da chave API:", apiKey);
 
     if (!apiKey) {
       throw new Error("Chave API Ticto não encontrada. Configure a chave no painel administrativo.");
