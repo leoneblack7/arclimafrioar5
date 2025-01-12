@@ -7,12 +7,12 @@ export class ProductScraperService {
       const scrapedData = {
         title: "Ar Condicionado Split Hi Wall Gree G-Diamond Auto Inverter 24.000 Btus Frio 220v R-32",
         price: 3599.90,
-        // Imagens do slider principal
+        // Imagens do slider principal usando o formato VTEX
         images: [
-          "https://climario.vteximg.com.br/arquivos/ids/197515/gd-auto1%20-%20284%20V.png",
-          "https://climario.vteximg.com.br/arquivos/ids/197516/gd-auto2%20-%20284%20V.png",
-          "https://climario.vteximg.com.br/arquivos/ids/197517/gd-auto3%20-%20284%20V.png",
-          "https://climario.vteximg.com.br/arquivos/ids/197518/gd-auto4%20-%20284%20V.png"
+          "https://climario.vtexassets.com/arquivos/ids/195408-800-450?v=638543146573970000&width=800&height=450&aspect=true",
+          "https://climario.vtexassets.com/arquivos/ids/195409-800-450?v=638543146573970000&width=800&height=450&aspect=true",
+          "https://climario.vtexassets.com/arquivos/ids/195410-800-450?v=638543146573970000&width=800&height=450&aspect=true",
+          "https://climario.vtexassets.com/arquivos/ids/195411-800-450?v=638543146573970000&width=800&height=450&aspect=true"
         ],
         description: `
 <h3>Ar Condicionado Split Hi Wall Gree G-Diamond Auto Inverter 24.000 Btus Frio 220v R-32</h3>
