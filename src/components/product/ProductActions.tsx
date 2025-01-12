@@ -9,7 +9,7 @@ interface ProductActionsProps {
 export const ProductActions = ({ onAddToCart, onBuyNow }: ProductActionsProps) => {
   return (
     <div className="flex gap-4">
-      <Button className="flex-1 group" onClick={onAddToCart}>
+      <Button className="flex-1 group bg-green-600 hover:bg-green-700" onClick={onAddToCart}>
         <ShoppingCart className="mr-2 h-4 w-4 group-hover:animate-bounce" />
         Adicionar ao Carrinho
       </Button>
