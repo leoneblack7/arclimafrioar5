@@ -3,7 +3,7 @@ import { BannerCard } from "./banner/BannerCard";
 import { useBannerManager } from "@/hooks/useBannerManager";
 
 export const BannerManager = () => {
-  const { banners, handleUploadSuccess, handleDelete, toggleBannerStatus } = useBannerManager();
+  const { banners, handleUploadSuccess, handleDelete, toggleBannerStatus, updateBannerUrl } = useBannerManager();
 
   return (
     <div className="space-y-4">
@@ -18,6 +18,7 @@ export const BannerManager = () => {
             active={banner.active}
             onToggleStatus={toggleBannerStatus}
             onDelete={handleDelete}
+            onUpdateUrl={updateBannerUrl}
           />
         ))}
       </div>

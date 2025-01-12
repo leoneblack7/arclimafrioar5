@@ -58,8 +58,20 @@ export const useBannerManager = () => {
         return;
       }
 
-      console.log("BannerManager - Banners carregados:", parsedBanners);
-      setBanners(parsedBanners);
+      // Garante que os banners padrão sempre estejam presentes
+      const existingDefaultBannerIds = parsedBanners
+        .filter((banner: Banner) => banner.id.startsWith('default-banner-'))
+        .map((banner: Banner) => banner.id);
+
+      const missingDefaultBanners = defaultBanners.filter(
+        defaultBanner => !existingDefaultBannerIds.includes(defaultBanner.id)
+      );
+
+      const updatedBanners = [...parsedBanners, ...missingDefaultBanners];
+      
+      console.log("BannerManager - Banners carregados:", updatedBanners);
+      localStorage.setItem('banners', JSON.stringify(updatedBanners));
+      setBanners(updatedBanners);
     } catch (error) {
       console.error('Erro ao carregar banners:', error);
       toast.error('Erro ao carregar os banners');
@@ -85,11 +97,6 @@ export const useBannerManager = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      if (id.startsWith('default-banner')) {
-        toast.error("Não é possível excluir os banners padrão");
-        return;
-      }
-
       console.log("BannerManager - Iniciando exclusão do banner:", id);
       const updatedBanners = banners.filter(banner => banner.id !== id);
       
@@ -124,6 +131,25 @@ export const useBannerManager = () => {
     }
   };
 
+  const updateBannerUrl = (id: string, newUrl: string) => {
+    try {
+      console.log("BannerManager - Atualizando URL do banner:", { id, newUrl });
+      const updatedBanners = banners.map(banner =>
+        banner.id === id ? { ...banner, image_url: newUrl } : banner
+      );
+      
+      localStorage.setItem('banners', JSON.stringify(updatedBanners));
+      setBanners(updatedBanners);
+      window.dispatchEvent(new Event('bannersUpdated'));
+      
+      console.log("BannerManager - URL atualizada com sucesso");
+      toast.success("URL do banner atualizada com sucesso!");
+    } catch (error) {
+      console.error('Erro ao atualizar URL do banner:', error);
+      toast.error("Erro ao atualizar a URL do banner");
+    }
+  };
+
   useEffect(() => {
     loadBanners();
   }, []);
@@ -132,7 +158,8 @@ export const useBannerManager = () => {
     banners,
     handleUploadSuccess,
     handleDelete,
-    toggleBannerStatus
+    toggleBannerStatus,
+    updateBannerUrl
   };
 };
 
