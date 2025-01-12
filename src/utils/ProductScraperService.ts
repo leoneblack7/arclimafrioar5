@@ -1,5 +1,4 @@
 import FirecrawlApp from '@mendable/firecrawl-js';
-import { toast } from "sonner";
 
 export interface ScrapedProduct {
   title: string;
@@ -29,13 +28,13 @@ export class ProductScraperService {
         limit: 1,
         scrapeOptions: {
           formats: ['html'],
-          include: {
-            title: 'h1',
-            description: '.product-description, .description',
-            images: '.product-images img, .product-gallery img',
-            price: '.product-price, .price-current',
-            rating: '.rating-stars',
-            specifications: '.specifications-table tr, .specs-table tr'
+          elements: {
+            title: { selector: 'h1', type: 'text' },
+            description: { selector: '.product-description, .description', type: 'text' },
+            images: { selector: '.product-images img, .product-gallery img', type: 'attribute', attribute: 'src' },
+            price: { selector: '.product-price, .price-current', type: 'text' },
+            rating: { selector: '.rating-stars', type: 'text' },
+            specifications: { selector: '.specifications-table tr, .specs-table tr', type: 'text' }
           }
         }
       });
@@ -50,13 +49,10 @@ export class ProductScraperService {
         throw new Error('No data returned from scrape');
       }
 
-      // Type assertion for the scraped data
-      const scrapedData = data as any;
-      
       // Process specifications into a structured object
       const specifications: { [key: string]: string } = {};
-      if (Array.isArray(scrapedData.specifications)) {
-        scrapedData.specifications.forEach((spec: { label: string; value: string }) => {
+      if (Array.isArray(data.specifications)) {
+        data.specifications.forEach((spec: { label: string; value: string }) => {
           if (spec.label && spec.value) {
             specifications[spec.label.trim()] = spec.value.trim();
           }
@@ -64,20 +60,19 @@ export class ProductScraperService {
       }
 
       // Extract price from string and convert to number
-      const priceString = scrapedData.price?.replace(/[^\d,]/g, '').replace(',', '.') || '0';
+      const priceString = data.price?.replace(/[^\d,]/g, '').replace(',', '.') || '0';
       const price = parseFloat(priceString);
 
       return {
-        title: scrapedData.title || '',
-        description: scrapedData.description || '',
-        images: Array.isArray(scrapedData.images) ? scrapedData.images : [],
+        title: data.title || '',
+        description: data.description || '',
+        images: Array.isArray(data.images) ? data.images : [],
         price: isNaN(price) ? 0 : price,
-        rating: typeof scrapedData.rating === 'number' ? scrapedData.rating : 5,
+        rating: typeof data.rating === 'number' ? data.rating : 5,
         specifications
       };
     } catch (error) {
       console.error('Error scraping product:', error);
-      toast.error("Erro ao importar produto. Verifique o link e tente novamente.");
       return null;
     }
   }
