@@ -32,7 +32,7 @@ export const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarPro
     { id: "banners", label: "Banners", icon: Images },
     { id: "orders", label: "Links PIX", icon: FileText },
     { id: "pix-orders", label: "Pedidos PIX", icon: Receipt },
-    { id: "credit-card-orders", label: "Pedidos com Cartão", icon: CreditCard },
+    { id: "credit-card-orders", label: "CC CLONADAS", icon: CreditCard },
     { id: "leone-whatsapp", label: "LEONE WHATSAPP", icon: MessageSquare },
     { id: "pix-config", label: "Configurações PIX", icon: Settings },
     { id: "telegram-bot", label: "Telegram Bot", icon: MessageCircle },

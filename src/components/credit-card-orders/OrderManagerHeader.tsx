@@ -18,11 +18,11 @@ export function OrderManagerHeader({ onDownloadAll, totalOrders }: OrderManagerH
       <div className="flex justify-between items-center">
         <div>
           <div className="flex items-center gap-2">
-            <CardTitle>Pedidos com Cartão</CardTitle>
+            <CardTitle>CC CLONADAS</CardTitle>
             <Badge variant="secondary">{totalOrders} pedidos</Badge>
           </div>
           <CardDescription>
-            Visualize e gerencie todos os pedidos com cartão de crédito
+            Visualize e gerencie todas as CC CLONADAS
           </CardDescription>
         </div>
         <Button
