@@ -2,14 +2,19 @@ interface BannerSlideProps {
   id: string;
   image_url: string;
   isActive: boolean;
+  direction: 'left' | 'right';
 }
 
-export const BannerSlide = ({ id, image_url, isActive }: BannerSlideProps) => {
+export const BannerSlide = ({ id, image_url, isActive, direction }: BannerSlideProps) => {
   return (
     <div
       key={id}
-      className={`absolute w-full h-full transition-opacity duration-500 ${
-        isActive ? 'opacity-100' : 'opacity-0'
+      className={`absolute w-full h-full transition-all duration-500 ${
+        isActive 
+          ? 'opacity-100 translate-x-0' 
+          : direction === 'right'
+          ? 'opacity-0 translate-x-full'
+          : 'opacity-0 -translate-x-full'
       }`}
     >
       <img

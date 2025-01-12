@@ -17,6 +17,7 @@ const defaultBanner: Banner = {
 export const Banner = () => {
   const [banners, setBanners] = useState<Banner[]>([defaultBanner]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right');
 
   const loadBanners = () => {
     try {
@@ -54,30 +55,19 @@ export const Banner = () => {
     console.log("Banner - Estado atual dos banners:", banners);
   }, [banners]);
 
-  const getRandomIndex = (currentIdx: number, length: number) => {
-    if (length <= 1) return 0;
-    let newIndex;
-    do {
-      newIndex = Math.floor(Math.random() * length);
-    } while (newIndex === currentIdx);
-    return newIndex;
-  };
-
   const nextSlide = () => {
-    if (banners.length > 1) {
-      setCurrentIndex(current => getRandomIndex(current, banners.length));
-    }
+    setSlideDirection('right');
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % banners.length);
   };
 
   const prevSlide = () => {
-    if (banners.length > 1) {
-      setCurrentIndex(current => getRandomIndex(current, banners.length));
-    }
+    setSlideDirection('left');
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + banners.length) % banners.length);
   };
 
   useEffect(() => {
     if (banners.length > 1) {
-      const interval = setInterval(nextSlide, 7000);
+      const interval = setInterval(nextSlide, 5000); // Changed to 5000ms (5 seconds)
       return () => clearInterval(interval);
     }
   }, [banners.length]);
@@ -90,6 +80,7 @@ export const Banner = () => {
           id={banner.id}
           image_url={banner.image_url}
           isActive={index === currentIndex}
+          direction={slideDirection}
         />
       ))}
       
