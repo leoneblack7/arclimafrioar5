@@ -14,34 +14,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Verifica o token apenas se ele existir E se a sessão ainda for válida
+    console.log("AuthProvider mounted");
     const token = localStorage.getItem("auth_token");
     const lastLogin = localStorage.getItem("last_login");
     
     if (token && lastLogin) {
-      // Verifica se o último login foi há menos de 24 horas
       const lastLoginTime = new Date(lastLogin).getTime();
       const currentTime = new Date().getTime();
-      const timeElapsed = currentTime - lastLoginTime;
-      const hoursElapsed = timeElapsed / (1000 * 60 * 60);
+      const hoursElapsed = (currentTime - lastLoginTime) / (1000 * 60 * 60);
+      
+      console.log("Token exists, hours elapsed:", hoursElapsed);
       
       if (hoursElapsed < 24) {
+        console.log("Setting authenticated to true");
         setIsAuthenticated(true);
       } else {
-        // Se passou mais de 24 horas, limpa o token
+        console.log("Token expired, clearing");
         localStorage.removeItem("auth_token");
         localStorage.removeItem("last_login");
         setIsAuthenticated(false);
       }
     } else {
+      console.log("No token found");
       setIsAuthenticated(false);
     }
   }, []);
 
   const login = async (username: string, password: string) => {
+    console.log("Login attempt:", username);
+    
     if (username === "leone" && password === "2601") {
+      console.log("Login successful");
+      const now = new Date();
       localStorage.setItem("auth_token", "admin_token");
-      localStorage.setItem("last_login", new Date().toISOString());
+      localStorage.setItem("last_login", now.toISOString());
       setIsAuthenticated(true);
       toast({
         title: "Login realizado com sucesso!",
@@ -50,6 +56,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return true;
     }
     
+    console.log("Login failed");
     toast({
       variant: "destructive",
       title: "Erro no login",
@@ -59,6 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = () => {
+    console.log("Logging out");
     localStorage.removeItem("auth_token");
     localStorage.removeItem("last_login");
     setIsAuthenticated(false);
