@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BarChart3, CreditCard, Link, Search, Edit2, RotateCcw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 
 export const Dashboard = () => {
   const { toast } = useToast();
@@ -40,6 +42,11 @@ export const Dashboard = () => {
       description: "Consultas por CPF hoje"
     }
   ]);
+
+  const chartData = stats.map(stat => ({
+    name: stat.title,
+    value: parseInt(stat.value)
+  }));
 
   const handleEdit = (id: string) => {
     const stat = stats.find(s => s.id === id);
@@ -141,6 +148,34 @@ export const Dashboard = () => {
           </Card>
         ))}
       </div>
+
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle>Visão Geral das Estatísticas</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[300px]">
+            <ChartContainer
+              config={{
+                primary: {
+                  theme: {
+                    light: "var(--primary)",
+                    dark: "var(--primary)",
+                  },
+                },
+              }}
+            >
+              <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip content={<ChartTooltip />} />
+                <Bar dataKey="value" fill="var(--primary)" />
+              </BarChart>
+            </ChartContainer>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
