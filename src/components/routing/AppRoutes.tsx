@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "@/pages/Index";
 import Admin from "@/pages/Admin";
 import Products from "@/pages/Products";
@@ -13,7 +13,14 @@ export const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<Index />} />
-      <Route path="/admblackside" element={<Admin />} />
+      <Route 
+        path="/admblackside" 
+        element={
+          <AuthProvider>
+            <Admin />
+          </AuthProvider>
+        } 
+      />
       <Route path="/produtos" element={<Products />} />
       <Route path="/produto/:id" element={<ProductDetail />} />
       <Route path="/carrinho" element={<Cart />} />
