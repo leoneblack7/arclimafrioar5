@@ -76,12 +76,17 @@ export default function ProductDetail() {
     addItem(product);
   };
 
+  // Use all available images or fallback to single image
+  const productImages = product.images?.length > 0 
+    ? product.images 
+    : [product.image];
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <div className="container mx-auto px-4 pt-24">
         <div className="grid md:grid-cols-2 gap-8">
-          <ProductGallery images={[product.image]} />
+          <ProductGallery images={productImages} />
           <div className="space-y-6">
             <div className="flex justify-between items-start">
               <div>
@@ -150,7 +155,6 @@ export default function ProductDetail() {
               )}
             </div>
 
-            {/* Seção de Descrição do Produto */}
             <div className="border rounded-lg p-4">
               <h2 className="text-lg font-semibold mb-2">Descrição do Produto</h2>
               <p className="text-gray-600 whitespace-pre-wrap">{product.description}</p>

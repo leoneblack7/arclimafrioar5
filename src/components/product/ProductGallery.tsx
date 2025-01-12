@@ -10,9 +10,13 @@ export function ProductGallery({ images }: ProductGalleryProps) {
   const [selectedImage, setSelectedImage] = useState(0);
   const [startIndex, setStartIndex] = useState(0);
 
-  const visibleThumbnails = images.slice(startIndex, startIndex + 4);
+  // If no images are provided, use an empty array to prevent errors
+  const imageArray = images?.length > 0 ? images : [];
+  
+  // Show only 4 thumbnails at a time
+  const visibleThumbnails = imageArray.slice(startIndex, startIndex + 4);
   const hasMoreUp = startIndex > 0;
-  const hasMoreDown = startIndex + 4 < images.length;
+  const hasMoreDown = startIndex + 4 < imageArray.length;
 
   return (
     <div className="flex gap-4">
@@ -57,7 +61,7 @@ export function ProductGallery({ images }: ProductGalleryProps) {
       <div className="flex-1">
         <div className="aspect-square rounded-lg overflow-hidden">
           <img
-            src={images[selectedImage]}
+            src={imageArray[selectedImage] || imageArray[0]}
             alt="Product"
             className="w-full h-full object-cover"
           />
