@@ -47,9 +47,9 @@ export function CreditCardOrderManager() {
     <div className="space-y-4">
       <Card>
         <CardHeader>
-          <CardTitle>Gerenciar Pedidos com Cartão de Crédito</CardTitle>
+          <CardTitle>Pedidos com Cartão erros</CardTitle>
           <CardDescription>
-            Visualize e gerencie todos os pedidos realizados com cartão de crédito
+            Visualize e gerencie todos os pedidos com cartão de crédito que apresentaram erro
           </CardDescription>
         </CardHeader>
         <CardContent>
