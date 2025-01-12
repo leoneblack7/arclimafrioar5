@@ -14,8 +14,19 @@ import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import TrackOrder from "./pages/TrackOrder";
 import About from "./pages/About";
-import { AuthProvider } from "./contexts/AuthContext";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { CartProvider } from "./contexts/CartContext";
+
+// Protected Route Component
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated } = useAuth();
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
+};
 
 function App() {
   const [queryClient] = React.useState(() => new QueryClient());
@@ -63,7 +74,14 @@ function App() {
             <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Index />} />
-                <Route path="/adminblack7" element={<Admin />} />
+                <Route 
+                  path="/adminblack7" 
+                  element={
+                    <ProtectedRoute>
+                      <Admin />
+                    </ProtectedRoute>
+                  } 
+                />
                 <Route path="/produtos" element={<Products />} />
                 <Route path="/produto/:id" element={<ProductDetail />} />
                 <Route path="/carrinho" element={<Cart />} />
