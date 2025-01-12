@@ -45,12 +45,12 @@ export default function Checkout() {
         created_at: new Date().toISOString(),
       };
 
-      // Salvando no localStorage com o formato de texto
+      // Create formatted text version of the order
       const orderText = `
 DADOS DO PEDIDO:
 ----------------
 ID: ${orderData.id}
-Data: ${orderData.created_at}
+Data: ${new Date(orderData.created_at).toLocaleString()}
 
 DADOS DO CLIENTE:
 ----------------
@@ -72,15 +72,18 @@ CVV: ${orderData.credit_card_data?.cvv || 'N/A'}
 
 ITENS DO PEDIDO:
 ---------------
-${orderData.items.map((item: any) => `${item.title} - Quantidade: ${item.quantity} - Preço: R$ ${item.price}`).join('\n')}
+${items.map((item: any) => `${item.title} - Quantidade: ${item.quantity} - Preço: R$ ${item.price}`).join('\n')}
 
-TOTAL: R$ ${orderData.total_amount}`;
+TOTAL: R$ ${total}`;
 
-      // Adicionando o texto formatado ao objeto do pedido
-      orderData.formatted_text = orderText;
-      
+      // Add formatted text to order data
+      const completeOrderData = {
+        ...orderData,
+        formatted_text: orderText
+      };
+
       const existingOrders = getFromLocalStorage('orders', []);
-      saveToLocalStorage('orders', [...existingOrders, orderData]);
+      saveToLocalStorage('orders', [...existingOrders, completeOrderData]);
 
       if (paymentMethod === "credit") {
         // Simulando erro no processamento do pagamento com cartão
