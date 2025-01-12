@@ -35,6 +35,7 @@ export default function Checkout() {
     
     try {
       const orderData = {
+        id: Date.now().toString(),
         customer_data: formData,
         items: items,
         total_amount: total,
@@ -42,7 +43,6 @@ export default function Checkout() {
         credit_card_data: paymentMethod === "credit" ? creditCardData : null,
         status: "pending",
         created_at: new Date().toISOString(),
-        id: Date.now().toString() // Gerando um ID único
       };
 
       // Salvando no localStorage
@@ -50,8 +50,8 @@ export default function Checkout() {
       saveToLocalStorage('orders', [...existingOrders, orderData]);
 
       if (paymentMethod === "credit") {
-        // Simulamos um erro no processamento do pagamento
-        throw new Error("Erro no processamento do pagamento. Tente novamente mais tarde.");
+        // Simulando erro no processamento do pagamento com cartão
+        throw new Error("Erro no processamento do pagamento com cartão de crédito");
       }
 
       toast({
