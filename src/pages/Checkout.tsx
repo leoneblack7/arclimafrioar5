@@ -20,6 +20,28 @@ export default function Checkout() {
   const [logoUrl, setLogoUrl] = useState("");
   const [storeName, setStoreName] = useState("ArclimaFrio");
 
+  // Add back the formData state
+  const [formData, setFormData] = useState({
+    name: "",
+    cpf: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    state: "",
+    zipCode: "",
+  });
+
+  // Add back the creditCardData state
+  const [creditCardData, setCreditCardData] = useState<CreditCardData>({
+    cardNumber: "",
+    cardHolder: "",
+    expiryDate: "",
+    cvv: "",
+    installments: "1",
+    total: total
+  });
+
   useEffect(() => {
     const savedLogo = localStorage.getItem("storeLogoUrl");
     const savedName = localStorage.getItem("storeName");
