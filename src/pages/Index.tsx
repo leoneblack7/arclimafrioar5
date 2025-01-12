@@ -6,14 +6,13 @@ import { FeaturesSection } from "@/components/home/FeaturesSection";
 import { ProductsSection } from "@/components/home/ProductsSection";
 import { CTASection } from "@/components/home/CTASection";
 import { Footer } from "@/components/home/Footer";
-import { Product } from "@/types/product";
 import { getFromLocalStorage } from "@/utils/localStorage";
 
 const Index = () => {
   const { data: products, isLoading } = useQuery({
-    queryKey: ["products"],
+    queryKey: ["featured-products"],
     queryFn: async () => {
-      const storedProducts = getFromLocalStorage('products', []);
+      const storedProducts = getFromLocalStorage('featured-products', []);
       return storedProducts
         .filter((item: any) => item.active)
         .map((item: any) => ({
@@ -27,20 +26,18 @@ const Index = () => {
     }
   });
 
-  const scrollToProducts = () => {
-    const productsSection = document.getElementById('products-section');
-    if (productsSection) {
-      productsSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <div className="w-full">
         <Banner />
       </div>
-      <HeroSection onExploreClick={scrollToProducts} />
+      <HeroSection onExploreClick={() => {
+        const productsSection = document.getElementById('products-section');
+        if (productsSection) {
+          productsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      }} />
       <FeaturesSection />
       {isLoading ? (
         <div className="text-center py-16">
