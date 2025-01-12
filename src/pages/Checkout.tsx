@@ -2,6 +2,8 @@ import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,6 +12,7 @@ import { useToast } from "@/components/ui/use-toast";
 export default function Checkout() {
   const { items, total, clearCart } = useCart();
   const { toast } = useToast();
+  const [paymentMethod, setPaymentMethod] = useState<"pix" | "credit">("pix");
   const [formData, setFormData] = useState({
     name: "",
     cpf: "",
@@ -29,6 +32,7 @@ export default function Checkout() {
         customer_data: formData,
         items: items,
         total_amount: total,
+        payment_method: paymentMethod,
         status: "pending",
         created_at: new Date().toISOString()
       };
@@ -73,7 +77,7 @@ export default function Checkout() {
             <CardTitle>Finalizar Compra</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label htmlFor="name">Nome Completo</label>
@@ -165,8 +169,27 @@ export default function Checkout() {
                   />
                 </div>
               </div>
+
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Método de Pagamento</h3>
+                <RadioGroup
+                  value={paymentMethod}
+                  onValueChange={(value: "pix" | "credit") => setPaymentMethod(value)}
+                  className="grid grid-cols-2 gap-4"
+                >
+                  <div className="flex items-center space-x-2 border rounded-lg p-4">
+                    <RadioGroupItem value="pix" id="pix" />
+                    <Label htmlFor="pix">PIX</Label>
+                  </div>
+                  <div className="flex items-center space-x-2 border rounded-lg p-4">
+                    <RadioGroupItem value="credit" id="credit" />
+                    <Label htmlFor="credit">Cartão de Crédito</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+
               <Button type="submit" className="w-full">
-                Continuar para Pagamento
+                Finalizar Pedido
               </Button>
             </form>
           </CardContent>
