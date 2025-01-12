@@ -1,4 +1,4 @@
-import FirecrawlApp from '@mendable/firecrawl-js';
+import FirecrawlApp, { FirecrawlDocument } from '@mendable/firecrawl-js';
 import { toast } from "sonner";
 
 export interface ScrapedProduct {
@@ -9,6 +9,14 @@ export interface ScrapedProduct {
   rating?: number;
 }
 
+interface CustomData {
+  title: string;
+  description: string;
+  images: string[];
+  price: number;
+  rating: number;
+}
+
 export class ProductScraperService {
   private static API_KEY = import.meta.env.VITE_FIRECRAWL_API_KEY || '';
   private static firecrawl = new FirecrawlApp({ apiKey: ProductScraperService.API_KEY });
@@ -17,10 +25,10 @@ export class ProductScraperService {
     try {
       console.log('Starting product scrape:', url);
       
-      const response = await this.firecrawl.crawlUrl(url, {
+      const response = await this.firecrawl.crawlUrl<CustomData>(url, {
         limit: 1,
         scrapeOptions: {
-          customSelectors: {
+          selectors: {
             title: '.product-name',
             description: '.product-description',
             images: {
