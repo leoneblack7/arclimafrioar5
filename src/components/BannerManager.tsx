@@ -34,6 +34,7 @@ export const BannerManager = () => {
     } catch (error) {
       console.error('Erro ao carregar banners:', error);
       toast.error('Erro ao carregar os banners');
+      setBanners([defaultBanner]); // Garante que o banner padrão seja exibido em caso de erro
     }
   };
 
