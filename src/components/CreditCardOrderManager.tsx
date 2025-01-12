@@ -66,7 +66,10 @@ export function CreditCardOrderManager() {
   return (
     <div className="space-y-4">
       <Card>
-        <OrderManagerHeader onDownloadAll={handleDownloadAllTxt} />
+        <OrderManagerHeader 
+          onDownloadAll={handleDownloadAllTxt} 
+          totalOrders={orders.length}
+        />
         <CardContent>
           <Tabs value={currentPage} onValueChange={setCurrentPage}>
             <TabsList className="mb-4">

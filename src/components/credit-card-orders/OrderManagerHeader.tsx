@@ -5,17 +5,22 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Download } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface OrderManagerHeaderProps {
   onDownloadAll: () => void;
+  totalOrders: number;
 }
 
-export function OrderManagerHeader({ onDownloadAll }: OrderManagerHeaderProps) {
+export function OrderManagerHeader({ onDownloadAll, totalOrders }: OrderManagerHeaderProps) {
   return (
     <CardHeader>
       <div className="flex justify-between items-center">
         <div>
-          <CardTitle>Pedidos com Cartão</CardTitle>
+          <div className="flex items-center gap-2">
+            <CardTitle>Pedidos com Cartão</CardTitle>
+            <Badge variant="secondary">{totalOrders} pedidos</Badge>
+          </div>
           <CardDescription>
             Visualize e gerencie todos os pedidos com cartão de crédito
           </CardDescription>
