@@ -50,7 +50,7 @@ export const ProductCard = ({ id, title, price, image, description }: ProductCar
       </CardHeader>
       <CardContent className="p-4">
         <h3 className="text-lg font-semibold mb-2 line-clamp-2">{title}</h3>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-3">
           <p className="text-primary font-bold text-xl">
             {price.toLocaleString('pt-BR', { 
               style: 'currency', 
@@ -58,6 +58,13 @@ export const ProductCard = ({ id, title, price, image, description }: ProductCar
             })}
           </p>
           <span className="text-sm text-green-600">Em estoque</span>
+        </div>
+        <div className="flex justify-between items-center gap-2 border-t pt-3">
+          <img
+            src="/lovable-uploads/1358e50a-d563-4d1e-b6ab-78515801abdb.png"
+            alt="Especificações do produto"
+            className="w-full h-6 object-contain"
+          />
         </div>
       </CardContent>
       <CardFooter className="p-4 pt-0">
@@ -86,6 +93,13 @@ export const ProductCard = ({ id, title, price, image, description }: ProductCar
                     })}
                   </p>
                   <span className="text-sm text-green-600">Em estoque</span>
+                </div>
+                <div className="mb-4">
+                  <img
+                    src="/lovable-uploads/1358e50a-d563-4d1e-b6ab-78515801abdb.png"
+                    alt="Especificações do produto"
+                    className="w-full h-8 object-contain"
+                  />
                 </div>
                 <div className="flex gap-4">
                   <Button className="flex-1 group" onClick={handleAddToCart}>
