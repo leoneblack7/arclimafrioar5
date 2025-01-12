@@ -41,8 +41,20 @@ export const PixConfigManager = () => {
 
   const handleSave = () => {
     saveToLocalStorage("PIX_CONFIG", config);
-    toast({
-      title: "Configurações salvas com sucesso!"
+    const status = [];
+    if (config.enabled) {
+      status.push("Integração Ticto PIX ativada");
+    } else {
+      status.push("Integração Ticto PIX desativada");
+    }
+    if (config.useCustomKeys) {
+      status.push("Chaves PIX personalizadas ativadas");
+    } else {
+      status.push("Chaves PIX personalizadas desativadas");
+    }
+    
+    toast.success("Configurações salvas com sucesso!", {
+      description: status.join(". ")
     });
   };
 
