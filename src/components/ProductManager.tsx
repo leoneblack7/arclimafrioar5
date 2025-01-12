@@ -4,8 +4,10 @@ import { Input } from "./ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { Switch } from "./ui/switch";
 import { toast } from "sonner";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Plus } from "lucide-react";
 import { ProductScraperService } from "@/utils/ProductScraperService";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
+import { Textarea } from "./ui/textarea";
 
 interface Product {
   id: number;
@@ -59,8 +61,11 @@ export const ProductManager = () => {
       active: true
     }
   ]);
+
   const [importUrl, setImportUrl] = useState("");
   const [isImporting, setIsImporting] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleImportProduct = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,9 +112,58 @@ export const ProductManager = () => {
     }
   };
 
+  const handleEditProduct = (product: Product) => {
+    setEditingProduct(product);
+    setIsDialogOpen(true);
+  };
+
+  const handleSaveEdit = () => {
+    if (editingProduct) {
+      setProducts(products.map(p => 
+        p.id === editingProduct.id ? editingProduct : p
+      ));
+      setIsDialogOpen(false);
+      setEditingProduct(null);
+      toast.success("Produto atualizado com sucesso!");
+    }
+  };
+
+  const handleNewProduct = () => {
+    const newProduct: Product = {
+      id: products.length + 1,
+      title: "Novo Produto",
+      price: 0,
+      image: "/placeholder.svg",
+      description: "Descrição do novo produto",
+      active: true
+    };
+    setEditingProduct(newProduct);
+    setIsDialogOpen(true);
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && editingProduct) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setEditingProduct({
+          ...editingProduct,
+          image: reader.result as string
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold">Gerenciar Produtos</h2>
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold">Gerenciar Produtos</h2>
+        <Button onClick={handleNewProduct} className="flex items-center gap-2">
+          <Plus className="h-4 w-4" />
+          Novo Produto
+        </Button>
+      </div>
       
       <div className="bg-white p-6 rounded-lg shadow">
         <h3 className="text-lg font-semibold mb-4">Importar Produto</h3>
@@ -126,6 +180,74 @@ export const ProductManager = () => {
           </Button>
         </form>
       </div>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>
+              {editingProduct?.id ? "Editar Produto" : "Novo Produto"}
+            </DialogTitle>
+          </DialogHeader>
+          {editingProduct && (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Título</label>
+                <Input
+                  value={editingProduct.title}
+                  onChange={(e) => setEditingProduct({
+                    ...editingProduct,
+                    title: e.target.value
+                  })}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Preço</label>
+                <Input
+                  type="number"
+                  value={editingProduct.price}
+                  onChange={(e) => setEditingProduct({
+                    ...editingProduct,
+                    price: parseFloat(e.target.value)
+                  })}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Descrição</label>
+                <Textarea
+                  value={editingProduct.description}
+                  onChange={(e) => setEditingProduct({
+                    ...editingProduct,
+                    description: e.target.value
+                  })}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Imagem</label>
+                <div className="flex items-center gap-4">
+                  <img
+                    src={editingProduct.image}
+                    alt={editingProduct.title}
+                    className="w-24 h-24 object-cover rounded"
+                  />
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-4 pt-4">
+                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                  Cancelar
+                </Button>
+                <Button onClick={handleSaveEdit}>
+                  Salvar
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <Table>
@@ -169,6 +291,13 @@ export const ProductManager = () => {
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => handleEditProduct(product)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
                     <Button
                       variant="outline"
                       size="icon"
