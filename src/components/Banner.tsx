@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from "@/integrations/supabase/client";
 
 interface Banner {
-  id: number;
-  imageUrl: string;
+  id: string;
+  image_url: string;
   active: boolean;
 }
 
@@ -12,17 +13,18 @@ export const Banner = () => {
   const [banners, setBanners] = useState<Banner[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const loadBanners = () => {
+  const loadBanners = async () => {
     try {
-      const savedBanners = localStorage.getItem("siteBanners");
-      console.log("Banner - Carregando banners:", savedBanners);
-      
-      if (savedBanners) {
-        const parsedBanners = JSON.parse(savedBanners);
-        const activeBanners = parsedBanners.filter((banner: Banner) => banner.active);
-        console.log("Banner - Banners ativos:", activeBanners);
-        setBanners(activeBanners);
-      }
+      const { data, error } = await supabase
+        .from('banners')
+        .select('*')
+        .eq('active', true)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+
+      console.log("Banner - Banners ativos carregados:", data);
+      setBanners(data || []);
     } catch (error) {
       console.error('Erro ao carregar banners:', error);
       toast.error('Erro ao carregar os banners');
@@ -31,10 +33,21 @@ export const Banner = () => {
 
   useEffect(() => {
     loadBanners();
-    window.addEventListener('storage', loadBanners);
     
+    // Inscrever-se para atualizações em tempo real
+    const channel = supabase
+      .channel('banner-changes')
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'banners' 
+      }, () => {
+        loadBanners();
+      })
+      .subscribe();
+
     return () => {
-      window.removeEventListener('storage', loadBanners);
+      channel.unsubscribe();
     };
   }, []);
 
@@ -80,7 +93,7 @@ export const Banner = () => {
           }`}
         >
           <img
-            src={banner.imageUrl}
+            src={banner.image_url}
             alt={`Banner ${index + 1}`}
             className="w-full h-full object-cover"
           />
