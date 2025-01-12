@@ -131,7 +131,7 @@ export const Banner = () => {
 
   return (
     <div 
-      className="relative w-full overflow-hidden"
+      className="relative w-full overflow-hidden aspect-[16/9]"
       tabIndex={0}
       aria-label="Banner carousel"
     >
