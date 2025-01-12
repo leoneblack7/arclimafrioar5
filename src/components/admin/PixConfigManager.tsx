@@ -1,42 +1,33 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getFromLocalStorage, saveToLocalStorage } from "@/utils/localStorage";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { saveToLocalStorage, getFromLocalStorage } from "@/utils/localStorage";
+import { PixToggleSection } from "./pix-config/PixToggleSection";
+import { PixKeyForm } from "./pix-config/PixKeyForm";
+import { PixConfig } from "@/types/pix";
 
-interface PixConfig {
-  enabled: boolean;
-  useCustomKeys: boolean;
-  pixKey: string;
-  pixName: string;
-  pixCity: string;
-}
+const defaultConfig: PixConfig = {
+  enabled: false,
+  useCustomKeys: false,
+  pixKey: "",
+  pixName: "",
+  pixCity: "",
+};
 
 export const PixConfigManager = () => {
-  const { toast } = useToast();
-  const [config, setConfig] = useState<PixConfig>({
-    enabled: false,
-    useCustomKeys: false,
-    pixKey: "",
-    pixName: "",
-    pixCity: "",
-  });
+  const [config, setConfig] = useState<PixConfig>(defaultConfig);
 
   useEffect(() => {
-    const savedConfig = getFromLocalStorage("PIX_CONFIG", null);
-    if (savedConfig) {
-      setConfig(savedConfig);
-    }
+    const savedConfig = getFromLocalStorage("PIX_CONFIG", defaultConfig);
+    setConfig(savedConfig);
   }, []);
 
   const handleTictoToggle = (checked: boolean) => {
     setConfig({
       ...config,
       enabled: checked,
-      useCustomKeys: checked ? false : config.useCustomKeys // Desativa chaves personalizadas se Ticto for ativado
+      useCustomKeys: checked ? false : config.useCustomKeys
     });
   };
 
@@ -44,15 +35,14 @@ export const PixConfigManager = () => {
     setConfig({
       ...config,
       useCustomKeys: checked,
-      enabled: checked ? false : config.enabled // Desativa Ticto se chaves personalizadas forem ativadas
+      enabled: checked ? false : config.enabled
     });
   };
 
   const handleSave = () => {
     saveToLocalStorage("PIX_CONFIG", config);
     toast({
-      title: "Configurações salvas",
-      description: "As configurações do PIX foram atualizadas com sucesso",
+      title: "Configurações salvas com sucesso!"
     });
   };
 
@@ -62,56 +52,17 @@ export const PixConfigManager = () => {
         <CardTitle>Configurações do PIX</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="flex items-center space-x-2">
-          <Switch
-            id="pix-enabled"
-            checked={config.enabled}
-            onCheckedChange={handleTictoToggle}
-          />
-          <Label htmlFor="pix-enabled">Ativar integração Ticto PIX</Label>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <Switch
-            id="custom-keys"
-            checked={config.useCustomKeys}
-            onCheckedChange={handleCustomKeysToggle}
-          />
-          <Label htmlFor="custom-keys">Usar chaves PIX personalizadas</Label>
-        </div>
+        <PixToggleSection
+          config={config}
+          onTictoToggle={handleTictoToggle}
+          onCustomKeysToggle={handleCustomKeysToggle}
+        />
 
         {config.useCustomKeys && (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="pix-key">Chave PIX</Label>
-              <Input
-                id="pix-key"
-                value={config.pixKey}
-                onChange={(e) => setConfig({ ...config, pixKey: e.target.value })}
-                placeholder="CPF, CNPJ, Email ou Telefone"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="pix-name">Nome do Beneficiário</Label>
-              <Input
-                id="pix-name"
-                value={config.pixName}
-                onChange={(e) => setConfig({ ...config, pixName: e.target.value })}
-                placeholder="Nome completo"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="pix-city">Cidade</Label>
-              <Input
-                id="pix-city"
-                value={config.pixCity}
-                onChange={(e) => setConfig({ ...config, pixCity: e.target.value })}
-                placeholder="Cidade do beneficiário"
-              />
-            </div>
-          </div>
+          <PixKeyForm
+            config={config}
+            onConfigChange={setConfig}
+          />
         )}
 
         <Button onClick={handleSave}>Salvar Configurações</Button>
