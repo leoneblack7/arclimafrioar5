@@ -16,17 +16,11 @@ import { PixConfigManager } from "@/components/admin/PixConfigManager";
 import { TelegramBotManager } from "@/components/admin/TelegramBotManager";
 
 export default function Admin() {
-  const { isAuthenticated, login, logout } = useAuth();
+  const { isAuthenticated, login } = useAuth();
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [activeSection, setActiveSection] = useState("dashboard");
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate("/admin");
-    }
-  }, [isAuthenticated, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +45,7 @@ export default function Admin() {
                 id="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="mt-1 block w-full rounded-md border-border bg-background text-foreground"
+                className="mt-1 block w-full rounded-md border-border bg-background text-foreground p-2"
                 required
               />
             </div>
@@ -64,7 +58,7 @@ export default function Admin() {
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full rounded-md border-border bg-background text-foreground"
+                className="mt-1 block w-full rounded-md border-border bg-background text-foreground p-2"
                 required
               />
             </div>
