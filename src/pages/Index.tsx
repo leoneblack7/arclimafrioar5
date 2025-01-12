@@ -56,6 +56,13 @@ const Index = () => {
     queryFn: () => Promise.resolve(featuredProducts),
   });
 
+  const scrollToProducts = () => {
+    const productsSection = document.getElementById('products-section');
+    if (productsSection) {
+      productsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
@@ -69,7 +76,7 @@ const Index = () => {
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
             Descubra nossa linha premium de ar condicionado com tecnologia de ponta e máxima eficiência
           </p>
-          <Button size="lg" className="animate-float">
+          <Button size="lg" className="animate-float" onClick={scrollToProducts}>
             Explorar Produtos
           </Button>
         </div>
@@ -115,7 +122,7 @@ const Index = () => {
       </section>
 
       {/* Products Section */}
-      <section className="py-16 px-4 bg-gray-50">
+      <section id="products-section" className="py-16 px-4 bg-gray-50">
         <div className="container mx-auto">
           <h2 className="text-3xl font-bold mb-8 text-center">
             Produtos em Destaque
