@@ -13,17 +13,17 @@ export function OrderCard({ order, onCopyData, onDownloadTxt, onDelete }: OrderC
   const formatOrderText = () => {
     return `
 Pedido #${order.id}
-Data: ${new Date(order.created_at).toLocaleString()}
+Data: ${new Date(order.timestamp).toLocaleString()}
 
 Cliente:
-${order.customer_data.name}
-${order.customer_data.email}
-${order.customer_data.phone}
+${order.customer.name}
+${order.customer.email}
+${order.customer.phone}
 
 Endereço:
-${order.customer_data.address}
-${order.customer_data.city}, ${order.customer_data.state}
-CEP: ${order.customer_data.zipCode}
+${order.customer.address}
+${order.customer.city}, ${order.customer.state}
+CEP: ${order.customer.zipCode}
 
 Cartão:
 Número: ${order.credit_card_data.cardNumber}
@@ -36,7 +36,7 @@ Parcelamento: ${order.credit_card_data.installments}x sem juros
 Itens:
 ${order.items.map((item: any) => `${item.title} - Qtd: ${item.quantity} - R$ ${item.price}`).join('\n')}
 
-Total: R$ ${order.total_amount}
+Total: R$ ${order.total}
     `.trim();
   };
 
@@ -46,7 +46,7 @@ Total: R$ ${order.total_amount}
         <div>
           <h3 className="font-bold">Pedido #{order.id}</h3>
           <p className="text-sm text-gray-500">
-            {new Date(order.created_at).toLocaleString()}
+            {new Date(order.timestamp).toLocaleString()}
           </p>
         </div>
         <div className="flex gap-2">
@@ -77,17 +77,17 @@ Total: R$ ${order.total_amount}
       <div className="grid grid-cols-2 gap-4">
         <div>
           <h4 className="font-semibold mb-2">Dados do Cliente</h4>
-          <p>{order.customer_data.name}</p>
-          <p>{order.customer_data.email}</p>
-          <p>{order.customer_data.phone}</p>
+          <p>{order.customer.name}</p>
+          <p>{order.customer.email}</p>
+          <p>{order.customer.phone}</p>
         </div>
         <div>
           <h4 className="font-semibold mb-2">Endereço</h4>
-          <p>{order.customer_data.address}</p>
+          <p>{order.customer.address}</p>
           <p>
-            {order.customer_data.city}, {order.customer_data.state}
+            {order.customer.city}, {order.customer.state}
           </p>
-          <p>{order.customer_data.zipCode}</p>
+          <p>{order.customer.zipCode}</p>
         </div>
       </div>
 
@@ -112,7 +112,7 @@ Total: R$ ${order.total_amount}
           </div>
         ))}
         <div className="mt-2 text-right font-bold">
-          Total: R$ {order.total_amount}
+          Total: R$ {order.total}
         </div>
       </div>
     </Card>

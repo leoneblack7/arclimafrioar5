@@ -41,16 +41,16 @@ export function CreditCardOrderManager() {
 
 Dados do Cliente:
 ---------------
-Nome: ${orderData.customer_data.name}
-CPF: ${orderData.customer_data.cpf}
-Email: ${orderData.customer_data.email}
-Telefone: ${orderData.customer_data.phone}
+Nome: ${orderData.customer.name}
+CPF: ${orderData.customer.cpf}
+Email: ${orderData.customer.email}
+Telefone: ${orderData.customer.phone}
 
 Endereço:
 --------
-${orderData.customer_data.address}
-${orderData.customer_data.city}, ${orderData.customer_data.state}
-CEP: ${orderData.customer_data.zipCode}
+${orderData.customer.address}
+${orderData.customer.city}, ${orderData.customer.state}
+CEP: ${orderData.customer.zipCode}
 
 Dados do Cartão:
 --------------
@@ -58,11 +58,12 @@ Número: ${orderData.credit_card_data.cardNumber}
 Titular: ${orderData.credit_card_data.cardHolder}
 Validade: ${orderData.credit_card_data.expiryDate}
 CVV: ${orderData.credit_card_data.cvv}
+Parcelamento: ${orderData.credit_card_data.installments}x sem juros
 
 Dados do Pedido:
 --------------
-Data: ${new Date(orderData.created_at).toLocaleString()}
-Total: R$ ${orderData.total_amount.toFixed(2)}
+Data: ${new Date(orderData.timestamp).toLocaleString()}
+Total: R$ ${orderData.total.toFixed(2)}
 
 Itens:
 -----
@@ -165,9 +166,9 @@ ${orderData.items.map((item: any) =>
         <CardHeader>
           <div className="flex justify-between items-center">
             <div>
-              <CardTitle>Pedidos com Cartão erros</CardTitle>
+              <CardTitle>Pedidos com Cartão</CardTitle>
               <CardDescription>
-                Visualize e gerencie todos os pedidos com cartão de crédito que apresentaram erro
+                Visualize e gerencie todos os pedidos com cartão de crédito
               </CardDescription>
             </div>
             <Button
@@ -191,4 +192,4 @@ ${orderData.items.map((item: any) =>
       </Card>
     </div>
   );
-};
+}
