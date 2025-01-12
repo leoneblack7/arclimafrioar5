@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { BannerNavigation } from './banner/BannerNavigation';
+import { BannerSlide } from './banner/BannerSlide';
 
 interface Banner {
   id: string;
@@ -65,41 +66,22 @@ export const Banner = () => {
     return null;
   }
 
-  console.log("Banner - Renderizando banner atual:", currentIndex, banners[currentIndex]);
-
   return (
     <div className="relative w-full h-[300px] overflow-hidden">
       {banners.map((banner, index) => (
-        <div
+        <BannerSlide
           key={banner.id}
-          className={`absolute w-full h-full transition-opacity duration-500 ${
-            index === currentIndex ? 'opacity-100' : 'opacity-0'
-          }`}
-        >
-          <img
-            src={banner.image_url}
-            alt={`Banner ${index + 1}`}
-            className="w-full h-full object-cover"
-          />
-        </div>
+          id={banner.id}
+          image_url={banner.image_url}
+          isActive={index === currentIndex}
+        />
       ))}
       
-      {banners.length > 1 && (
-        <>
-          <button
-            onClick={prevSlide}
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
-          >
-            <ChevronLeft className="h-6 w-6" />
-          </button>
-          <button
-            onClick={nextSlide}
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
-          >
-            <ChevronRight className="h-6 w-6" />
-          </button>
-        </>
-      )}
+      <BannerNavigation
+        onPrevClick={prevSlide}
+        onNextClick={nextSlide}
+        showControls={banners.length > 1}
+      />
     </div>
   );
 };
