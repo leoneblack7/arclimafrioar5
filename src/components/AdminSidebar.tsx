@@ -13,6 +13,7 @@ import {
   CreditCard,
   MessageCircle,
   Settings,
+  User,
 } from "lucide-react";
 import { Button } from "./ui/button";
 
@@ -36,6 +37,7 @@ export const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarPro
     { id: "leone-whatsapp", label: "LEONE WHATSAPP", icon: MessageSquare },
     { id: "pix-config", label: "Configurações PIX", icon: Settings },
     { id: "telegram-bot", label: "Telegram Bot", icon: MessageCircle },
+    { id: "user-management", label: "Gerenciar Usuário", icon: User },
   ];
 
   return (
