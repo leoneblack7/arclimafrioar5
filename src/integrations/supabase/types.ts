@@ -9,6 +9,45 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      orders: {
+        Row: {
+          created_at: string | null
+          id: string
+          status: string
+          total_amount: number
+          payment_method: string
+          customer_data: Json
+          credit_card_data: Json | null
+          items: Json[]
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          status: string
+          total_amount: number
+          payment_method: string
+          customer_data: Json
+          credit_card_data?: Json | null
+          items: Json[]
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          status?: string
+          total_amount?: number
+          payment_method?: string
+          customer_data?: Json
+          credit_card_data?: Json | null
+          items?: Json[]
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       banners: {
         Row: {
           active: boolean | null
@@ -74,33 +113,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      orders: {
-        Row: {
-          created_at: string | null
-          id: string
-          status: string
-          total_amount: number
-          updated_at: string | null
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          status: string
-          total_amount: number
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          status?: string
-          total_amount?: number
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
       }
       products: {
         Row: {
@@ -178,7 +190,7 @@ export type Tables<
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
         Database[PublicTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
       Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
