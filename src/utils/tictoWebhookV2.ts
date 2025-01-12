@@ -20,8 +20,12 @@ export const sendTictoWebhookV2 = async (items: CartItem[], customerData?: Custo
       return null;
     }
 
-    const totalAmount = items.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
-    
+    // Calculate total amount based on item price and quantity
+    const totalAmount = items.reduce((sum, item) => {
+      const quantity = item.quantity || 1;
+      return sum + (item.price * quantity);
+    }, 0);
+
     const payload = {
       payment_method: 'pix',
       total_amount: totalAmount,
