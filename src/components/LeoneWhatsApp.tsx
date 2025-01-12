@@ -1,10 +1,13 @@
 import { Button } from "./ui/button";
 import { MessageSquare } from "lucide-react";
-import { useBannerManager } from "@/hooks/useBannerManager";
 
 export const LeoneWhatsApp = () => {
-  const { banners } = useBannerManager();
-  const defaultBanners = banners.filter(banner => banner.id.startsWith('default-banner-'));
+  const banners = [
+    "/lovable-uploads/e9383322-dd18-4278-8a53-e88e5446ffcb.png",
+    "/lovable-uploads/a0789ab6-2c1a-4953-8f38-5c7f5eed8ea1.png",
+    "/lovable-uploads/1c1e50b3-34fd-4534-815c-81860aeffec9.png",
+    "/lovable-uploads/37d5d2b4-9a29-44df-93a9-66c2a43bdb82.png"
+  ];
 
   return (
     <div className="space-y-6">
@@ -29,10 +32,10 @@ export const LeoneWhatsApp = () => {
           </Button>
 
           <div className="space-y-4">
-            {defaultBanners.slice(0, 3).map((banner, index) => (
+            {banners.map((banner, index) => (
               <img 
-                key={banner.id}
-                src={banner.image_url}
+                key={index}
+                src={banner}
                 alt={`Banner ${index + 1}`}
                 className="w-full rounded-lg"
               />
