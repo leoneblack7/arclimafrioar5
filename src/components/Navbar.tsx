@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { SearchBar } from "./SearchBar";
 import { CartDrawer } from "./CartDrawer";
+import { Link } from "react-router-dom";
 
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -12,26 +13,26 @@ export const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <a href="/" className="text-2xl font-bold text-primary">
+            <Link to="/" className="text-2xl font-bold text-primary">
               ArclimaFrio
-            </a>
+            </Link>
           </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             <SearchBar />
-            <a href="/" className="text-gray-600 hover:text-primary transition-colors">
+            <Link to="/" className="text-gray-600 hover:text-primary transition-colors">
               Início
-            </a>
-            <a href="/produtos" className="text-gray-600 hover:text-primary transition-colors">
+            </Link>
+            <Link to="/" className="text-gray-600 hover:text-primary transition-colors">
               Produtos
-            </a>
-            <a href="/sobre" className="text-gray-600 hover:text-primary transition-colors">
+            </Link>
+            <Link to="/sobre" className="text-gray-600 hover:text-primary transition-colors">
               Sobre
-            </a>
-            <a href="/rastreio" className="text-gray-600 hover:text-primary transition-colors">
+            </Link>
+            <Link to="/rastreio" className="text-gray-600 hover:text-primary transition-colors">
               Rastrear Pedido
-            </a>
+            </Link>
             <CartDrawer />
           </div>
 
@@ -56,18 +57,18 @@ export const Navbar = () => {
               <SearchBar />
             </div>
             <div className="flex flex-col space-y-4">
-              <a href="/" className="text-gray-600 hover:text-primary transition-colors">
+              <Link to="/" className="text-gray-600 hover:text-primary transition-colors">
                 Início
-              </a>
-              <a href="/produtos" className="text-gray-600 hover:text-primary transition-colors">
+              </Link>
+              <Link to="/" className="text-gray-600 hover:text-primary transition-colors">
                 Produtos
-              </a>
-              <a href="/sobre" className="text-gray-600 hover:text-primary transition-colors">
+              </Link>
+              <Link to="/sobre" className="text-gray-600 hover:text-primary transition-colors">
                 Sobre
-              </a>
-              <a href="/contato" className="text-gray-600 hover:text-primary transition-colors">
-                Contato
-              </a>
+              </Link>
+              <Link to="/rastreio" className="text-gray-600 hover:text-primary transition-colors">
+                Rastrear Pedido
+              </Link>
             </div>
           </div>
         )}
