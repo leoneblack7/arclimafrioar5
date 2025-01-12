@@ -4,9 +4,22 @@ import { useState } from "react";
 import { SearchBar } from "./SearchBar";
 import { CartDrawer } from "./CartDrawer";
 import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
+
+  const scrollToProducts = () => {
+    if (location.pathname === '/') {
+      const productsSection = document.getElementById('products-section');
+      if (productsSection) {
+        productsSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      window.location.href = '/#products-section';
+    }
+  };
 
   return (
     <nav className="bg-white shadow-sm fixed w-full top-0 z-50">
@@ -24,9 +37,12 @@ export const Navbar = () => {
             <Link to="/" className="text-gray-600 hover:text-primary transition-colors">
               Início
             </Link>
-            <Link to="/" className="text-gray-600 hover:text-primary transition-colors">
+            <button 
+              onClick={scrollToProducts}
+              className="text-gray-600 hover:text-primary transition-colors"
+            >
               Produtos
-            </Link>
+            </button>
             <Link to="/sobre" className="text-gray-600 hover:text-primary transition-colors">
               Sobre
             </Link>
@@ -60,9 +76,12 @@ export const Navbar = () => {
               <Link to="/" className="text-gray-600 hover:text-primary transition-colors">
                 Início
               </Link>
-              <Link to="/" className="text-gray-600 hover:text-primary transition-colors">
+              <button 
+                onClick={scrollToProducts}
+                className="text-left text-gray-600 hover:text-primary transition-colors"
+              >
                 Produtos
-              </Link>
+              </button>
               <Link to="/sobre" className="text-gray-600 hover:text-primary transition-colors">
                 Sobre
               </Link>
