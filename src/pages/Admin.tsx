@@ -13,16 +13,28 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { LeoneWhatsApp } from "@/components/LeoneWhatsApp";
 import { PixConfigManager } from "@/components/admin/PixConfigManager";
 import { TelegramBotManager } from "@/components/admin/TelegramBotManager";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
 
 export default function Admin() {
-  const { isAuthenticated, login } = useAuth();
+  const { isAuthenticated, login, currentUsername, changeUsername } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [activeSection, setActiveSection] = useState("dashboard");
+  const [oldUsername, setOldUsername] = useState("");
+  const [newUsername, setNewUsername] = useState("");
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     await login(username, password);
+  };
+
+  const handleUsernameChange = (e: React.FormEvent) => {
+    e.preventDefault();
+    changeUsername(oldUsername, newUsername);
+    setOldUsername("");
+    setNewUsername("");
   };
 
   if (!isAuthenticated) {
@@ -81,7 +93,44 @@ export default function Admin() {
     <div className="min-h-screen bg-background/80 backdrop-blur-sm">
       <AdminSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
       <div className="ml-64 p-8">
-        {activeSection === "dashboard" && <Dashboard />}
+        {activeSection === "dashboard" && (
+          <>
+            <Dashboard />
+            <Card className="mt-8 p-6">
+              <h2 className="text-2xl font-bold mb-4">Gerenciar Usuário</h2>
+              <p className="text-muted-foreground mb-4">Usuário atual: {currentUsername}</p>
+              <form onSubmit={handleUsernameChange} className="space-y-4">
+                <div>
+                  <label htmlFor="oldUsername" className="block text-sm font-medium mb-1">
+                    Usuário Antigo
+                  </label>
+                  <Input
+                    id="oldUsername"
+                    value={oldUsername}
+                    onChange={(e) => setOldUsername(e.target.value)}
+                    placeholder="Digite o usuário atual"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="newUsername" className="block text-sm font-medium mb-1">
+                    Novo Usuário
+                  </label>
+                  <Input
+                    id="newUsername"
+                    value={newUsername}
+                    onChange={(e) => setNewUsername(e.target.value)}
+                    placeholder="Digite o novo usuário"
+                    required
+                  />
+                </div>
+                <Button type="submit">
+                  Alterar Usuário
+                </Button>
+              </form>
+            </Card>
+          </>
+        )}
         {activeSection === "featured" && <FeaturedProductManager />}
         {activeSection === "logo" && <LogoManager />}
         {activeSection === "products" && <ProductManager />}
