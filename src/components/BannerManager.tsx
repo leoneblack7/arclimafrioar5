@@ -17,12 +17,14 @@ export const BannerManager = () => {
 
   const loadBanners = async () => {
     try {
+      console.log("BannerManager - Iniciando carregamento dos banners");
       const { data, error } = await supabase
         .from('banners')
         .select('*')
         .order('created_at', { ascending: true });
 
       if (error) {
+        console.error("BannerManager - Erro ao carregar banners:", error);
         throw error;
       }
 
@@ -41,32 +43,39 @@ export const BannerManager = () => {
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      console.log("BannerManager - Iniciando processo de upload", {
+        fileName: file.name,
+        fileType: file.type,
+        fileSize: file.size
+      });
+
       if (!file.type.startsWith('image/')) {
+        console.error("BannerManager - Tipo de arquivo inválido:", file.type);
         toast.error("Por favor, selecione apenas arquivos de imagem");
         return;
       }
 
       try {
-        console.log("Iniciando upload do arquivo:", file.name);
-
+        console.log("BannerManager - Iniciando upload para o Storage");
+        
         // Upload da imagem para o Storage do Supabase
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('banners')
           .upload(`banner-${Date.now()}`, file);
 
         if (uploadError) {
-          console.error('Erro no upload para storage:', uploadError);
+          console.error('BannerManager - Erro no upload para storage:', uploadError);
           throw uploadError;
         }
 
-        console.log("Upload concluído, dados:", uploadData);
+        console.log("BannerManager - Upload concluído, dados:", uploadData);
 
         // Obter URL pública da imagem
         const { data: { publicUrl } } = supabase.storage
           .from('banners')
           .getPublicUrl(uploadData.path);
 
-        console.log("URL pública gerada:", publicUrl);
+        console.log("BannerManager - URL pública gerada:", publicUrl);
 
         // Criar novo banner no banco
         const { error: insertError } = await supabase
@@ -74,15 +83,21 @@ export const BannerManager = () => {
           .insert([{ image_url: publicUrl, active: true }]);
 
         if (insertError) {
-          console.error('Erro ao inserir no banco:', insertError);
+          console.error('BannerManager - Erro ao inserir no banco:', insertError);
           throw insertError;
         }
 
+        console.log("BannerManager - Banner inserido com sucesso no banco");
         toast.success("Banner adicionado e ativado com sucesso!");
         loadBanners();
-      } catch (error) {
-        console.error('Erro detalhado ao fazer upload do banner:', error);
-        toast.error("Erro ao fazer upload do banner. Verifique o console para mais detalhes.");
+      } catch (error: any) {
+        console.error('BannerManager - Erro detalhado ao fazer upload do banner:', {
+          error,
+          message: error.message,
+          details: error.details,
+          hint: error.hint
+        });
+        toast.error(`Erro ao fazer upload do banner: ${error.message || 'Erro desconhecido'}`);
       }
     }
   };
@@ -93,13 +108,18 @@ export const BannerManager = () => {
 
   const handleDelete = async (id: string) => {
     try {
+      console.log("BannerManager - Iniciando exclusão do banner:", id);
       const { error } = await supabase
         .from('banners')
         .delete()
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error("BannerManager - Erro ao excluir banner:", error);
+        throw error;
+      }
 
+      console.log("BannerManager - Banner excluído com sucesso");
       toast.success("Banner removido com sucesso!");
       loadBanners();
     } catch (error) {
@@ -110,13 +130,18 @@ export const BannerManager = () => {
 
   const toggleBannerStatus = async (id: string, newStatus: boolean) => {
     try {
+      console.log("BannerManager - Alterando status do banner:", { id, newStatus });
       const { error } = await supabase
         .from('banners')
         .update({ active: newStatus })
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error("BannerManager - Erro ao atualizar status:", error);
+        throw error;
+      }
 
+      console.log("BannerManager - Status atualizado com sucesso");
       toast.success(newStatus ? "Banner ativado com sucesso!" : "Banner desativado com sucesso!");
       loadBanners();
     } catch (error) {
