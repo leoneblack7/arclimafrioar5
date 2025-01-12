@@ -9,6 +9,7 @@ export const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarPro
   const sections = [
     { id: 'dashboard', label: 'Início' },
     { id: 'products', label: 'Gerenciar Produtos' },
+    { id: 'banners', label: 'Gerenciar Banners' },
     { id: 'logo', label: 'Logo da Loja' },
     { id: 'orders', label: 'Pedidos' },
     { id: 'settings', label: 'Configurações' }

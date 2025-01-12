@@ -3,8 +3,8 @@ import { ProductCard } from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { AirVent, RefrigeratorIcon, Settings, Truck } from "lucide-react";
+import { Banner } from "@/components/Banner";
 
-// Temporary mock data until we integrate with backend
 const featuredProducts = [
   {
     id: 1,
@@ -66,6 +66,9 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
+      
+      {/* Banner Section */}
+      <Banner />
       
       {/* Hero Section */}
       <section className="pt-24 pb-12 px-4 bg-gradient-to-b from-white to-blue-50">
