@@ -44,12 +44,14 @@ export const BannerManager = () => {
     try {
       console.log("BannerManager - Iniciando carregamento dos banners");
       const storedBanners = localStorage.getItem('banners');
+      
       if (!storedBanners) {
-        console.log("BannerManager - Inicializando com banners padrão");
+        console.log("BannerManager - Nenhum banner encontrado, usando padrões");
         localStorage.setItem('banners', JSON.stringify(defaultBanners));
         setBanners(defaultBanners);
         return;
       }
+
       const parsedBanners = JSON.parse(storedBanners);
       console.log("BannerManager - Banners carregados:", parsedBanners);
       setBanners(parsedBanners);
