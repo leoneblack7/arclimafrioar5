@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Banner {
   id: number;
@@ -12,11 +13,17 @@ export const Banner = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    const savedBanners = localStorage.getItem("siteBanners");
-    if (savedBanners) {
-      const parsedBanners = JSON.parse(savedBanners);
-      const activeBanners = parsedBanners.filter((banner: Banner) => banner.active);
-      setBanners(activeBanners);
+    try {
+      const savedBanners = localStorage.getItem("siteBanners");
+      if (savedBanners) {
+        const parsedBanners = JSON.parse(savedBanners);
+        const activeBanners = parsedBanners.filter((banner: Banner) => banner.active);
+        setBanners(activeBanners);
+        console.log('Active banners loaded:', activeBanners);
+      }
+    } catch (error) {
+      console.error('Error loading banners:', error);
+      toast.error('Erro ao carregar os banners');
     }
   }, []);
 
@@ -35,7 +42,10 @@ export const Banner = () => {
     }
   }, [banners.length]);
 
-  if (banners.length === 0) return null;
+  if (banners.length === 0) {
+    console.log('No active banners found');
+    return null;
+  }
 
   return (
     <div className="relative w-full h-[300px] overflow-hidden">
