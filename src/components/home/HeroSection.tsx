@@ -6,7 +6,7 @@ interface HeroSectionProps {
 
 export const HeroSection = ({ onExploreClick }: HeroSectionProps) => {
   return (
-    <section className="pt-8 pb-12 px-4 bg-gradient-to-b from-white to-blue-50">
+    <section className="pb-12 px-4 bg-gradient-to-b from-white to-blue-50">
       <div className="container mx-auto text-center pt-8">
         <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500">
           Climatização Inteligente com ArclimaFrio
