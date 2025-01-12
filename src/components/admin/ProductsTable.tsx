@@ -29,20 +29,20 @@ export const ProductsTable = ({ products, onEdit, onDelete, onToggleActive }: Pr
   };
 
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
+    <div className="bg-background rounded-lg shadow overflow-hidden">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Produto</TableHead>
-            <TableHead>Preço</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Ações</TableHead>
+            <TableHead className="text-foreground dark:text-foreground">Produto</TableHead>
+            <TableHead className="text-foreground dark:text-foreground">Preço</TableHead>
+            <TableHead className="text-foreground dark:text-foreground">Status</TableHead>
+            <TableHead className="text-foreground dark:text-foreground">Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {products.map((product) => (
             <TableRow key={product.id}>
-              <TableCell>
+              <TableCell className="text-foreground dark:text-foreground">
                 <div className="flex items-center gap-4">
                   <img
                     src={product.image}
@@ -50,14 +50,14 @@ export const ProductsTable = ({ products, onEdit, onDelete, onToggleActive }: Pr
                     className="w-12 h-12 object-cover rounded"
                   />
                   <div>
-                    <p className="font-medium">{product.title}</p>
-                    <p className="text-sm text-gray-500 truncate max-w-md">
+                    <p className="font-medium text-foreground dark:text-foreground">{product.title}</p>
+                    <p className="text-sm text-muted-foreground dark:text-muted-foreground truncate max-w-md">
                       {product.description}
                     </p>
                   </div>
                 </div>
               </TableCell>
-              <TableCell>
+              <TableCell className="text-foreground dark:text-foreground">
                 {product.price.toLocaleString('pt-BR', {
                   style: 'currency',
                   currency: 'BRL'
