@@ -74,6 +74,20 @@ export const Banner = () => {
     setCurrentIndex(index);
   };
 
+  // Adiciona o event listener para as teclas
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'ArrowLeft') {
+        prevSlide();
+      } else if (event.key === 'ArrowRight') {
+        nextSlide();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   useEffect(() => {
     if (banners.length > 1) {
       const interval = setInterval(nextSlide, 5000);
@@ -82,7 +96,11 @@ export const Banner = () => {
   }, [banners.length]);
 
   return (
-    <div className="relative w-full h-[300px] overflow-hidden mt-16">
+    <div 
+      className="relative w-full h-[300px] overflow-hidden mt-16"
+      tabIndex={0} // Adiciona tabIndex para permitir foco no elemento
+      aria-label="Banner carousel"
+    >
       {banners.map((banner, index) => (
         <BannerSlide
           key={banner.id}
