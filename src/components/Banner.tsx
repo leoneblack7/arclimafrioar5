@@ -13,6 +13,7 @@ export const Banner = () => {
 
   const loadBanners = () => {
     try {
+      console.log("Banner - Iniciando carregamento dos banners");
       const storedBanners = localStorage.getItem('banners');
       const parsedBanners = storedBanners ? JSON.parse(storedBanners) : [];
       const activeBanners = parsedBanners.filter((banner: Banner) => banner.active);
@@ -60,8 +61,11 @@ export const Banner = () => {
   }, [banners.length]);
 
   if (banners.length === 0) {
+    console.log("Banner - Nenhum banner ativo encontrado");
     return null;
   }
+
+  console.log("Banner - Renderizando banner atual:", currentIndex, banners[currentIndex]);
 
   return (
     <div className="relative w-full h-[300px] overflow-hidden">
