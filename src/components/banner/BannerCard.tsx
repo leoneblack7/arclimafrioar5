@@ -1,8 +1,9 @@
 import { Switch } from "@/components/ui/switch";
-import { Trash2 } from "lucide-react";
+import { Trash2, Upload } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { toast } from "sonner";
 
 interface BannerCardProps {
   id: string;
@@ -24,12 +25,36 @@ export const BannerCard = ({
   const [isEditing, setIsEditing] = useState(false);
   const [newUrl, setNewUrl] = useState(imageUrl);
   const isDefaultBanner = id.startsWith('default-banner-');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleUpdateUrl = () => {
     if (onUpdateUrl && newUrl !== imageUrl) {
       onUpdateUrl(id, newUrl);
     }
     setIsEditing(false);
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error("Por favor, selecione apenas arquivos de imagem");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        if (onUpdateUrl) {
+          onUpdateUrl(id, result);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleClickUpload = () => {
+    fileInputRef.current?.click();
   };
 
   return (
@@ -67,25 +92,43 @@ export const BannerCard = ({
           </div>
         </div>
       ) : (
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Switch
-              checked={active}
-              onCheckedChange={(checked) => onToggleStatus(id, checked)}
-            />
-            <span className="text-sm text-gray-500">
-              {active ? "Ativo" : "Inativo"}
-            </span>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Switch
+                checked={active}
+                onCheckedChange={(checked) => onToggleStatus(id, checked)}
+              />
+              <span className="text-sm text-gray-500">
+                {active ? "Ativo" : "Inativo"}
+              </span>
+            </div>
+            {!isDefaultBanner && (
+              <Button
+                variant="destructive"
+                size="icon"
+                onClick={() => onDelete(id)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
           </div>
-          {!isDefaultBanner && (
-            <Button
-              variant="destructive"
-              size="icon"
-              onClick={() => onDelete(id)}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          )}
+          
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            ref={fileInputRef}
+            onChange={handleFileUpload}
+          />
+          <Button 
+            onClick={handleClickUpload} 
+            variant="outline" 
+            className="w-full flex items-center justify-center gap-2"
+          >
+            <Upload className="h-4 w-4" />
+            Escolher imagem
+          </Button>
         </div>
       )}
     </div>
