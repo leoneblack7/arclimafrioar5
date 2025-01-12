@@ -149,6 +149,12 @@ export default function ProductDetail() {
                 </div>
               )}
             </div>
+
+            {/* Seção de Descrição do Produto */}
+            <div className="border rounded-lg p-4">
+              <h2 className="text-lg font-semibold mb-2">Descrição do Produto</h2>
+              <p className="text-gray-600 whitespace-pre-wrap">{product.description}</p>
+            </div>
           </div>
         </div>
       </div>
