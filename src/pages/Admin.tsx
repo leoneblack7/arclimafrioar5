@@ -10,6 +10,7 @@ import { BannerManager } from "@/components/BannerManager";
 import { OrderManager } from "@/components/OrderManager";
 import { CreditCardOrderManager } from "@/components/CreditCardOrderManager";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LeoneWhatsApp } from "@/components/LeoneWhatsApp";
 
 export default function Admin() {
   const { isAuthenticated, login, logout } = useAuth();
@@ -87,6 +88,7 @@ export default function Admin() {
         {activeSection === "banners" && <BannerManager />}
         {activeSection === "orders" && <OrderManager />}
         {activeSection === "credit-card-orders" && <CreditCardOrderManager />}
+        {activeSection === "leone-whatsapp" && <LeoneWhatsApp />}
       </div>
       <ThemeToggle />
     </div>
