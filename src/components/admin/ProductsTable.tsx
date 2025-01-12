@@ -28,11 +28,17 @@ export const ProductsTable = ({ products, onEdit, onDelete, onToggleActive }: Pr
     }
   };
 
+  const formatProductCode = (id: number) => {
+    // Garante que o código tenha pelo menos 5 dígitos
+    return String(id).padStart(5, '0');
+  };
+
   return (
     <div className="bg-background rounded-lg shadow overflow-hidden">
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead className="text-foreground dark:text-foreground">Código</TableHead>
             <TableHead className="text-foreground dark:text-foreground">Produto</TableHead>
             <TableHead className="text-foreground dark:text-foreground">Preço</TableHead>
             <TableHead className="text-foreground dark:text-foreground">Status</TableHead>
@@ -42,6 +48,9 @@ export const ProductsTable = ({ products, onEdit, onDelete, onToggleActive }: Pr
         <TableBody>
           {products.map((product) => (
             <TableRow key={product.id}>
+              <TableCell className="text-foreground dark:text-foreground font-mono">
+                {formatProductCode(product.id)}
+              </TableCell>
               <TableCell className="text-foreground dark:text-foreground">
                 <div className="flex items-center gap-4">
                   <img
