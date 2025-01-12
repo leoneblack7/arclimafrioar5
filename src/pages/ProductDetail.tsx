@@ -60,6 +60,10 @@ export default function ProductDetail() {
     navigate("/checkout");
   };
 
+  const handleAddToCart = () => {
+    addItem(product);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
@@ -92,13 +96,23 @@ export default function ProductDetail() {
                   currency: 'BRL' 
                 })}
               </p>
-              <Button 
-                className="w-full bg-orange-500 hover:bg-orange-600 mt-4" 
-                size="lg"
-                onClick={handleBuyNow}
-              >
-                COMPRAR AGORA
-              </Button>
+              <div className="flex gap-4">
+                <Button 
+                  className="flex-1 bg-green-500 hover:bg-green-600" 
+                  size="lg"
+                  onClick={handleBuyNow}
+                >
+                  COMPRAR AGORA
+                </Button>
+                <Button 
+                  variant="outline"
+                  className="flex-1" 
+                  size="lg"
+                  onClick={handleAddToCart}
+                >
+                  Adicionar ao Carrinho
+                </Button>
+              </div>
             </div>
 
             <div className="border rounded-lg p-4">
