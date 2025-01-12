@@ -18,6 +18,7 @@ export const useProductManager = () => {
         title: item.title,
         price: Number(item.price),
         image: item.image || '/placeholder.svg',
+        images: item.images || [item.image || '/placeholder.svg'],
         description: item.description,
         active: item.active || false
       }));
@@ -30,6 +31,7 @@ export const useProductManager = () => {
       title: "Novo Produto",
       price: 0,
       image: "/placeholder.svg",
+      images: ["/placeholder.svg"],
       description: "Descrição do novo produto",
       active: true
     };
@@ -43,7 +45,9 @@ export const useProductManager = () => {
       const productToSave = {
         ...updatedProduct,
         price: Number(updatedProduct.price),
-        id: updatedProduct.id || Date.now()
+        id: updatedProduct.id || Date.now(),
+        images: updatedProduct.images || [updatedProduct.image],
+        image: updatedProduct.images?.[0] || updatedProduct.image
       };
 
       if (products.find(p => p.id === productToSave.id)) {
@@ -73,6 +77,7 @@ export const useProductManager = () => {
         title: scrapedProduct.title,
         price: Number(scrapedProduct.price),
         image: scrapedProduct.images[0] || '/placeholder.svg',
+        images: scrapedProduct.images || [scrapedProduct.images[0] || '/placeholder.svg'],
         description: scrapedProduct.description,
         active: true
       };
