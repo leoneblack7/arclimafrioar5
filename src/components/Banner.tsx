@@ -18,8 +18,9 @@ export const Banner = () => {
       const storedBanners = localStorage.getItem('banners');
       if (storedBanners) {
         const parsedBanners = JSON.parse(storedBanners);
+        console.log("Banner - Banners carregados:", parsedBanners);
         const activeBanners = parsedBanners.filter((banner: Banner) => banner.active);
-        console.log("Banner - Banners ativos carregados:", activeBanners);
+        console.log("Banner - Banners ativos:", activeBanners);
         setBanners(activeBanners);
       }
     } catch (error) {
