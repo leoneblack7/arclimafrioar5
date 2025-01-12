@@ -5,24 +5,24 @@ import { Button } from "@/components/ui/button";
 const featuredProducts = [
   {
     id: 1,
-    title: "Smart Inverter AC",
+    title: "Ar Condicionado Inverter",
     price: 999.99,
     image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7",
-    description: "Energy-efficient smart air conditioner with WiFi control",
+    description: "Ar condicionado inteligente com controle WiFi e economia de energia",
   },
   {
     id: 2,
-    title: "Portable AC Unit",
+    title: "Ar Condicionado Portátil",
     price: 499.99,
     image: "https://images.unsplash.com/photo-1518770660439-4636190af475",
-    description: "Compact and powerful portable air conditioning solution",
+    description: "Solução compacta e potente de ar condicionado portátil",
   },
   {
     id: 3,
-    title: "Premium Split AC",
+    title: "Split Premium",
     price: 1299.99,
     image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e",
-    description: "High-performance split system with advanced cooling",
+    description: "Sistema split de alto desempenho com resfriamento avançado",
   },
 ];
 
@@ -31,25 +31,25 @@ const Index = () => {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       
-      {/* Hero Section */}
+      {/* Seção Principal */}
       <section className="pt-24 pb-12 px-4 bg-gradient-to-b from-white to-secondary">
         <div className="container mx-auto text-center">
           <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600">
-            Stay Cool with ArclimaFrio
+            Mantenha-se Fresco com ArclimaFrio
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Discover our range of energy-efficient air conditioning solutions for your home and office
+            Descubra nossa linha de soluções em ar condicionado para sua casa e escritório
           </p>
           <Button size="lg" className="animate-float">
-            Shop Now
+            Comprar Agora
           </Button>
         </div>
       </section>
 
-      {/* Featured Products */}
+      {/* Produtos em Destaque */}
       <section className="py-12 px-4">
         <div className="container mx-auto">
-          <h2 className="text-3xl font-bold mb-8 text-center">Featured Products</h2>
+          <h2 className="text-3xl font-bold mb-8 text-center">Produtos em Destaque</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {featuredProducts.map((product) => (
               <ProductCard key={product.id} {...product} />
@@ -58,25 +58,25 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Seção de Recursos */}
       <section className="py-12 px-4 bg-white">
         <div className="container mx-auto">
-          <h2 className="text-3xl font-bold mb-12 text-center">Why Choose Us</h2>
+          <h2 className="text-3xl font-bold mb-12 text-center">Por Que Nos Escolher</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
-                title: "Energy Efficient",
-                description: "Save money with our energy-efficient units",
+                title: "Economia de Energia",
+                description: "Economize dinheiro com nossas unidades eficientes",
                 icon: "⚡",
               },
               {
-                title: "24/7 Support",
-                description: "Expert support whenever you need it",
+                title: "Suporte 24/7",
+                description: "Suporte especializado quando você precisar",
                 icon: "🛠️",
               },
               {
-                title: "Fast Delivery",
-                description: "Quick and reliable delivery service",
+                title: "Entrega Rápida",
+                description: "Serviço de entrega rápido e confiável",
                 icon: "🚚",
               },
             ].map((feature, index) => (

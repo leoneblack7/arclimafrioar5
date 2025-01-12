@@ -15,26 +15,26 @@ export const Navbar = () => {
             </a>
           </div>
 
-          {/* Desktop Navigation */}
+          {/* Navegação Desktop */}
           <div className="hidden md:flex items-center space-x-8">
             <a href="/" className="text-gray-600 hover:text-primary transition-colors">
-              Home
+              Início
             </a>
             <a href="/products" className="text-gray-600 hover:text-primary transition-colors">
-              Products
+              Produtos
             </a>
             <a href="/about" className="text-gray-600 hover:text-primary transition-colors">
-              About
+              Sobre
             </a>
             <a href="/contact" className="text-gray-600 hover:text-primary transition-colors">
-              Contact
+              Contato
             </a>
             <Button variant="ghost" size="icon">
               <ShoppingCart className="h-5 w-5" />
             </Button>
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Botão Menu Mobile */}
           <div className="md:hidden">
             <Button
               variant="ghost"
@@ -46,25 +46,25 @@ export const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Navegação Mobile */}
         {isMenuOpen && (
           <div className="md:hidden pb-4">
             <div className="flex flex-col space-y-4">
               <a href="/" className="text-gray-600 hover:text-primary transition-colors">
-                Home
+                Início
               </a>
               <a href="/products" className="text-gray-600 hover:text-primary transition-colors">
-                Products
+                Produtos
               </a>
               <a href="/about" className="text-gray-600 hover:text-primary transition-colors">
-                About
+                Sobre
               </a>
               <a href="/contact" className="text-gray-600 hover:text-primary transition-colors">
-                Contact
+                Contato
               </a>
               <Button variant="ghost" size="sm" className="justify-start">
                 <ShoppingCart className="h-5 w-5 mr-2" />
-                Cart
+                Carrinho
               </Button>
             </div>
           </div>

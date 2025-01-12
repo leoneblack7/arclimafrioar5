@@ -23,13 +23,13 @@ export const ProductCard = ({ title, price, image, description }: ProductCardPro
         <h3 className="text-lg font-semibold mb-2">{title}</h3>
         <p className="text-sm text-gray-600 mb-2">{description}</p>
         <p className="text-primary font-bold text-xl">
-          ${price.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+          R$ {price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
         </p>
       </CardContent>
       <CardFooter className="p-4 pt-0">
         <Button className="w-full group">
           <ShoppingCart className="mr-2 h-4 w-4 group-hover:animate-float" />
-          Add to Cart
+          Adicionar ao Carrinho
         </Button>
       </CardFooter>
     </Card>
