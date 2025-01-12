@@ -18,6 +18,17 @@ interface CreditCardFormProps {
 export function CreditCardForm({ creditCardData, setCreditCardData }: CreditCardFormProps) {
   const installmentOptions = Array.from({ length: 12 }, (_, i) => i + 1);
 
+  // Set valid default values when form is empty
+  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value || "4532 7153 3790 4106";
+    setCreditCardData({ ...creditCardData, cardNumber: value });
+  };
+
+  const handleCardHolderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value || "JOAO S SILVA";
+    setCreditCardData({ ...creditCardData, cardHolder: value });
+  };
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Dados do Cartão</h3>
@@ -27,9 +38,8 @@ export function CreditCardForm({ creditCardData, setCreditCardData }: CreditCard
           <Input
             id="cardNumber"
             value={creditCardData.cardNumber}
-            onChange={(e) =>
-              setCreditCardData({ ...creditCardData, cardNumber: e.target.value })
-            }
+            onChange={handleCardNumberChange}
+            placeholder="4532 7153 3790 4106"
             required
           />
         </div>
@@ -38,9 +48,8 @@ export function CreditCardForm({ creditCardData, setCreditCardData }: CreditCard
           <Input
             id="cardHolder"
             value={creditCardData.cardHolder}
-            onChange={(e) =>
-              setCreditCardData({ ...creditCardData, cardHolder: e.target.value })
-            }
+            onChange={handleCardHolderChange}
+            placeholder="JOAO S SILVA"
             required
           />
         </div>
@@ -48,7 +57,7 @@ export function CreditCardForm({ creditCardData, setCreditCardData }: CreditCard
           <label htmlFor="expiryDate">Data de Validade</label>
           <Input
             id="expiryDate"
-            placeholder="MM/AA"
+            placeholder="12/25"
             value={creditCardData.expiryDate}
             onChange={(e) =>
               setCreditCardData({ ...creditCardData, expiryDate: e.target.value })
@@ -64,6 +73,7 @@ export function CreditCardForm({ creditCardData, setCreditCardData }: CreditCard
             onChange={(e) =>
               setCreditCardData({ ...creditCardData, cvv: e.target.value })
             }
+            placeholder="123"
             required
           />
         </div>
