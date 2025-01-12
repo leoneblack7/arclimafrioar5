@@ -10,12 +10,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { getFromLocalStorage } from "@/utils/localStorage";
+import { Product } from "@/types/product";
 
 export const PixPaymentManager = () => {
   const { products, handleSaveProduct } = useProductManager();
+  const featuredProducts = getFromLocalStorage('featured-products', []) as Product[];
+
+  // Combine and remove duplicates based on product ID
+  const allProducts = [...products, ...featuredProducts].filter((product, index, self) =>
+    index === self.findIndex((p) => p.id === product.id)
+  );
 
   const handleSetPixLink = async (productId: number, pixLink: string) => {
-    const product = products.find((p) => p.id === productId);
+    const product = allProducts.find((p) => p.id === productId);
     if (!product) return;
 
     try {
@@ -39,15 +47,19 @@ export const PixPaymentManager = () => {
         <TableHeader>
           <TableRow>
             <TableHead>Produto</TableHead>
+            <TableHead>Tipo</TableHead>
             <TableHead>Preço</TableHead>
             <TableHead>Link PIX</TableHead>
             <TableHead>Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {products.map((product) => (
+          {allProducts.map((product) => (
             <TableRow key={product.id}>
               <TableCell>{product.title}</TableCell>
+              <TableCell>
+                {featuredProducts.some(p => p.id === product.id) ? 'Destaque' : 'Regular'}
+              </TableCell>
               <TableCell>
                 {product.price.toLocaleString("pt-BR", {
                   style: "currency",
