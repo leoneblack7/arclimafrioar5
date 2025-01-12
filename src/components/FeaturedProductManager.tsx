@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import { Plus } from "lucide-react";
 import { Dialog } from "./ui/dialog";
@@ -6,6 +6,7 @@ import { ProductForm } from "./admin/ProductForm";
 import { ProductImportForm } from "./admin/ProductImportForm";
 import { ProductsTable } from "./admin/ProductsTable";
 import { toast } from "sonner";
+import { saveToLocalStorage, getFromLocalStorage } from "@/utils/localStorage";
 
 interface Product {
   id: number;
@@ -17,59 +18,65 @@ interface Product {
 }
 
 export const FeaturedProductManager = () => {
-  const [products, setProducts] = useState<Product[]>([
-    {
-      id: 1,
-      title: "Ar Condicionado Split 12000 BTUs Inverter",
-      price: 2499.99,
-      image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
-      description: "Split Inverter com tecnologia de última geração, economia de energia e controle via WiFi.",
-      active: true
-    },
-    {
-      id: 2,
-      title: "Ar Condicionado Split 9000 BTUs",
-      price: 1899.99,
-      image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
-      description: "Ideal para ambientes pequenos, com operação silenciosa e alta eficiência.",
-      active: true
-    },
-    {
-      id: 3,
-      title: "Ar Condicionado Portátil 12000 BTUs",
-      price: 3299.99,
-      image: "https://images.unsplash.com/photo-1518770660439-4636190af475",
-      description: "Solução portátil com mobilidade e praticidade para qualquer ambiente.",
-      active: true
-    },
-    {
-      id: 4,
-      title: "Split Hi-Wall Premium 18000 BTUs",
-      price: 3599.99,
-      image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6",
-      description: "Sistema avançado de filtragem e máxima eficiência energética.",
-      active: true
-    },
-    {
-      id: 5,
-      title: "Multi Split Inverter 24000 BTUs",
-      price: 4599.99,
-      image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
-      description: "Sistema multi split para até 3 ambientes, com tecnologia inverter.",
-      active: true
-    },
-    {
-      id: 6,
-      title: "Ar Condicionado Cassete 36000 BTUs",
-      price: 5999.99,
-      image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
-      description: "Ideal para ambientes comerciais, com distribuição uniforme do ar.",
-      active: true
-    }
-  ]);
+  const [products, setProducts] = useState<Product[]>(() => {
+    return getFromLocalStorage('featured-products', [
+      {
+        id: 1,
+        title: "Ar Condicionado Split 12000 BTUs Inverter",
+        price: 2499.99,
+        image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
+        description: "Split Inverter com tecnologia de última geração, economia de energia e controle via WiFi.",
+        active: true
+      },
+      {
+        id: 2,
+        title: "Ar Condicionado Split 9000 BTUs",
+        price: 1899.99,
+        image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
+        description: "Ideal para ambientes pequenos, com operação silenciosa e alta eficiência.",
+        active: true
+      },
+      {
+        id: 3,
+        title: "Ar Condicionado Portátil 12000 BTUs",
+        price: 3299.99,
+        image: "https://images.unsplash.com/photo-1518770660439-4636190af475",
+        description: "Solução portátil com mobilidade e praticidade para qualquer ambiente.",
+        active: true
+      },
+      {
+        id: 4,
+        title: "Split Hi-Wall Premium 18000 BTUs",
+        price: 3599.99,
+        image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6",
+        description: "Sistema avançado de filtragem e máxima eficiência energética.",
+        active: true
+      },
+      {
+        id: 5,
+        title: "Multi Split Inverter 24000 BTUs",
+        price: 4599.99,
+        image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
+        description: "Sistema multi split para até 3 ambientes, com tecnologia inverter.",
+        active: true
+      },
+      {
+        id: 6,
+        title: "Ar Condicionado Cassete 36000 BTUs",
+        price: 5999.99,
+        image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
+        description: "Ideal para ambientes comerciais, com distribuição uniforme do ar.",
+        active: true
+      }
+    ]);
+  });
 
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  useEffect(() => {
+    saveToLocalStorage('featured-products', products);
+  }, [products]);
 
   const handleNewProduct = () => {
     if (products.length >= 6) {
