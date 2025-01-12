@@ -25,6 +25,13 @@ interface ScrapeSelectors {
   productSpecs: { text: string }[];
 }
 
+interface CustomCrawlOptions {
+  formats: string[];
+  selectors: {
+    [key: string]: string | { selector: string; attribute: string };
+  };
+}
+
 export class ProductScraperService {
   private static API_KEY = import.meta.env.VITE_FIRECRAWL_API_KEY || '';
   private static firecrawl = new FirecrawlApp({ apiKey: ProductScraperService.API_KEY });
@@ -48,7 +55,7 @@ export class ProductScraperService {
             'productRating': '.rating-stars',
             'productSpecs': '.specifications-table tr, .specs-table tr'
           }
-        }
+        } as CustomCrawlOptions
       });
 
       if (!response.success) {
@@ -62,7 +69,6 @@ export class ProductScraperService {
 
       const selectors = data.selectors;
 
-      // Process specifications into a structured object
       const specifications: { [key: string]: string } = {};
       const rawSpecs = selectors.productSpecs || [];
       rawSpecs.forEach((spec) => {
@@ -72,7 +78,6 @@ export class ProductScraperService {
         }
       });
 
-      // Extract price from string and convert to number
       const priceText = (selectors.productPrice[0] || '0').replace(/[^\d,]/g, '').replace(',', '.') || '0';
       const price = parseFloat(priceText);
 

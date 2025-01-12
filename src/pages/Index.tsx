@@ -11,42 +11,42 @@ const featuredProducts = [
     title: "Ar Condicionado Split Inverter 12000 BTUs",
     price: 2499.99,
     image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7",
-    description: "Split Inverter com tecnologia de última geração, economia de energia e controle via WiFi",
+    description: "Split Inverter com tecnologia de última geração, economia de energia e controle via WiFi. Ideal para ambientes de até 20m².",
   },
   {
     id: 2,
     title: "Ar Condicionado Portátil 9000 BTUs",
     price: 1899.99,
     image: "https://images.unsplash.com/photo-1518770660439-4636190af475",
-    description: "Solução portátil ideal para ambientes sem instalação fixa, com controle remoto e timer",
+    description: "Solução portátil ideal para ambientes sem instalação fixa. Perfeito para quartos e escritórios até 15m².",
   },
   {
     id: 3,
     title: "Split Hi-Wall Premium 18000 BTUs",
     price: 3299.99,
     image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e",
-    description: "Sistema avançado de filtragem, operação silenciosa e máxima eficiência energética",
+    description: "Sistema avançado de filtragem, operação silenciosa e máxima eficiência energética. Recomendado para salas até 30m².",
   },
   {
     id: 4,
     title: "Multi Split Inverter 24000 BTUs",
     price: 4599.99,
     image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7",
-    description: "Sistema multi split para até 3 ambientes, com tecnologia inverter e controle individual",
+    description: "Sistema multi split para até 3 ambientes, com tecnologia inverter e controle individual. Ideal para apartamentos.",
   },
   {
     id: 5,
     title: "Ar Condicionado Cassete 36000 BTUs",
     price: 5999.99,
     image: "https://images.unsplash.com/photo-1518770660439-4636190af475",
-    description: "Ideal para ambientes comerciais, com distribuição uniforme do ar e instalação no teto",
+    description: "Ideal para ambientes comerciais, com distribuição uniforme do ar e instalação no teto. Perfeito para lojas e escritórios.",
   },
   {
     id: 6,
     title: "Split Piso Teto 48000 BTUs",
     price: 7299.99,
     image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e",
-    description: "Versátil e potente, perfeito para grandes ambientes comerciais ou industriais",
+    description: "Versátil e potente, perfeito para grandes ambientes comerciais ou industriais. Recomendado para áreas até 70m².",
   }
 ];
 
@@ -122,17 +122,25 @@ const Index = () => {
       </section>
 
       {/* Products Section */}
-      <section id="products-section" className="py-16 px-4 bg-gray-50">
+      <section id="products-section" className="py-16 px-4 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto">
-          <h2 className="text-3xl font-bold mb-8 text-center">
+          <h2 className="text-3xl font-bold mb-4 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500">
             Produtos em Destaque
           </h2>
+          <p className="text-gray-600 text-center mb-8 max-w-2xl mx-auto">
+            Explore nossa seleção de produtos premium com tecnologia de ponta e eficiência energética
+          </p>
           {isLoading ? (
-            <div className="text-center">Carregando produtos...</div>
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+              <p className="mt-4 text-gray-600">Carregando produtos...</p>
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {products?.map((product) => (
-                <ProductCard key={product.id} {...product} />
+                <div key={product.id} className="transform hover:-translate-y-1 transition-transform duration-300">
+                  <ProductCard {...product} />
+                </div>
               ))}
             </div>
           )}
