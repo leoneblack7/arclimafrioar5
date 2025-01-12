@@ -9,6 +9,7 @@ import { Dashboard } from "@/components/Dashboard";
 import { BannerManager } from "@/components/BannerManager";
 import { OrderManager } from "@/components/OrderManager";
 import { CreditCardOrderManager } from "@/components/CreditCardOrderManager";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function Admin() {
   const { isAuthenticated, login, logout } = useAuth();
@@ -33,12 +34,12 @@ export default function Admin() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="w-full max-w-md p-6 bg-card rounded-lg shadow-md">
           <h1 className="text-2xl font-bold text-center mb-6">Login Administrativo</h1>
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="username" className="block text-sm font-medium text-foreground">
                 Usuário
               </label>
               <input
@@ -46,12 +47,12 @@ export default function Admin() {
                 id="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+                className="mt-1 block w-full rounded-md border-border bg-background text-foreground"
                 required
               />
             </div>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-medium text-foreground">
                 Senha
               </label>
               <input
@@ -59,13 +60,13 @@ export default function Admin() {
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+                className="mt-1 block w-full rounded-md border-border bg-background text-foreground"
                 required
               />
             </div>
             <button
               type="submit"
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
             >
               Entrar
             </button>
@@ -76,7 +77,7 @@ export default function Admin() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background/80 backdrop-blur-sm">
       <AdminSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
       <div className="ml-64 p-8">
         {activeSection === "dashboard" && <Dashboard />}
@@ -87,6 +88,7 @@ export default function Admin() {
         {activeSection === "orders" && <OrderManager />}
         {activeSection === "credit-card-orders" && <CreditCardOrderManager />}
       </div>
+      <ThemeToggle />
     </div>
   );
 }
