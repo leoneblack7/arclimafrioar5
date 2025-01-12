@@ -4,13 +4,14 @@ import { useAuth } from "@/contexts/AuthContext";
 import { AdminSidebar } from "@/components/AdminSidebar";
 import { LogoManager } from "@/components/LogoManager";
 import { ProductManager } from "@/components/ProductManager";
+import { Dashboard } from "@/components/Dashboard";
 
 export default function Admin() {
   const { isAuthenticated, login, logout } = useAuth();
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [activeSection, setActiveSection] = useState("products");
+  const [activeSection, setActiveSection] = useState("dashboard");
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -74,9 +75,9 @@ export default function Admin() {
     <div className="min-h-screen bg-gray-50">
       <AdminSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
       <div className="ml-64 p-8">
+        {activeSection === "dashboard" && <Dashboard />}
         {activeSection === "logo" && <LogoManager />}
         {activeSection === "products" && <ProductManager />}
-        {/* Add other sections as needed */}
       </div>
     </div>
   );

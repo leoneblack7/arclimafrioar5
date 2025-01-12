@@ -7,6 +7,7 @@ interface AdminSidebarProps {
 
 export const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarProps) => {
   const sections = [
+    { id: 'dashboard', label: 'Início' },
     { id: 'products', label: 'Gerenciar Produtos' },
     { id: 'logo', label: 'Logo da Loja' },
     { id: 'orders', label: 'Pedidos' },
