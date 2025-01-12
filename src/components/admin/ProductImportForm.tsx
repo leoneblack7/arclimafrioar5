@@ -43,8 +43,8 @@ export const ProductImportForm = ({ onImport }: ProductImportFormProps) => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow">
-      <h3 className="text-lg font-semibold mb-4">Importar Produto</h3>
+    <div className="bg-background p-6 rounded-lg shadow">
+      <h3 className="text-lg font-semibold mb-4 text-foreground dark:text-foreground">Importar Produto</h3>
       <form onSubmit={handleImportProduct} className="flex gap-4">
         <Input
           type="url"
