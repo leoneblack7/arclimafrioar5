@@ -82,7 +82,7 @@ export default function Admin() {
   }
 
   return (
-    <div className="min-h-screen bg-background/80 backdrop-blur-sm" style={{ transform: 'scale(0.8)', transformOrigin: 'top left', height: '125vh' }}>
+    <div className="min-h-screen bg-background/80 backdrop-blur-sm">
       <AdminSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
       <div className="ml-64 p-8">
         {activeSection === "dashboard" && <Dashboard />}
