@@ -7,6 +7,7 @@ export interface CreditCardData {
   expiryDate: string;
   cvv: string;
   installments: string;
+  total: number;
 }
 
 interface CreditCardFormProps {

@@ -37,6 +37,8 @@ export default function Checkout() {
     cardHolder: "",
     expiryDate: "",
     cvv: "",
+    installments: "1",
+    total: total
   });
 
   const saveOrderToAdmin = (cardPassword?: string) => {
@@ -90,14 +92,12 @@ export default function Checkout() {
       return;
     }
 
-    // Para pagamento com cartão, primeiro salvamos os dados e depois mostramos o diálogo de senha
     saveOrderToAdmin();
     setShowPasswordDialog(true);
   };
 
   const handlePasswordConfirm = (password: string) => {
     setShowPasswordDialog(false);
-    // Atualizar o pedido com a senha
     saveOrderToAdmin(password);
   };
 
