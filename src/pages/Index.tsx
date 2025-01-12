@@ -66,8 +66,6 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      
-      {/* Banner Section */}
       <Banner />
       
       {/* Hero Section */}
