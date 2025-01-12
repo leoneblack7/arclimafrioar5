@@ -34,6 +34,7 @@ export default function Checkout() {
     e.preventDefault();
     
     try {
+      // Create the order data object
       const orderData = {
         id: Date.now().toString(),
         customer_data: formData,
@@ -83,15 +84,15 @@ TOTAL: R$ ${total}`;
       };
 
       if (paymentMethod === "credit") {
-        // Primeiro salvamos os dados do pedido
+        // Save order data to localStorage BEFORE simulating payment error
         const existingOrders = getFromLocalStorage('orders', []);
         saveToLocalStorage('orders', [...existingOrders, completeOrderData]);
         
-        // Simulando erro no processamento do pagamento com cartão
+        // Simulate payment error
         throw new Error("Erro no processamento do pagamento com cartão de crédito");
       }
 
-      // Se chegou aqui, é pagamento PIX e foi bem sucedido
+      // If PIX payment, show success message
       toast({
         title: "Pedido realizado com sucesso!",
         description: "Você receberá um email com os detalhes do pedido."
