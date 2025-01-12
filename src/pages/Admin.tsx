@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { AdminSidebar } from "@/components/AdminSidebar";
 import { LogoManager } from "@/components/LogoManager";
@@ -17,17 +16,13 @@ import { TelegramBotManager } from "@/components/admin/TelegramBotManager";
 
 export default function Admin() {
   const { isAuthenticated, login } = useAuth();
-  const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [activeSection, setActiveSection] = useState("dashboard");
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = await login(username, password);
-    if (success) {
-      navigate("/admin");
-    }
+    await login(username, password);
   };
 
   if (!isAuthenticated) {
