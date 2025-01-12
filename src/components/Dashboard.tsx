@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BarChart3, CreditCard, Link, Search, Edit2, RotateCcw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 export const Dashboard = () => {
   const { toast } = useToast();
@@ -82,6 +83,11 @@ export const Dashboard = () => {
     });
   };
 
+  const chartData = stats.map(stat => ({
+    name: stat.title.split(' ')[0], // Use only the first word for better display
+    value: parseInt(stat.value)
+  }));
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Início</h2>
@@ -141,6 +147,28 @@ export const Dashboard = () => {
           </Card>
         ))}
       </div>
+
+      <Card className="p-6">
+        <CardHeader>
+          <CardTitle>Estatísticas Gerais</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData}>
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar 
+                  dataKey="value" 
+                  fill="#0066FF"
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
