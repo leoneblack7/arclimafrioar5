@@ -10,12 +10,13 @@ export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const [logoUrl, setLogoUrl] = useState("");
+  const [storeName, setStoreName] = useState("ArclimaFrio");
 
   useEffect(() => {
     const storedLogoUrl = localStorage.getItem("storeLogoUrl");
-    if (storedLogoUrl) {
-      setLogoUrl(storedLogoUrl);
-    }
+    const storedName = localStorage.getItem("storeName");
+    if (storedLogoUrl) setLogoUrl(storedLogoUrl);
+    if (storedName) setStoreName(storedName);
   }, []);
 
   const scrollToProducts = () => {
@@ -36,9 +37,9 @@ export const Navbar = () => {
           <div className="flex items-center">
             <Link to="/" className="text-2xl font-bold text-primary">
               {logoUrl ? (
-                <img src={logoUrl} alt="Store logo" className="h-12 w-auto" />
+                <img src={logoUrl} alt={storeName} className="h-12 w-auto" />
               ) : (
-                "ArclimaFrio"
+                <span>{storeName}</span>
               )}
             </Link>
           </div>
@@ -78,7 +79,6 @@ export const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden pb-4">
             <div className="py-4">

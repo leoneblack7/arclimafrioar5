@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { toast } from "sonner";
@@ -6,15 +6,24 @@ import { Label } from "./ui/label";
 
 export const LogoManager = () => {
   const [logoUrl, setLogoUrl] = useState("");
+  const [storeName, setStoreName] = useState("ArclimaFrio");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSaveLogo = () => {
-    if (!logoUrl) {
-      toast.error("Por favor, selecione uma imagem ou insira uma URL");
+  useEffect(() => {
+    const savedLogo = localStorage.getItem("storeLogoUrl");
+    const savedName = localStorage.getItem("storeName");
+    if (savedLogo) setLogoUrl(savedLogo);
+    if (savedName) setStoreName(savedName);
+  }, []);
+
+  const handleSave = () => {
+    if (!logoUrl && !storeName) {
+      toast.error("Por favor, insira um nome ou selecione uma logo");
       return;
     }
     localStorage.setItem("storeLogoUrl", logoUrl);
-    toast.success("Logo atualizada com sucesso!");
+    localStorage.setItem("storeName", storeName);
+    toast.success("Configurações atualizadas com sucesso!");
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,8 +48,18 @@ export const LogoManager = () => {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold">Gerenciar Logo</h2>
+      <h2 className="text-2xl font-bold">Gerenciar Logo e Nome da Loja</h2>
       <div className="space-y-6 max-w-md">
+        <div className="space-y-4">
+          <Label>Nome da Loja</Label>
+          <Input
+            type="text"
+            placeholder="Nome da loja"
+            value={storeName}
+            onChange={(e) => setStoreName(e.target.value)}
+          />
+        </div>
+
         <div className="space-y-4">
           <Label>Upload do dispositivo</Label>
           <input
@@ -65,19 +84,25 @@ export const LogoManager = () => {
           />
         </div>
 
-        <Button onClick={handleSaveLogo} className="w-full">
-          Salvar Logo
+        <Button onClick={handleSave} className="w-full">
+          Salvar Configurações
         </Button>
       </div>
       
-      {logoUrl && (
+      {(logoUrl || storeName) && (
         <div className="mt-4">
           <p className="text-sm text-gray-500 mb-2">Prévia:</p>
-          <img 
-            src={logoUrl} 
-            alt="Logo preview" 
-            className="max-w-[200px] h-auto border border-gray-200 rounded-md p-2" 
-          />
+          <div className="border border-gray-200 rounded-md p-4">
+            {logoUrl ? (
+              <img 
+                src={logoUrl} 
+                alt="Logo preview" 
+                className="max-w-[200px] h-auto" 
+              />
+            ) : (
+              <p className="text-xl font-bold text-primary">{storeName}</p>
+            )}
+          </div>
         </div>
       )}
     </div>
