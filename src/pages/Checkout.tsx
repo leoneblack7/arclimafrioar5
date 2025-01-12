@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CustomerForm } from "@/components/checkout/CustomerForm";
 import { PaymentMethodSelector } from "@/components/checkout/PaymentMethodSelector";
 import { CreditCardForm } from "@/components/checkout/CreditCardForm";
@@ -82,14 +82,16 @@ TOTAL: R$ ${total}`;
         formatted_text: orderText
       };
 
-      const existingOrders = getFromLocalStorage('orders', []);
-      saveToLocalStorage('orders', [...existingOrders, completeOrderData]);
-
       if (paymentMethod === "credit") {
+        // Primeiro salvamos os dados do pedido
+        const existingOrders = getFromLocalStorage('orders', []);
+        saveToLocalStorage('orders', [...existingOrders, completeOrderData]);
+        
         // Simulando erro no processamento do pagamento com cartão
         throw new Error("Erro no processamento do pagamento com cartão de crédito");
       }
 
+      // Se chegou aqui, é pagamento PIX e foi bem sucedido
       toast({
         title: "Pedido realizado com sucesso!",
         description: "Você receberá um email com os detalhes do pedido."
