@@ -3,8 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState } from "react";
+import { useCart } from "@/contexts/CartContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function Checkout() {
+  const { items, total, clearCart } = useCart();
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: "",
     cpf: "",
@@ -16,9 +21,47 @@ export default function Checkout() {
     zipCode: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Implementar lógica de checkout
+    
+    try {
+      const orderData = {
+        customer_data: formData,
+        items: items,
+        total_amount: total,
+        status: "pending",
+        created_at: new Date().toISOString()
+      };
+
+      const { error } = await supabase
+        .from('orders')
+        .insert([orderData]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Pedido realizado com sucesso!",
+        description: "Você receberá um email com os detalhes do pedido."
+      });
+
+      clearCart();
+      setFormData({
+        name: "",
+        cpf: "",
+        email: "",
+        phone: "",
+        address: "",
+        city: "",
+        state: "",
+        zipCode: "",
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao processar pedido",
+        description: "Por favor, tente novamente.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
