@@ -3,7 +3,6 @@ import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import { Trash2, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 
 interface Banner {
   id: string;
@@ -15,21 +14,13 @@ export const BannerManager = () => {
   const [banners, setBanners] = useState<Banner[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const loadBanners = async () => {
+  const loadBanners = () => {
     try {
       console.log("BannerManager - Iniciando carregamento dos banners");
-      const { data, error } = await supabase
-        .from('banners')
-        .select('*')
-        .order('created_at', { ascending: true });
-
-      if (error) {
-        console.error("BannerManager - Erro ao carregar banners:", error);
-        throw error;
-      }
-
-      console.log("BannerManager - Banners carregados:", data);
-      setBanners(data || []);
+      const storedBanners = localStorage.getItem('banners');
+      const parsedBanners = storedBanners ? JSON.parse(storedBanners) : [];
+      console.log("BannerManager - Banners carregados:", parsedBanners);
+      setBanners(parsedBanners);
     } catch (error) {
       console.error('Erro ao carregar banners:', error);
       toast.error('Erro ao carregar os banners');
@@ -56,48 +47,29 @@ export const BannerManager = () => {
       }
 
       try {
-        console.log("BannerManager - Iniciando upload para o Storage");
-        
-        // Upload da imagem para o Storage do Supabase
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('banners')
-          .upload(`banner-${Date.now()}`, file);
+        // Convert file to base64
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64String = reader.result as string;
+          const newBanner = {
+            id: `banner-${Date.now()}`,
+            image_url: base64String,
+            active: true
+          };
 
-        if (uploadError) {
-          console.error('BannerManager - Erro no upload para storage:', uploadError);
-          throw uploadError;
-        }
+          const updatedBanners = [...banners, newBanner];
+          localStorage.setItem('banners', JSON.stringify(updatedBanners));
+          window.dispatchEvent(new Event('bannersUpdated'));
+          
+          console.log("BannerManager - Banner adicionado com sucesso");
+          toast.success("Banner adicionado e ativado com sucesso!");
+          loadBanners();
+        };
 
-        console.log("BannerManager - Upload concluído, dados:", uploadData);
-
-        // Obter URL pública da imagem
-        const { data: { publicUrl } } = supabase.storage
-          .from('banners')
-          .getPublicUrl(uploadData.path);
-
-        console.log("BannerManager - URL pública gerada:", publicUrl);
-
-        // Criar novo banner no banco
-        const { error: insertError } = await supabase
-          .from('banners')
-          .insert([{ image_url: publicUrl, active: true }]);
-
-        if (insertError) {
-          console.error('BannerManager - Erro ao inserir no banco:', insertError);
-          throw insertError;
-        }
-
-        console.log("BannerManager - Banner inserido com sucesso no banco");
-        toast.success("Banner adicionado e ativado com sucesso!");
-        loadBanners();
+        reader.readAsDataURL(file);
       } catch (error: any) {
-        console.error('BannerManager - Erro detalhado ao fazer upload do banner:', {
-          error,
-          message: error.message,
-          details: error.details,
-          hint: error.hint
-        });
-        toast.error(`Erro ao fazer upload do banner: ${error.message || 'Erro desconhecido'}`);
+        console.error('BannerManager - Erro ao adicionar banner:', error);
+        toast.error(`Erro ao adicionar banner: ${error.message || 'Erro desconhecido'}`);
       }
     }
   };
@@ -109,16 +81,10 @@ export const BannerManager = () => {
   const handleDelete = async (id: string) => {
     try {
       console.log("BannerManager - Iniciando exclusão do banner:", id);
-      const { error } = await supabase
-        .from('banners')
-        .delete()
-        .eq('id', id);
-
-      if (error) {
-        console.error("BannerManager - Erro ao excluir banner:", error);
-        throw error;
-      }
-
+      const updatedBanners = banners.filter(banner => banner.id !== id);
+      localStorage.setItem('banners', JSON.stringify(updatedBanners));
+      window.dispatchEvent(new Event('bannersUpdated'));
+      
       console.log("BannerManager - Banner excluído com sucesso");
       toast.success("Banner removido com sucesso!");
       loadBanners();
@@ -131,16 +97,12 @@ export const BannerManager = () => {
   const toggleBannerStatus = async (id: string, newStatus: boolean) => {
     try {
       console.log("BannerManager - Alterando status do banner:", { id, newStatus });
-      const { error } = await supabase
-        .from('banners')
-        .update({ active: newStatus })
-        .eq('id', id);
-
-      if (error) {
-        console.error("BannerManager - Erro ao atualizar status:", error);
-        throw error;
-      }
-
+      const updatedBanners = banners.map(banner =>
+        banner.id === id ? { ...banner, active: newStatus } : banner
+      );
+      localStorage.setItem('banners', JSON.stringify(updatedBanners));
+      window.dispatchEvent(new Event('bannersUpdated'));
+      
       console.log("BannerManager - Status atualizado com sucesso");
       toast.success(newStatus ? "Banner ativado com sucesso!" : "Banner desativado com sucesso!");
       loadBanners();

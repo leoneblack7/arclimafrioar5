@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { toast } from 'sonner';
-import { supabase } from "@/integrations/supabase/client";
 
 interface Banner {
   id: string;
@@ -13,41 +11,23 @@ export const Banner = () => {
   const [banners, setBanners] = useState<Banner[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const loadBanners = async () => {
+  const loadBanners = () => {
     try {
-      const { data, error } = await supabase
-        .from('banners')
-        .select('*')
-        .eq('active', true)
-        .order('created_at', { ascending: true });
-
-      if (error) throw error;
-
-      console.log("Banner - Banners ativos carregados:", data);
-      setBanners(data || []);
+      const storedBanners = localStorage.getItem('banners');
+      const parsedBanners = storedBanners ? JSON.parse(storedBanners) : [];
+      const activeBanners = parsedBanners.filter((banner: Banner) => banner.active);
+      console.log("Banner - Banners ativos carregados:", activeBanners);
+      setBanners(activeBanners);
     } catch (error) {
       console.error('Erro ao carregar banners:', error);
-      toast.error('Erro ao carregar os banners');
     }
   };
 
   useEffect(() => {
     loadBanners();
-    
-    // Inscrever-se para atualizações em tempo real
-    const channel = supabase
-      .channel('banner-changes')
-      .on('postgres_changes', { 
-        event: '*', 
-        schema: 'public', 
-        table: 'banners' 
-      }, () => {
-        loadBanners();
-      })
-      .subscribe();
-
+    window.addEventListener('bannersUpdated', loadBanners);
     return () => {
-      channel.unsubscribe();
+      window.removeEventListener('bannersUpdated', loadBanners);
     };
   }, []);
 
@@ -74,7 +54,7 @@ export const Banner = () => {
 
   useEffect(() => {
     if (banners.length > 1) {
-      const interval = setInterval(nextSlide, 7000); // 7 segundos
+      const interval = setInterval(nextSlide, 7000);
       return () => clearInterval(interval);
     }
   }, [banners.length]);
