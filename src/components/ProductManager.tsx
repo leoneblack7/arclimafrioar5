@@ -1,102 +1,121 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import { Plus } from "lucide-react";
 import { Dialog } from "./ui/dialog";
 import { ProductForm } from "./admin/ProductForm";
 import { ProductImportForm } from "./admin/ProductImportForm";
 import { ProductsTable } from "./admin/ProductsTable";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 interface Product {
-  id: number;
+  id: string;
   title: string;
   price: number;
-  image: string;
+  image_url: string;
   description: string;
   active: boolean;
 }
 
 export const ProductManager = () => {
-  const [products, setProducts] = useState<Product[]>([
-    {
-      id: 1,
-      title: "Ar Condicionado Split 12000 BTUs Inverter",
-      price: 2499.99,
-      image: "/placeholder.svg",
-      description: "Ar condicionado split 12000 BTUs com tecnologia inverter, economia de energia",
-      active: true
-    },
-    {
-      id: 2,
-      title: "Ar Condicionado Split 9000 BTUs",
-      price: 1899.99,
-      image: "/placeholder.svg",
-      description: "Ar condicionado split 9000 BTUs ideal para ambientes pequenos",
-      active: true
-    },
-    {
-      id: 3,
-      title: "Ar Condicionado Portátil 12000 BTUs",
-      price: 3299.99,
-      image: "/placeholder.svg",
-      description: "Ar condicionado portátil com mobilidade e praticidade",
-      active: true
-    },
-    {
-      id: 4,
-      title: "Ar Condicionado Split 18000 BTUs",
-      price: 3599.99,
-      image: "/placeholder.svg",
-      description: "Ar condicionado split 18000 BTUs para ambientes grandes",
-      active: true
-    },
-    {
-      id: 5,
-      title: "Ar Condicionado Split 24000 BTUs",
-      price: 4299.99,
-      image: "/placeholder.svg",
-      description: "Ar condicionado split 24000 BTUs para áreas extensas",
-      active: true
-    }
-  ]);
-
+  const queryClient = useQueryClient();
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  const { data: products = [], isLoading } = useQuery({
+    queryKey: ["products"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*');
+      
+      if (error) {
+        toast.error("Erro ao carregar produtos");
+        throw error;
+      }
+      
+      return data || [];
+    }
+  });
+
   const handleNewProduct = () => {
-    const newProduct: Product = {
-      id: products.length + 1,
+    const newProduct: Partial<Product> = {
       title: "Novo Produto",
       price: 0,
-      image: "/placeholder.svg",
+      image_url: "/placeholder.svg",
       description: "Descrição do novo produto",
       active: true
     };
-    setEditingProduct(newProduct);
+    setEditingProduct(newProduct as Product);
     setIsDialogOpen(true);
   };
 
-  const handleSaveProduct = (updatedProduct: Product) => {
-    if (updatedProduct.id) {
-      setProducts(products.map(p => 
-        p.id === updatedProduct.id ? updatedProduct : p
-      ));
-    } else {
-      setProducts([...products, { ...updatedProduct, id: products.length + 1 }]);
+  const handleSaveProduct = async (updatedProduct: Product) => {
+    try {
+      if (updatedProduct.id) {
+        const { error } = await supabase
+          .from('products')
+          .update({
+            title: updatedProduct.title,
+            price: updatedProduct.price,
+            image_url: updatedProduct.image_url,
+            description: updatedProduct.description,
+            active: updatedProduct.active
+          })
+          .eq('id', updatedProduct.id);
+
+        if (error) throw error;
+        toast.success("Produto atualizado com sucesso!");
+      } else {
+        const { error } = await supabase
+          .from('products')
+          .insert([{
+            title: updatedProduct.title,
+            price: updatedProduct.price,
+            image_url: updatedProduct.image_url,
+            description: updatedProduct.description,
+            active: updatedProduct.active
+          }]);
+
+        if (error) throw error;
+        toast.success("Produto adicionado com sucesso!");
+      }
+      
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      setEditingProduct(null);
+      setIsDialogOpen(false);
+    } catch (error) {
+      console.error('Error saving product:', error);
+      toast.error("Erro ao salvar produto");
     }
-    setEditingProduct(null);
   };
 
-  const handleImportProduct = (scrapedProduct: any) => {
-    const newProduct = {
-      id: products.length + 1,
-      title: scrapedProduct.title,
-      price: scrapedProduct.price,
-      image: scrapedProduct.images[0] || '',
-      description: scrapedProduct.description,
-      active: true
-    };
-    setProducts([...products, newProduct]);
+  const handleImportProduct = async (scrapedProduct: any) => {
+    try {
+      const { error } = await supabase
+        .from('products')
+        .insert([{
+          title: scrapedProduct.title,
+          price: scrapedProduct.price,
+          image_url: scrapedProduct.images[0] || '/placeholder.svg',
+          description: scrapedProduct.description,
+          active: true
+        }]);
+
+      if (error) throw error;
+      
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      toast.success("Produto importado com sucesso!");
+    } catch (error) {
+      console.error('Error importing product:', error);
+      toast.error("Erro ao importar produto");
+    }
   };
+
+  if (isLoading) {
+    return <div>Carregando...</div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -129,15 +148,40 @@ export const ProductManager = () => {
           setEditingProduct(product);
           setIsDialogOpen(true);
         }}
-        onDelete={(productId) => {
-          setProducts(products.filter(p => p.id !== productId));
+        onDelete={async (productId) => {
+          try {
+            const { error } = await supabase
+              .from('products')
+              .delete()
+              .eq('id', productId);
+
+            if (error) throw error;
+            
+            queryClient.invalidateQueries({ queryKey: ["products"] });
+            toast.success("Produto removido com sucesso!");
+          } catch (error) {
+            console.error('Error deleting product:', error);
+            toast.error("Erro ao remover produto");
+          }
         }}
-        onToggleActive={(productId) => {
-          setProducts(products.map(product => 
-            product.id === productId 
-              ? { ...product, active: !product.active }
-              : product
-          ));
+        onToggleActive={async (productId) => {
+          const product = products.find(p => p.id === productId);
+          if (!product) return;
+
+          try {
+            const { error } = await supabase
+              .from('products')
+              .update({ active: !product.active })
+              .eq('id', productId);
+
+            if (error) throw error;
+            
+            queryClient.invalidateQueries({ queryKey: ["products"] });
+            toast.success("Status do produto atualizado!");
+          } catch (error) {
+            console.error('Error updating product status:', error);
+            toast.error("Erro ao atualizar status do produto");
+          }
         }}
       />
     </div>
