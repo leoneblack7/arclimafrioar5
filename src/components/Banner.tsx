@@ -57,17 +57,20 @@ export const Banner = () => {
         const parsedBanners = JSON.parse(storedBanners);
         console.log("Banner - Banners parseados:", parsedBanners);
         
-        // Filtra apenas os banners ativos
-        const activeBanners = parsedBanners.filter((banner: Banner) => banner.active);
-        
-        if (activeBanners.length > 0) {
-          console.log("Banner - Usando banners do localStorage");
-          setBanners(activeBanners);
-        } else {
-          console.log("Banner - Usando banners padrão pois não há ativos");
-          setBanners(defaultBanners);
+        if (parsedBanners && Array.isArray(parsedBanners) && parsedBanners.length > 0) {
+          // Filtra apenas os banners ativos
+          const activeBanners = parsedBanners.filter((banner: Banner) => banner.active);
+          
+          if (activeBanners.length > 0) {
+            console.log("Banner - Usando banners do localStorage");
+            setBanners(activeBanners);
+            return;
+          }
         }
       }
+      
+      console.log("Banner - Usando banners padrão");
+      setBanners(defaultBanners);
     } catch (error) {
       console.error('Erro ao carregar banners:', error);
       setBanners(defaultBanners);
@@ -120,6 +123,11 @@ export const Banner = () => {
       return () => clearInterval(interval);
     }
   }, [banners.length]);
+
+  if (banners.length === 0) {
+    console.log("Banner - Nenhum banner disponível");
+    return null;
+  }
 
   return (
     <div 
