@@ -1,6 +1,8 @@
-import { ShoppingCart, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { SearchBar } from "./SearchBar";
+import { CartDrawer } from "./CartDrawer";
 
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -15,57 +17,57 @@ export const Navbar = () => {
             </a>
           </div>
 
-          {/* Navegação Desktop */}
+          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
+            <SearchBar />
             <a href="/" className="text-gray-600 hover:text-primary transition-colors">
               Início
             </a>
-            <a href="/products" className="text-gray-600 hover:text-primary transition-colors">
+            <a href="/produtos" className="text-gray-600 hover:text-primary transition-colors">
               Produtos
             </a>
-            <a href="/about" className="text-gray-600 hover:text-primary transition-colors">
+            <a href="/sobre" className="text-gray-600 hover:text-primary transition-colors">
               Sobre
             </a>
-            <a href="/contact" className="text-gray-600 hover:text-primary transition-colors">
+            <a href="/contato" className="text-gray-600 hover:text-primary transition-colors">
               Contato
             </a>
-            <Button variant="ghost" size="icon">
-              <ShoppingCart className="h-5 w-5" />
-            </Button>
+            <CartDrawer />
           </div>
 
-          {/* Botão Menu Mobile */}
-          <div className="md:hidden">
+          {/* Mobile Menu Button */}
+          <div className="md:hidden flex items-center">
+            <CartDrawer />
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="ml-2"
             >
               <Menu className="h-5 w-5" />
             </Button>
           </div>
         </div>
 
-        {/* Navegação Mobile */}
+        {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden pb-4">
+            <div className="py-4">
+              <SearchBar />
+            </div>
             <div className="flex flex-col space-y-4">
               <a href="/" className="text-gray-600 hover:text-primary transition-colors">
                 Início
               </a>
-              <a href="/products" className="text-gray-600 hover:text-primary transition-colors">
+              <a href="/produtos" className="text-gray-600 hover:text-primary transition-colors">
                 Produtos
               </a>
-              <a href="/about" className="text-gray-600 hover:text-primary transition-colors">
+              <a href="/sobre" className="text-gray-600 hover:text-primary transition-colors">
                 Sobre
               </a>
-              <a href="/contact" className="text-gray-600 hover:text-primary transition-colors">
+              <a href="/contato" className="text-gray-600 hover:text-primary transition-colors">
                 Contato
               </a>
-              <Button variant="ghost" size="sm" className="justify-start">
-                <ShoppingCart className="h-5 w-5 mr-2" />
-                Carrinho
-              </Button>
             </div>
           </div>
         )}
