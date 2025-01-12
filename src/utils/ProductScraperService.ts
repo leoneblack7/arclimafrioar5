@@ -16,6 +16,15 @@ export interface ScrapedProduct {
   };
 }
 
+interface ScrapeSelectors {
+  h1: string[];
+  description: string[];
+  productImages: { src: string }[];
+  productPrice: string[];
+  productRating: string[];
+  productSpecs: { text: string }[];
+}
+
 export class ProductScraperService {
   private static API_KEY = import.meta.env.VITE_FIRECRAWL_API_KEY || '';
   private static firecrawl = new FirecrawlApp({ apiKey: ProductScraperService.API_KEY });
@@ -28,16 +37,16 @@ export class ProductScraperService {
         limit: 1,
         scrapeOptions: {
           formats: ['html'],
-          selector: {
-            h1: 'h1',
-            description: '.product-description, .description',
-            productImages: {
+          selectors: {
+            'h1': 'h1',
+            'description': '.product-description, .description',
+            'productImages': {
               selector: '.product-images img, .product-gallery img',
               attribute: 'src'
             },
-            productPrice: '.product-price, .price-current',
-            productRating: '.rating-stars',
-            productSpecs: '.specifications-table tr, .specs-table tr'
+            'productPrice': '.product-price, .price-current',
+            'productRating': '.rating-stars',
+            'productSpecs': '.specifications-table tr, .specs-table tr'
           }
         }
       });
@@ -46,33 +55,33 @@ export class ProductScraperService {
         throw new Error('Failed to scrape product');
       }
 
-      const data = response.data[0];
+      const data = response.data[0] as unknown as { selectors: ScrapeSelectors };
       if (!data) {
         throw new Error('No data returned from scrape');
       }
 
+      const selectors = data.selectors;
+
       // Process specifications into a structured object
       const specifications: { [key: string]: string } = {};
-      const rawSpecs = data.productSpecs || [];
-      if (Array.isArray(rawSpecs)) {
-        rawSpecs.forEach((spec: { text: string }) => {
-          const [label, value] = spec.text.split(':').map(s => s.trim());
-          if (label && value) {
-            specifications[label] = value;
-          }
-        });
-      }
+      const rawSpecs = selectors.productSpecs || [];
+      rawSpecs.forEach((spec) => {
+        const [label, value] = spec.text.split(':').map(s => s.trim());
+        if (label && value) {
+          specifications[label] = value;
+        }
+      });
 
       // Extract price from string and convert to number
-      const priceText = (data.productPrice as string)?.replace(/[^\d,]/g, '').replace(',', '.') || '0';
+      const priceText = (selectors.productPrice[0] || '0').replace(/[^\d,]/g, '').replace(',', '.') || '0';
       const price = parseFloat(priceText);
 
       return {
-        title: (data.h1 as string) || '',
-        description: (data.description as string) || '',
-        images: Array.isArray(data.productImages) ? data.productImages : [],
+        title: selectors.h1[0] || '',
+        description: selectors.description[0] || '',
+        images: selectors.productImages.map(img => img.src),
         price: isNaN(price) ? 0 : price,
-        rating: typeof data.productRating === 'number' ? data.productRating : 5,
+        rating: parseFloat(selectors.productRating[0]) || 5,
         specifications
       };
     } catch (error) {
