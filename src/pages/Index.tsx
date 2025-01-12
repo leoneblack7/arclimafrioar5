@@ -67,9 +67,11 @@ const Index = () => {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       
-      {/* Hero Section with Banner */}
+      {/* Banner Section */}
+      <Banner />
+      
+      {/* Hero Section */}
       <section className="pt-16 pb-12 px-4 bg-gradient-to-b from-white to-blue-50">
-        <Banner />
         <div className="container mx-auto text-center pt-8">
           <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500">
             Climatização Inteligente com ArclimaFrio
