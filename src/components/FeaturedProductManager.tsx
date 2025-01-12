@@ -136,7 +136,7 @@ export const FeaturedProductManager = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Produtos em Destaque</h2>
+        <h2 className="text-2xl font-bold text-foreground dark:text-foreground">Produtos em Destaque</h2>
         <Button 
           onClick={handleNewProduct} 
           className="flex items-center gap-2"
