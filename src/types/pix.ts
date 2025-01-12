@@ -7,4 +7,5 @@ export interface PixConfig {
   pixCity: string;
   pixPayClientId?: string;
   pixPayClientSecret?: string;
+  maintenanceMode: boolean;
 }

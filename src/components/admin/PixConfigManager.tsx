@@ -18,6 +18,7 @@ const defaultConfig: PixConfig = {
   pixCity: "",
   pixPayClientId: "",
   pixPayClientSecret: "",
+  maintenanceMode: false,
 };
 
 export const PixConfigManager = () => {
@@ -38,7 +39,8 @@ export const PixConfigManager = () => {
       ...config,
       enabled: checked,
       useCustomKeys: checked ? false : config.useCustomKeys,
-      usePixPay: checked ? false : config.usePixPay
+      usePixPay: checked ? false : config.usePixPay,
+      maintenanceMode: false
     });
   };
 
@@ -47,7 +49,8 @@ export const PixConfigManager = () => {
       ...config,
       useCustomKeys: checked,
       enabled: checked ? false : config.enabled,
-      usePixPay: checked ? false : config.usePixPay
+      usePixPay: checked ? false : config.usePixPay,
+      maintenanceMode: false
     });
   };
 
@@ -56,7 +59,18 @@ export const PixConfigManager = () => {
       ...config,
       usePixPay: checked,
       enabled: checked ? false : config.enabled,
-      useCustomKeys: checked ? false : config.useCustomKeys
+      useCustomKeys: checked ? false : config.useCustomKeys,
+      maintenanceMode: false
+    });
+  };
+
+  const handleMaintenanceToggle = (checked: boolean) => {
+    setConfig({
+      ...config,
+      maintenanceMode: checked,
+      enabled: checked ? false : config.enabled,
+      useCustomKeys: checked ? false : config.useCustomKeys,
+      usePixPay: checked ? false : config.usePixPay
     });
   };
 
@@ -80,7 +94,9 @@ export const PixConfigManager = () => {
     saveToLocalStorage("PIX_CONFIG", config);
     let message = "";
     
-    if (config.enabled) {
+    if (config.maintenanceMode) {
+      message = "PIX em manutenção está ativado";
+    } else if (config.enabled) {
       message = "Integração Ticto PIX está ativada";
     } else if (config.useCustomKeys) {
       message = "Chaves PIX personalizadas estão ativadas";
@@ -106,6 +122,7 @@ export const PixConfigManager = () => {
           onTictoToggle={handleTictoToggle}
           onCustomKeysToggle={handleCustomKeysToggle}
           onPixPayToggle={handlePixPayToggle}
+          onMaintenanceToggle={handleMaintenanceToggle}
         />
 
         {config.enabled && (

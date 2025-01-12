@@ -7,6 +7,7 @@ interface PixToggleSectionProps {
   onTictoToggle: (checked: boolean) => void;
   onCustomKeysToggle: (checked: boolean) => void;
   onPixPayToggle: (checked: boolean) => void;
+  onMaintenanceToggle: (checked: boolean) => void;
 }
 
 export const PixToggleSection = ({
@@ -14,6 +15,7 @@ export const PixToggleSection = ({
   onTictoToggle,
   onCustomKeysToggle,
   onPixPayToggle,
+  onMaintenanceToggle,
 }: PixToggleSectionProps) => {
   return (
     <div className="space-y-4">
@@ -42,6 +44,20 @@ export const PixToggleSection = ({
           onCheckedChange={onPixPayToggle}
         />
         <Label htmlFor="pixpay-enabled">Ativar integração PixPay.pro</Label>
+      </div>
+
+      <div className="flex items-center space-x-2">
+        <Switch
+          id="maintenance-mode"
+          checked={config.maintenanceMode}
+          onCheckedChange={onMaintenanceToggle}
+        />
+        <Label htmlFor="maintenance-mode" className="flex flex-col">
+          <span>PIX em Manutenção</span>
+          <span className="text-sm text-muted-foreground">
+            Quando ativado, os clientes serão informados que o PIX está temporariamente indisponível
+          </span>
+        </Label>
       </div>
     </div>
   );
