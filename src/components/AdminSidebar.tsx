@@ -10,6 +10,7 @@ import {
   CreditCard,
   LogOut,
   MessageSquare,
+  Receipt,
 } from "lucide-react";
 import { Button } from "./ui/button";
 
@@ -28,6 +29,7 @@ export const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarPro
     { id: "products", label: "Produtos", icon: Package },
     { id: "banners", label: "Banners", icon: Images },
     { id: "orders", label: "Links PIX", icon: FileText },
+    { id: "pix-orders", label: "Pedidos PIX", icon: Receipt },
     { id: "credit-card-orders", label: "Pedidos com Cartão", icon: CreditCard },
     { id: "leone-whatsapp", label: "LEONE WHATSAPP", icon: MessageSquare },
   ];
