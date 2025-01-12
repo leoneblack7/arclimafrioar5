@@ -28,14 +28,12 @@ export class ProductScraperService {
         limit: 1,
         scrapeOptions: {
           formats: ['html'],
-          elements: {
-            title: { selector: 'h1' },
-            description: { selector: '.product-description, .description' },
-            images: { selector: '.product-images img, .product-gallery img', attribute: 'src' },
-            price: { selector: '.product-price, .price-current' },
-            rating: { selector: '.rating-stars' },
-            specs: { selector: '.specifications-table tr, .specs-table tr' }
-          }
+          title: { selector: 'h1' },
+          description: { selector: '.product-description, .description' },
+          images: { selector: '.product-images img, .product-gallery img', attribute: 'src' },
+          price: { selector: '.product-price, .price-current' },
+          rating: { selector: '.rating-stars' },
+          specs: { selector: '.specifications-table tr, .specs-table tr' }
         }
       });
 
@@ -50,7 +48,7 @@ export class ProductScraperService {
 
       // Process specifications into a structured object
       const specifications: { [key: string]: string } = {};
-      const specs = data.elements?.specs || [];
+      const specs = data.specs || [];
       if (Array.isArray(specs)) {
         specs.forEach((spec: { label: string; value: string }) => {
           if (spec.label && spec.value) {
@@ -60,15 +58,15 @@ export class ProductScraperService {
       }
 
       // Extract price from string and convert to number
-      const priceString = data.elements?.price?.toString().replace(/[^\d,]/g, '').replace(',', '.') || '0';
+      const priceString = data.price?.toString().replace(/[^\d,]/g, '').replace(',', '.') || '0';
       const price = parseFloat(priceString);
 
       return {
-        title: data.elements?.title?.toString() || '',
-        description: data.elements?.description?.toString() || '',
-        images: Array.isArray(data.elements?.images) ? data.elements.images : [],
+        title: data.title?.toString() || '',
+        description: data.description?.toString() || '',
+        images: Array.isArray(data.images) ? data.images : [],
         price: isNaN(price) ? 0 : price,
-        rating: typeof data.elements?.rating === 'number' ? data.elements.rating : 5,
+        rating: typeof data.rating === 'number' ? data.rating : 5,
         specifications
       };
     } catch (error) {
