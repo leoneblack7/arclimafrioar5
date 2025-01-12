@@ -15,31 +15,15 @@ export const BannerManager = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const loadBanners = () => {
-    console.log("BannerManager - Carregando banners...");
     const savedBanners = localStorage.getItem("siteBanners");
     if (savedBanners) {
       const parsedBanners = JSON.parse(savedBanners);
-      console.log("BannerManager - Banners carregados:", parsedBanners);
       setBanners(parsedBanners);
-    } else {
-      const defaultBanner: Banner = {
-        id: 1,
-        imageUrl: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
-        active: true
-      };
-      setBanners([defaultBanner]);
-      localStorage.setItem("siteBanners", JSON.stringify([defaultBanner]));
-      console.log("BannerManager - Banner padrão adicionado:", defaultBanner);
     }
   };
 
   useEffect(() => {
     loadBanners();
-    window.addEventListener('storage', loadBanners);
-    
-    return () => {
-      window.removeEventListener('storage', loadBanners);
-    };
   }, []);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,13 +39,13 @@ export const BannerManager = () => {
         const newBanner: Banner = {
           id: Date.now(),
           imageUrl: result,
-          active: false
+          active: true // Ativando banner por padrão
         };
         const updatedBanners = [...banners, newBanner];
         setBanners(updatedBanners);
         localStorage.setItem("siteBanners", JSON.stringify(updatedBanners));
         window.dispatchEvent(new Event('storage'));
-        toast.success("Banner adicionado com sucesso!");
+        toast.success("Banner adicionado e ativado com sucesso!");
       };
       reader.readAsDataURL(file);
     }

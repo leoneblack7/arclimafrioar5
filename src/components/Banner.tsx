@@ -38,21 +38,30 @@ export const Banner = () => {
     };
   }, []);
 
+  const getRandomIndex = (currentIdx: number, length: number) => {
+    if (length <= 1) return 0;
+    let newIndex;
+    do {
+      newIndex = Math.floor(Math.random() * length);
+    } while (newIndex === currentIdx);
+    return newIndex;
+  };
+
   const nextSlide = () => {
     if (banners.length > 1) {
-      setCurrentIndex((prev) => (prev + 1) % banners.length);
+      setCurrentIndex(current => getRandomIndex(current, banners.length));
     }
   };
 
   const prevSlide = () => {
     if (banners.length > 1) {
-      setCurrentIndex((prev) => (prev - 1 + banners.length) % banners.length);
+      setCurrentIndex(current => getRandomIndex(current, banners.length));
     }
   };
 
   useEffect(() => {
     if (banners.length > 1) {
-      const interval = setInterval(nextSlide, 5000);
+      const interval = setInterval(nextSlide, 7000); // 7 segundos
       return () => clearInterval(interval);
     }
   }, [banners.length]);
