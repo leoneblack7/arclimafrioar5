@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Product } from "@/types/product";
+import { useState } from "react";
 
 interface ProductFormProps {
   product: Product;
@@ -11,18 +12,25 @@ interface ProductFormProps {
 }
 
 export const ProductForm = ({ product, onSave, onCancel }: ProductFormProps) => {
+  const [formData, setFormData] = useState(product);
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        onSave({
-          ...product,
+        setFormData({
+          ...formData,
           image: reader.result as string
         });
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSave(formData);
   };
 
   return (
@@ -32,35 +40,35 @@ export const ProductForm = ({ product, onSave, onCancel }: ProductFormProps) => 
           {product.id ? "Editar Produto" : "Novo Produto"}
         </DialogTitle>
       </DialogHeader>
-      <div className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
           <label className="text-sm font-medium">Título</label>
           <Input
-            value={product.title}
-            onChange={(e) => onSave({ ...product, title: e.target.value })}
+            value={formData.title}
+            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
           />
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium">Preço</label>
           <Input
             type="number"
-            value={product.price}
-            onChange={(e) => onSave({ ...product, price: Number(e.target.value) })}
+            value={formData.price}
+            onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
           />
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium">Descrição</label>
           <Textarea
-            value={product.description}
-            onChange={(e) => onSave({ ...product, description: e.target.value })}
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           />
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium">Imagem</label>
           <div className="flex items-center gap-4">
             <img
-              src={product.image}
-              alt={product.title}
+              src={formData.image}
+              alt={formData.title}
               className="w-24 h-24 object-cover rounded"
             />
             <Input
@@ -71,14 +79,14 @@ export const ProductForm = ({ product, onSave, onCancel }: ProductFormProps) => 
           </div>
         </div>
         <div className="flex justify-end gap-4 pt-4">
-          <Button variant="outline" onClick={onCancel}>
+          <Button type="button" variant="outline" onClick={onCancel}>
             Cancelar
           </Button>
-          <Button onClick={() => onSave(product)}>
+          <Button type="submit">
             Salvar
           </Button>
         </div>
-      </div>
+      </form>
     </DialogContent>
   );
 };
