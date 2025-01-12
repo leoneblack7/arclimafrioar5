@@ -58,18 +58,7 @@ Poderosa barreira contra agentes causadores de doenças respiratórias. Mantém 
 •       <b>Economia de Energia</b>
 <b>Auto Learning:</b> Uma nova forma de conforto térmico em que o uso de algoritmo combinado com as leituras dos parâmetros e condições do ambiente permite ao sistema calcular o melhor ponto de operação, gerando redução do consumo e aumentando de eficiência.
 
-<b>Trocadores de calor:</b> Até 15% mais eficientes. Tubulação em cobre com ranhuras.`,
-        specifications: {
-          voltage: "220v",
-          capacity: "24.000 Btus",
-          type: "Split Hi Wall",
-          compressor: "Inverter",
-          energyEfficiency: "A",
-          warranty: "60 Meses",
-          noise: "51/44/43/40/38/37/35 dB",
-          refrigerantGas: "R-32",
-          color: "Preto Perola"
-        }
+<b>Trocadores de calor:</b> Até 15% mais eficientes. Tubulação em cobre com ranhuras.`
       };
 
       return {
