@@ -5,6 +5,7 @@ import { AdminSidebar } from "@/components/AdminSidebar";
 import { LogoManager } from "@/components/LogoManager";
 import { ProductManager } from "@/components/ProductManager";
 import { Dashboard } from "@/components/Dashboard";
+import { BannerManager } from "@/components/BannerManager";
 
 export default function Admin() {
   const { isAuthenticated, login, logout } = useAuth();
@@ -78,6 +79,7 @@ export default function Admin() {
         {activeSection === "dashboard" && <Dashboard />}
         {activeSection === "logo" && <LogoManager />}
         {activeSection === "products" && <ProductManager />}
+        {activeSection === "banners" && <BannerManager />}
       </div>
     </div>
   );
