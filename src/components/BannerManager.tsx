@@ -9,6 +9,12 @@ interface Banner {
   active: boolean;
 }
 
+const defaultBanner: Banner = {
+  id: 'default-banner',
+  image_url: 'https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7',
+  active: true
+};
+
 export const BannerManager = () => {
   const [banners, setBanners] = useState<Banner[]>([]);
 
@@ -16,7 +22,13 @@ export const BannerManager = () => {
     try {
       console.log("BannerManager - Iniciando carregamento dos banners");
       const storedBanners = localStorage.getItem('banners');
-      const parsedBanners = storedBanners ? JSON.parse(storedBanners) : [];
+      if (!storedBanners) {
+        console.log("BannerManager - Inicializando com banner padrão");
+        localStorage.setItem('banners', JSON.stringify([defaultBanner]));
+        setBanners([defaultBanner]);
+        return;
+      }
+      const parsedBanners = JSON.parse(storedBanners);
       console.log("BannerManager - Banners carregados:", parsedBanners);
       setBanners(parsedBanners);
     } catch (error) {
@@ -47,8 +59,18 @@ export const BannerManager = () => {
 
   const handleDelete = async (id: string) => {
     try {
+      if (id === 'default-banner' && banners.length === 1) {
+        toast.error("Não é possível excluir o banner padrão quando é o único banner");
+        return;
+      }
+
       console.log("BannerManager - Iniciando exclusão do banner:", id);
       const updatedBanners = banners.filter(banner => banner.id !== id);
+      
+      if (updatedBanners.length === 0) {
+        updatedBanners.push(defaultBanner);
+      }
+      
       localStorage.setItem('banners', JSON.stringify(updatedBanners));
       window.dispatchEvent(new Event('bannersUpdated'));
       
