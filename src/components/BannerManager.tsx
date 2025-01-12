@@ -3,7 +3,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { toast } from "sonner";
 import { Label } from "./ui/label";
-import { Trash2 } from "lucide-react";
+import { Trash2, Eye, EyeOff } from "lucide-react";
 
 interface Banner {
   id: number;
@@ -35,7 +35,7 @@ export const BannerManager = () => {
         const newBanner: Banner = {
           id: Date.now(),
           imageUrl: result,
-          active: true
+          active: false
         };
         const updatedBanners = [...banners, newBanner];
         setBanners(updatedBanners);
@@ -57,13 +57,22 @@ export const BannerManager = () => {
     toast.success("Banner removido com sucesso!");
   };
 
-  const toggleActive = (id: number) => {
+  const activateBanner = (id: number) => {
     const updatedBanners = banners.map(banner => 
-      banner.id === id ? { ...banner, active: !banner.active } : banner
+      banner.id === id ? { ...banner, active: true } : banner
     );
     setBanners(updatedBanners);
     localStorage.setItem("siteBanners", JSON.stringify(updatedBanners));
-    toast.success("Status do banner atualizado!");
+    toast.success("Banner ativado com sucesso!");
+  };
+
+  const deactivateBanner = (id: number) => {
+    const updatedBanners = banners.map(banner => 
+      banner.id === id ? { ...banner, active: false } : banner
+    );
+    setBanners(updatedBanners);
+    localStorage.setItem("siteBanners", JSON.stringify(updatedBanners));
+    toast.success("Banner desativado com sucesso!");
   };
 
   return (
@@ -94,13 +103,26 @@ export const BannerManager = () => {
               alt="Banner preview" 
               className="w-full h-40 object-cover rounded-md"
             />
-            <div className="flex justify-between items-center">
-              <Button
-                variant={banner.active ? "default" : "secondary"}
-                onClick={() => toggleActive(banner.id)}
-              >
-                {banner.active ? "Ativo" : "Inativo"}
-              </Button>
+            <div className="flex justify-between items-center gap-2">
+              {!banner.active ? (
+                <Button
+                  variant="default"
+                  className="flex-1"
+                  onClick={() => activateBanner(banner.id)}
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  Ativar
+                </Button>
+              ) : (
+                <Button
+                  variant="secondary"
+                  className="flex-1"
+                  onClick={() => deactivateBanner(banner.id)}
+                >
+                  <EyeOff className="h-4 w-4 mr-2" />
+                  Desativar
+                </Button>
+              )}
               <Button
                 variant="destructive"
                 size="icon"
