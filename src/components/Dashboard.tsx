@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BarChart3, CreditCard, Link, Search, Edit2, RotateCcw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { StatsChart } from "@/components/admin/StatsChart";
 
 export const Dashboard = () => {
   const { toast } = useToast();
@@ -142,8 +141,6 @@ export const Dashboard = () => {
           </Card>
         ))}
       </div>
-
-      <StatsChart stats={stats} />
     </div>
   );
 };
