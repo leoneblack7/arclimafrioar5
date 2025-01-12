@@ -12,6 +12,7 @@ import {
   MessageSquare,
   Receipt,
   Key,
+  MessageCircle,
 } from "lucide-react";
 import { Button } from "./ui/button";
 
@@ -34,6 +35,7 @@ export const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarPro
     { id: "credit-card-orders", label: "Pedidos com Cartão", icon: CreditCard },
     { id: "leone-whatsapp", label: "LEONE WHATSAPP", icon: MessageSquare },
     { id: "ticto-key", label: "Chave API Ticto", icon: Key },
+    { id: "telegram-bot", label: "Telegram Bot", icon: MessageCircle },
   ];
 
   return (
