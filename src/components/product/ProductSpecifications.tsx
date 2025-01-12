@@ -6,7 +6,7 @@ export const ProductSpecifications = ({ className = "h-6" }: ProductSpecificatio
   return (
     <div className="flex justify-between items-center gap-2 border-t pt-3">
       <img
-        src="/lovable-uploads/1358e50a-d563-4d1e-b6ab-78515801abdb.png"
+        src="/lovable-uploads/5275c902-4f65-478a-847b-67042b1e63c6.png"
         alt="Especificações do produto"
         className={`w-full object-contain ${className}`}
       />
