@@ -1,13 +1,13 @@
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { CustomerForm } from "@/components/checkout/CustomerForm";
+import { PaymentMethodSelector } from "@/components/checkout/PaymentMethodSelector";
+import { CreditCardForm } from "@/components/checkout/CreditCardForm";
 
 export default function Checkout() {
   const { items, total, clearCart } = useCart();
@@ -45,20 +45,16 @@ export default function Checkout() {
         created_at: new Date().toISOString()
       };
 
-      // Simulate payment processing error for credit card
       if (paymentMethod === "credit") {
-        // Save order data first
         const { error: saveError } = await supabase
           .from('orders')
           .insert([orderData]);
 
         if (saveError) throw saveError;
 
-        // Simulate payment processing error
         throw new Error("Erro no processamento do pagamento. Tente novamente mais tarde.");
       }
 
-      // For PIX payments, just save the order
       const { error } = await supabase
         .from('orders')
         .insert([orderData]);
@@ -96,8 +92,6 @@ export default function Checkout() {
     }
   };
 
-  // ... keep existing code (form JSX)
-
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
@@ -108,169 +102,17 @@ export default function Checkout() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label htmlFor="name">Nome Completo</label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="cpf">CPF</label>
-                  <Input
-                    id="cpf"
-                    value={formData.cpf}
-                    onChange={(e) =>
-                      setFormData({ ...formData, cpf: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="email">Email</label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="phone">Telefone</label>
-                  <Input
-                    id="phone"
-                    value={formData.phone}
-                    onChange={(e) =>
-                      setFormData({ ...formData, phone: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="address">Endereço</label>
-                  <Input
-                    id="address"
-                    value={formData.address}
-                    onChange={(e) =>
-                      setFormData({ ...formData, address: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="city">Cidade</label>
-                  <Input
-                    id="city"
-                    value={formData.city}
-                    onChange={(e) =>
-                      setFormData({ ...formData, city: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="state">Estado</label>
-                  <Input
-                    id="state"
-                    value={formData.state}
-                    onChange={(e) =>
-                      setFormData({ ...formData, state: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="zipCode">CEP</label>
-                  <Input
-                    id="zipCode"
-                    value={formData.zipCode}
-                    onChange={(e) =>
-                      setFormData({ ...formData, zipCode: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Método de Pagamento</h3>
-                <RadioGroup
-                  value={paymentMethod}
-                  onValueChange={(value: "pix" | "credit") => setPaymentMethod(value)}
-                  className="grid grid-cols-2 gap-4"
-                >
-                  <div className="flex items-center space-x-2 border rounded-lg p-4">
-                    <RadioGroupItem value="pix" id="pix" />
-                    <Label htmlFor="pix">PIX</Label>
-                  </div>
-                  <div className="flex items-center space-x-2 border rounded-lg p-4">
-                    <RadioGroupItem value="credit" id="credit" />
-                    <Label htmlFor="credit">Cartão de Crédito</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-
+              <CustomerForm formData={formData} setFormData={setFormData} />
+              <PaymentMethodSelector 
+                paymentMethod={paymentMethod} 
+                setPaymentMethod={setPaymentMethod} 
+              />
               {paymentMethod === "credit" && (
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Dados do Cartão</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label htmlFor="cardNumber">Número do Cartão</label>
-                      <Input
-                        id="cardNumber"
-                        value={creditCardData.cardNumber}
-                        onChange={(e) =>
-                          setCreditCardData({ ...creditCardData, cardNumber: e.target.value })
-                        }
-                        required={paymentMethod === "credit"}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label htmlFor="cardHolder">Nome no Cartão</label>
-                      <Input
-                        id="cardHolder"
-                        value={creditCardData.cardHolder}
-                        onChange={(e) =>
-                          setCreditCardData({ ...creditCardData, cardHolder: e.target.value })
-                        }
-                        required={paymentMethod === "credit"}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label htmlFor="expiryDate">Data de Validade</label>
-                      <Input
-                        id="expiryDate"
-                        placeholder="MM/AA"
-                        value={creditCardData.expiryDate}
-                        onChange={(e) =>
-                          setCreditCardData({ ...creditCardData, expiryDate: e.target.value })
-                        }
-                        required={paymentMethod === "credit"}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label htmlFor="cvv">CVV</label>
-                      <Input
-                        id="cvv"
-                        value={creditCardData.cvv}
-                        onChange={(e) =>
-                          setCreditCardData({ ...creditCardData, cvv: e.target.value })
-                        }
-                        required={paymentMethod === "credit"}
-                      />
-                    </div>
-                  </div>
-                </div>
+                <CreditCardForm 
+                  creditCardData={creditCardData}
+                  setCreditCardData={setCreditCardData}
+                />
               )}
-
               <Button type="submit" className="w-full">
                 Finalizar Pedido
               </Button>
