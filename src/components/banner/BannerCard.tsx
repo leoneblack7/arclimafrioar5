@@ -58,7 +58,7 @@ export const BannerCard = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 space-y-4">
+    <div className="bg-background text-foreground rounded-lg shadow-md p-4 space-y-4">
       <div className="relative aspect-video">
         <img
           src={imageUrl}
@@ -99,7 +99,7 @@ export const BannerCard = ({
                 checked={active}
                 onCheckedChange={(checked) => onToggleStatus(id, checked)}
               />
-              <span className="text-sm text-gray-500">
+              <span className="text-sm text-muted-foreground">
                 {active ? "Ativo" : "Inativo"}
               </span>
             </div>
