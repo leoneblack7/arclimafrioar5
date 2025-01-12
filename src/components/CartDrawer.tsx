@@ -19,10 +19,17 @@ export const CartDrawer = () => {
   const [paymentMethod, setPaymentMethod] = useState<"pix" | "credit">("pix");
 
   const handleCheckout = () => {
-    if (paymentMethod === "pix" && items.length === 1) {
-      // If PIX and single item, use the product's PIX link
-      const pixLink = items[0].pixLink || "https://payment.ticto.app/O368AB06D";
-      window.open(pixLink, "_blank");
+    if (paymentMethod === "pix") {
+      // For PIX payments, use the product's specific PIX link
+      if (items.length === 1) {
+        const pixLink = items[0].pixLink;
+        if (pixLink) {
+          window.open(pixLink, "_blank");
+          return;
+        }
+      }
+      // If no specific PIX link or multiple items, use default link
+      window.open("https://payment.ticto.app/O368AB06D", "_blank");
     } else {
       navigate("/checkout");
     }
