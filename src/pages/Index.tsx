@@ -15,9 +15,9 @@ const Index = () => {
     queryFn: async () => {
       const storedProducts = getFromLocalStorage('products', []);
       return storedProducts
-        .filter((item: Product) => item.active)
+        .filter((item: any) => item.active)
         .map((item: any) => ({
-          id: item.id,
+          id: Number(item.id),
           title: item.title,
           price: item.price,
           image: item.image || '/placeholder.svg',

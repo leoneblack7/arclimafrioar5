@@ -20,7 +20,7 @@ export const ProductManager = () => {
     queryFn: async () => {
       const storedProducts = getFromLocalStorage('products', []);
       return storedProducts.map((item: any) => ({
-        id: item.id,
+        id: Number(item.id),
         title: item.title,
         price: item.price,
         image: item.image || '/placeholder.svg',
@@ -32,7 +32,7 @@ export const ProductManager = () => {
 
   const handleNewProduct = () => {
     const newProduct: Product = {
-      id: Date.now().toString(),
+      id: Date.now(),
       title: "Novo Produto",
       price: 0,
       image: "/placeholder.svg",
@@ -54,7 +54,7 @@ export const ProductManager = () => {
       } else {
         const newProduct = {
           ...updatedProduct,
-          id: Date.now().toString()
+          id: Date.now()
         };
         updatedProducts = [...products, newProduct];
         toast.success("Produto adicionado com sucesso!");
@@ -72,8 +72,8 @@ export const ProductManager = () => {
 
   const handleImportProduct = async (scrapedProduct: any) => {
     try {
-      const newProduct = {
-        id: Date.now().toString(),
+      const newProduct: Product = {
+        id: Date.now(),
         title: scrapedProduct.title,
         price: scrapedProduct.price,
         image: scrapedProduct.images[0] || '/placeholder.svg',
