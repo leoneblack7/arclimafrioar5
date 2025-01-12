@@ -8,6 +8,7 @@ import React from "react";
 // Pages
 import Index from "./pages/Index";
 import Admin from "./pages/Admin";
+import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
@@ -30,6 +31,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/admin" element={<Admin />} />
+                <Route path="/produtos" element={<Products />} />
                 <Route path="/produto/:id" element={<ProductDetail />} />
                 <Route path="/carrinho" element={<Cart />} />
                 <Route path="/checkout" element={<Checkout />} />

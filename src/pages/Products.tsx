@@ -1,13 +1,10 @@
 import { Navbar } from "@/components/Navbar";
 import { useQuery } from "@tanstack/react-query";
-import { Banner } from "@/components/Banner";
-import { HeroSection } from "@/components/home/HeroSection";
-import { FeaturesSection } from "@/components/home/FeaturesSection";
 import { ProductsSection } from "@/components/home/ProductsSection";
-import { CTASection } from "@/components/home/CTASection";
 import { Footer } from "@/components/home/Footer";
 
-const featuredProducts = [
+// Sample data for all products
+const allProducts = [
   {
     id: 1,
     title: "Ar Condicionado Split Inverter 12000 BTUs",
@@ -50,7 +47,6 @@ const featuredProducts = [
     image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e",
     description: "Versátil e potente, perfeito para grandes ambientes comerciais ou industriais. Recomendado para áreas até 70m².",
   },
-  // Additional products
   {
     id: 7,
     title: "Ar Condicionado Window 10000 BTUs",
@@ -67,43 +63,32 @@ const featuredProducts = [
   }
 ];
 
-const Index = () => {
+const Products = () => {
   const { data: products, isLoading } = useQuery({
-    queryKey: ["featured-products"],
-    queryFn: () => Promise.resolve(featuredProducts),
+    queryKey: ["products"],
+    queryFn: () => Promise.resolve(allProducts),
   });
-
-  const scrollToProducts = () => {
-    const productsSection = document.getElementById('products-section');
-    if (productsSection) {
-      productsSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <div className="w-full">
-        <Banner />
+      <div className="pt-16">
+        {isLoading ? (
+          <div className="text-center py-16">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-4 text-gray-600">Carregando produtos...</p>
+          </div>
+        ) : (
+          <ProductsSection 
+            products={products || []} 
+            title="Todos os Produtos"
+            description="Explore nossa coleção completa de produtos"
+          />
+        )}
       </div>
-      <HeroSection onExploreClick={scrollToProducts} />
-      <FeaturesSection />
-      {isLoading ? (
-        <div className="text-center py-16">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-gray-600">Carregando produtos...</p>
-        </div>
-      ) : (
-        <ProductsSection 
-          products={products || []} 
-          title="Produtos em Destaque"
-          description="Explore nossa seleção de produtos premium com tecnologia de ponta e eficiência energética"
-        />
-      )}
-      <CTASection />
       <Footer />
     </div>
   );
 };
 
-export default Index;
+export default Products;

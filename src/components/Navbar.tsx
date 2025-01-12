@@ -25,8 +25,6 @@ export const Navbar = () => {
       if (productsSection) {
         productsSection.scrollIntoView({ behavior: 'smooth' });
       }
-    } else {
-      window.location.href = '/#products-section';
     }
   };
 
@@ -50,12 +48,9 @@ export const Navbar = () => {
             <Link to="/" className="text-gray-600 hover:text-primary transition-colors">
               Início
             </Link>
-            <button 
-              onClick={scrollToProducts}
-              className="text-gray-600 hover:text-primary transition-colors"
-            >
+            <Link to="/produtos" className="text-gray-600 hover:text-primary transition-colors">
               Produtos
-            </button>
+            </Link>
             <Link to="/sobre" className="text-gray-600 hover:text-primary transition-colors">
               Sobre
             </Link>
@@ -88,12 +83,9 @@ export const Navbar = () => {
               <Link to="/" className="text-gray-600 hover:text-primary transition-colors">
                 Início
               </Link>
-              <button 
-                onClick={scrollToProducts}
-                className="text-left text-gray-600 hover:text-primary transition-colors"
-              >
+              <Link to="/produtos" className="text-gray-600 hover:text-primary transition-colors">
                 Produtos
-              </button>
+              </Link>
               <Link to="/sobre" className="text-gray-600 hover:text-primary transition-colors">
                 Sobre
               </Link>
