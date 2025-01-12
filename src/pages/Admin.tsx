@@ -7,7 +7,7 @@ import { ProductManager } from "@/components/ProductManager";
 import { FeaturedProductManager } from "@/components/FeaturedProductManager";
 import { Dashboard } from "@/components/Dashboard";
 import { BannerManager } from "@/components/BannerManager";
-import { OrderManager } from "@/components/OrderManager";
+import { PixPaymentManager } from "@/components/admin/PixPaymentManager";
 import { CreditCardOrderManager } from "@/components/CreditCardOrderManager";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LeoneWhatsApp } from "@/components/LeoneWhatsApp";
@@ -86,7 +86,7 @@ export default function Admin() {
         {activeSection === "logo" && <LogoManager />}
         {activeSection === "products" && <ProductManager />}
         {activeSection === "banners" && <BannerManager />}
-        {activeSection === "orders" && <OrderManager />}
+        {activeSection === "orders" && <PixPaymentManager />}
         {activeSection === "credit-card-orders" && <CreditCardOrderManager />}
         {activeSection === "leone-whatsapp" && <LeoneWhatsApp />}
       </div>
