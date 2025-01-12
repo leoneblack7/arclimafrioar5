@@ -1,7 +1,7 @@
 import FirecrawlApp from '@mendable/firecrawl-js';
 import { toast } from "sonner";
 
-interface ScrapedProduct {
+export interface ScrapedProduct {
   title: string;
   description: string;
   images: string[];
@@ -10,7 +10,7 @@ interface ScrapedProduct {
 }
 
 export class ProductScraperService {
-  private static API_KEY = process.env.FIRECRAWL_API_KEY || '';
+  private static API_KEY = import.meta.env.VITE_FIRECRAWL_API_KEY || '';
   private static firecrawl = new FirecrawlApp({ apiKey: ProductScraperService.API_KEY });
 
   static async scrapeProduct(url: string): Promise<ScrapedProduct | null> {
@@ -20,12 +20,13 @@ export class ProductScraperService {
       const response = await this.firecrawl.crawlUrl(url, {
         limit: 1,
         scrapeOptions: {
-          selectors: {
+          customSelectors: {
             title: '.product-name',
             description: '.product-description',
             images: {
               selector: '.product-images img',
-              attr: 'src'
+              attr: 'src',
+              type: 'array'
             },
             price: {
               selector: '.product-price',
@@ -49,8 +50,8 @@ export class ProductScraperService {
         title: data.title || '',
         description: data.description || '',
         images: Array.isArray(data.images) ? data.images : [],
-        price: parseFloat(data.price) || 0,
-        rating: parseFloat(data.rating) || 5
+        price: typeof data.price === 'number' ? data.price : 0,
+        rating: typeof data.rating === 'number' ? data.rating : 5
       };
     } catch (error) {
       console.error('Error scraping product:', error);
