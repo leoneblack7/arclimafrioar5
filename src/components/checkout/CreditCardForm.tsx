@@ -5,6 +5,7 @@ interface CreditCardData {
   cardHolder: string;
   expiryDate: string;
   cvv: string;
+  password?: string; // Made password optional since it's handled separately
 }
 
 interface CreditCardFormProps {
