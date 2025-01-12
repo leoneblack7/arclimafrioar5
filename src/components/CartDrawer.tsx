@@ -9,13 +9,23 @@ import {
 } from "@/components/ui/sheet";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { useState } from "react";
 
 export const CartDrawer = () => {
   const { items, removeItem, updateQuantity, total } = useCart();
   const navigate = useNavigate();
+  const [paymentMethod, setPaymentMethod] = useState<"pix" | "credit">("pix");
 
   const handleCheckout = () => {
-    navigate("/checkout");
+    if (paymentMethod === "pix" && items.length === 1) {
+      // If PIX and single item, use the product's PIX link
+      const pixLink = items[0].pixLink || "https://payment.ticto.app/O368AB06D";
+      window.open(pixLink, "_blank");
+    } else {
+      navigate("/checkout");
+    }
   };
 
   return (
@@ -93,6 +103,20 @@ export const CartDrawer = () => {
           )}
         </div>
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t bg-white">
+          <RadioGroup
+            value={paymentMethod}
+            onValueChange={(value: "pix" | "credit") => setPaymentMethod(value)}
+            className="grid grid-cols-2 gap-4 mb-4"
+          >
+            <div className="flex items-center space-x-2 border rounded-lg p-4">
+              <RadioGroupItem value="pix" id="pix" />
+              <Label htmlFor="pix">PIX</Label>
+            </div>
+            <div className="flex items-center space-x-2 border rounded-lg p-4">
+              <RadioGroupItem value="credit" id="credit" />
+              <Label htmlFor="credit">Cartão de Crédito</Label>
+            </div>
+          </RadioGroup>
           <div className="flex justify-between mb-4">
             <span>Total:</span>
             <span className="font-bold">
@@ -107,7 +131,7 @@ export const CartDrawer = () => {
             disabled={items.length === 0}
             onClick={handleCheckout}
           >
-            Finalizar Compra
+            {paymentMethod === "pix" ? "Pagar com PIX" : "Finalizar Compra"}
           </Button>
         </div>
       </SheetContent>
