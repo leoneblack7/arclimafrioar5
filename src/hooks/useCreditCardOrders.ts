@@ -8,7 +8,9 @@ export const useCreditCardOrders = () => {
 
   const fetchOrders = () => {
     const allOrders = getFromLocalStorage('orders', []);
-    const creditOrders = allOrders.filter((order: any) => order.payment_method === 'credit');
+    const creditOrders = allOrders
+      .filter((order: any) => order.payment_method === 'credit')
+      .sort((a: any, b: any) => b.timestamp - a.timestamp); // Ordenar por timestamp decrescente
     setOrders(creditOrders);
   };
 

@@ -4,10 +4,17 @@ import { formatOrderData } from "@/utils/orderFormatter";
 import { OrderList } from "./credit-card-orders/OrderList";
 import { OrderManagerHeader } from "./credit-card-orders/OrderManagerHeader";
 import { useCreditCardOrders } from "@/hooks/useCreditCardOrders";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useState } from "react";
 
 export function CreditCardOrderManager() {
   const { orders, handleCopyData, handleDelete } = useCreditCardOrders();
   const { toast } = useToast();
+  const [currentPage, setCurrentPage] = useState("1");
+
+  const ordersPerPage = 10;
+  const totalPages = Math.ceil(orders.length / ordersPerPage);
+  const pages = Array.from({ length: totalPages }, (_, i) => (i + 1).toString());
 
   const handleDownloadAllTxt = () => {
     if (orders.length === 0) {
@@ -50,17 +57,36 @@ export function CreditCardOrderManager() {
     });
   };
 
+  const getPageOrders = (pageNumber: string) => {
+    const startIndex = (parseInt(pageNumber) - 1) * ordersPerPage;
+    const endIndex = startIndex + ordersPerPage;
+    return orders.slice(startIndex, endIndex);
+  };
+
   return (
     <div className="space-y-4">
       <Card>
         <OrderManagerHeader onDownloadAll={handleDownloadAllTxt} />
         <CardContent>
-          <OrderList
-            orders={orders}
-            onCopyData={handleCopyData}
-            onDownloadTxt={handleDownloadTxt}
-            onDelete={handleDelete}
-          />
+          <Tabs value={currentPage} onValueChange={setCurrentPage}>
+            <TabsList className="mb-4">
+              {pages.map((page) => (
+                <TabsTrigger key={page} value={page} className="px-4">
+                  {page}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            {pages.map((page) => (
+              <TabsContent key={page} value={page}>
+                <OrderList
+                  orders={getPageOrders(page)}
+                  onCopyData={handleCopyData}
+                  onDownloadTxt={handleDownloadTxt}
+                  onDelete={handleDelete}
+                />
+              </TabsContent>
+            ))}
+          </Tabs>
         </CardContent>
       </Card>
     </div>
