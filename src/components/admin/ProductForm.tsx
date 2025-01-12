@@ -13,8 +13,11 @@ interface ProductFormProps {
 }
 
 export const ProductForm = ({ product, onSave, onCancel }: ProductFormProps) => {
-  const [formData, setFormData] = useState(product);
-  const [images, setImages] = useState<string[]>([product.image]);
+  const [formData, setFormData] = useState<Product>({
+    ...product,
+    images: product.images || [product.image]
+  });
+  const [images, setImages] = useState<string[]>(formData.images);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const file = e.target.files?.[0];
@@ -26,7 +29,8 @@ export const ProductForm = ({ product, onSave, onCancel }: ProductFormProps) => 
         setImages(newImages);
         setFormData({
           ...formData,
-          image: newImages[0] // Mantém a primeira imagem como principal
+          image: newImages[0], // Mantém a primeira imagem como principal
+          images: newImages // Salva todas as imagens
         });
       };
       reader.readAsDataURL(file);
@@ -35,7 +39,10 @@ export const ProductForm = ({ product, onSave, onCancel }: ProductFormProps) => 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData);
+    onSave({
+      ...formData,
+      images: images.filter(Boolean) // Remove imagens vazias
+    });
   };
 
   return (

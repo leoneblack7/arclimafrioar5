@@ -15,6 +15,7 @@ export const FeaturedProductManager = () => {
         title: "Ar Condicionado Split 12000 BTUs Inverter",
         price: 2499.99,
         image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
+        images: ["https://images.unsplash.com/photo-1649972904349-6e44c42644a7"],
         description: "Split Inverter com tecnologia de última geração, economia de energia e controle via WiFi.",
         active: true
       },
@@ -79,6 +80,7 @@ export const FeaturedProductManager = () => {
       title: "Novo Produto em Destaque",
       price: 0,
       image: "/placeholder.svg",
+      images: ["/placeholder.svg"],
       description: "Descrição do novo produto em destaque",
       active: true
     };
@@ -92,13 +94,18 @@ export const FeaturedProductManager = () => {
       return;
     }
 
+    const productToSave = {
+      ...updatedProduct,
+      images: updatedProduct.images || [updatedProduct.image]
+    };
+
     if (updatedProduct.id) {
       setProducts(products.map(p => 
-        p.id === updatedProduct.id ? updatedProduct : p
+        p.id === updatedProduct.id ? productToSave : p
       ));
       toast.success("Produto em destaque atualizado com sucesso!");
     } else {
-      setProducts([...products, { ...updatedProduct, id: products.length + 1 }]);
+      setProducts([...products, { ...productToSave, id: products.length + 1 }]);
       toast.success("Novo produto em destaque adicionado!");
     }
     setEditingProduct(null);
@@ -116,6 +123,7 @@ export const FeaturedProductManager = () => {
       title: scrapedProduct.title,
       price: scrapedProduct.price,
       image: scrapedProduct.images[0] || '/placeholder.svg',
+      images: scrapedProduct.images || [scrapedProduct.images[0] || '/placeholder.svg'],
       description: scrapedProduct.description,
       active: true
     };
