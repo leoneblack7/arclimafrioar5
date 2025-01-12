@@ -51,18 +51,18 @@ export const sendTictoWebhookV2 = async (items: CartItem[], customerData?: Custo
     };
 
     console.log('Payload da requisição:', payload);
-    console.log('URL da requisição: https://webhook.ticto.dev/v2/checkout');
+    console.log('URL da requisição: https://api.ticto.com.br/v2/checkout');
     console.log('Headers:', {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey.substring(0, 4)}...${apiKey.substring(apiKey.length - 4)}`
+      'X-API-KEY': `${apiKey.substring(0, 4)}...${apiKey.substring(apiKey.length - 4)}`
     });
 
     try {
-      const response = await fetch('https://webhook.ticto.dev/v2/checkout', {
+      const response = await fetch('https://api.ticto.com.br/v2/checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
+          'X-API-KEY': apiKey
         },
         body: JSON.stringify(payload)
       });
