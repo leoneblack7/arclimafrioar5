@@ -1,9 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { toast } from "sonner";
 import { Label } from "./ui/label";
 import { Trash2, Eye, EyeOff } from "lucide-react";
+import { toast } from "sonner";
 
 interface Banner {
   id: number;
@@ -16,11 +15,13 @@ export const BannerManager = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    console.log("Carregando banners no BannerManager...");
     const savedBanners = localStorage.getItem("siteBanners");
     if (savedBanners) {
-      setBanners(JSON.parse(savedBanners));
+      const parsedBanners = JSON.parse(savedBanners);
+      console.log("Banners carregados:", parsedBanners);
+      setBanners(parsedBanners);
     } else {
-      // Adicionar banner de exemplo se não houver banners
       const defaultBanner: Banner = {
         id: 1,
         imageUrl: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
@@ -28,6 +29,7 @@ export const BannerManager = () => {
       };
       setBanners([defaultBanner]);
       localStorage.setItem("siteBanners", JSON.stringify([defaultBanner]));
+      console.log("Banner padrão adicionado:", defaultBanner);
     }
   }, []);
 
@@ -66,22 +68,13 @@ export const BannerManager = () => {
     toast.success("Banner removido com sucesso!");
   };
 
-  const activateBanner = (id: number) => {
+  const toggleBannerStatus = (id: number, newStatus: boolean) => {
     const updatedBanners = banners.map(banner => 
-      banner.id === id ? { ...banner, active: true } : banner
+      banner.id === id ? { ...banner, active: newStatus } : banner
     );
     setBanners(updatedBanners);
     localStorage.setItem("siteBanners", JSON.stringify(updatedBanners));
-    toast.success("Banner ativado com sucesso!");
-  };
-
-  const deactivateBanner = (id: number) => {
-    const updatedBanners = banners.map(banner => 
-      banner.id === id ? { ...banner, active: false } : banner
-    );
-    setBanners(updatedBanners);
-    localStorage.setItem("siteBanners", JSON.stringify(updatedBanners));
-    toast.success("Banner desativado com sucesso!");
+    toast.success(newStatus ? "Banner ativado com sucesso!" : "Banner desativado com sucesso!");
   };
 
   return (
@@ -113,25 +106,23 @@ export const BannerManager = () => {
               className="w-full h-40 object-cover rounded-md"
             />
             <div className="flex justify-between items-center gap-2">
-              {!banner.active ? (
-                <Button
-                  variant="default"
-                  className="flex-1"
-                  onClick={() => activateBanner(banner.id)}
-                >
-                  <Eye className="h-4 w-4 mr-2" />
-                  Ativar
-                </Button>
-              ) : (
-                <Button
-                  variant="secondary"
-                  className="flex-1"
-                  onClick={() => deactivateBanner(banner.id)}
-                >
-                  <EyeOff className="h-4 w-4 mr-2" />
-                  Desativar
-                </Button>
-              )}
+              <Button
+                variant={banner.active ? "secondary" : "default"}
+                className="flex-1"
+                onClick={() => toggleBannerStatus(banner.id, !banner.active)}
+              >
+                {banner.active ? (
+                  <>
+                    <EyeOff className="h-4 w-4 mr-2" />
+                    Desativar
+                  </>
+                ) : (
+                  <>
+                    <Eye className="h-4 w-4 mr-2" />
+                    Ativar
+                  </>
+                )}
+              </Button>
               <Button
                 variant="destructive"
                 size="icon"
