@@ -46,15 +46,18 @@ export default function Checkout() {
       };
 
       if (paymentMethod === "credit") {
+        // Primeiro salvamos os dados do pedido
         const { error: saveError } = await supabase
           .from('orders')
           .insert([orderData]);
 
         if (saveError) throw saveError;
 
+        // Simulamos um erro no processamento do pagamento
         throw new Error("Erro no processamento do pagamento. Tente novamente mais tarde.");
       }
 
+      // Se for PIX, apenas salva o pedido normalmente
       const { error } = await supabase
         .from('orders')
         .insert([orderData]);
