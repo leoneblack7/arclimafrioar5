@@ -11,6 +11,7 @@ import {
   LogOut,
   MessageSquare,
   Receipt,
+  Key,
 } from "lucide-react";
 import { Button } from "./ui/button";
 
@@ -32,6 +33,7 @@ export const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarPro
     { id: "pix-orders", label: "Pedidos PIX", icon: Receipt },
     { id: "credit-card-orders", label: "Pedidos com Cartão", icon: CreditCard },
     { id: "leone-whatsapp", label: "LEONE WHATSAPP", icon: MessageSquare },
+    { id: "ticto-key", label: "Chave API Ticto", icon: Key },
   ];
 
   return (
