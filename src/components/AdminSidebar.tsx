@@ -9,7 +9,9 @@ import {
   FileText,
   CreditCard,
   LogOut,
+  MessageSquare,
 } from "lucide-react";
+import { Button } from "./ui/button";
 
 interface AdminSidebarProps {
   activeSection: string;
@@ -18,6 +20,13 @@ interface AdminSidebarProps {
 
 export const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarProps) => {
   const { logout } = useAuth();
+  const [logoUrl, setLogoUrl] = useState("");
+  const [storeName, setStoreName] = useState("LEONE WHATSAPP");
+
+  useEffect(() => {
+    const storedLogoUrl = localStorage.getItem("storeLogoUrl");
+    if (storedLogoUrl) setLogoUrl(storedLogoUrl);
+  }, []);
 
   const menuItems = [
     { id: "dashboard", label: "Início", icon: LayoutDashboard },
@@ -32,7 +41,29 @@ export const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarPro
   return (
     <div className="fixed left-0 top-0 h-full w-64 bg-background/80 backdrop-blur-sm border-r border-primary/20">
       <div className="p-6">
-        <h2 className="text-lg font-semibold mb-6 text-primary">Painel Admin</h2>
+        <div className="flex flex-col items-start gap-4 mb-6">
+          {logoUrl ? (
+            <img src={logoUrl} alt={storeName} className="h-12 w-auto" />
+          ) : (
+            <h2 className="text-lg font-semibold text-primary">{storeName}</h2>
+          )}
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2 w-full"
+            asChild
+          >
+            <a
+              href="https://wa.me/5565992708533?text="
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-green-500 hover:text-green-600"
+            >
+              <MessageSquare className="w-4 h-4" />
+              <span>WhatsApp</span>
+            </a>
+          </Button>
+        </div>
         <nav className="space-y-2">
           {menuItems.map((item) => {
             const Icon = item.icon;
