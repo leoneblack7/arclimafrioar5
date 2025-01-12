@@ -7,4 +7,9 @@ export interface Product {
   description: string;
   active: boolean;
   pixLink?: string;
+  specifications?: {
+    warranty: string;
+    technical: Record<string, string>;
+    components: Record<string, string>;
+  };
 }
