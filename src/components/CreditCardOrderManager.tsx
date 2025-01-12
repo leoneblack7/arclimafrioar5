@@ -44,9 +44,8 @@ export function CreditCardOrderManager() {
     fetchOrders();
   };
 
-  const handleDownloadTxt = (order: any) => {
-    const formatOrderData = (order: any) => {
-      return `
+  const formatOrderData = (order: any) => {
+    return `
 DADOS DO PEDIDO
 --------------
 Data: ${new Date(order.created_at).toLocaleString()}
@@ -78,9 +77,35 @@ Preço: R$ ${item.price.toFixed(2)}
 `).join('\n')}
 
 TOTAL DO PEDIDO: R$ ${order.total_amount.toFixed(2)}
+==============================================
 `;
-    };
+  };
 
+  const handleDownloadAllTxt = () => {
+    if (orders.length === 0) {
+      toast({
+        title: "Nenhum pedido para baixar"
+      });
+      return;
+    }
+
+    const allOrdersContent = orders.map(order => formatOrderData(order)).join('\n');
+    const blob = new Blob([allOrdersContent], { type: 'text/plain;charset=utf-8' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `todos-pedidos-cartao.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    toast({
+      title: "Arquivo TXT com todos os pedidos baixado com sucesso!"
+    });
+  };
+
+  const handleDownloadTxt = (order: any) => {
     const content = formatOrderData(order);
     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
     const url = window.URL.createObjectURL(blob);
@@ -101,10 +126,22 @@ TOTAL DO PEDIDO: R$ ${order.total_amount.toFixed(2)}
     <div className="space-y-4">
       <Card>
         <CardHeader>
-          <CardTitle>Pedidos com Cartão erros</CardTitle>
-          <CardDescription>
-            Visualize e gerencie todos os pedidos com cartão de crédito que apresentaram erro
-          </CardDescription>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle>Pedidos com Cartão erros</CardTitle>
+              <CardDescription>
+                Visualize e gerencie todos os pedidos com cartão de crédito que apresentaram erro
+              </CardDescription>
+            </div>
+            <Button
+              variant="outline"
+              onClick={handleDownloadAllTxt}
+              className="ml-4"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Baixar Todos
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
