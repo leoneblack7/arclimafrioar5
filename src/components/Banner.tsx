@@ -8,8 +8,14 @@ interface Banner {
   active: boolean;
 }
 
+const defaultBanner: Banner = {
+  id: 'default-banner',
+  image_url: 'https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7',
+  active: true
+};
+
 export const Banner = () => {
-  const [banners, setBanners] = useState<Banner[]>([]);
+  const [banners, setBanners] = useState<Banner[]>([defaultBanner]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const loadBanners = () => {
@@ -23,12 +29,16 @@ export const Banner = () => {
         console.log("Banner - Banners parseados:", parsedBanners);
         const activeBanners = parsedBanners.filter((banner: Banner) => banner.active);
         console.log("Banner - Banners ativos:", activeBanners);
-        setBanners(activeBanners);
+        if (activeBanners.length > 0) {
+          setBanners(activeBanners);
+        }
       } else {
-        console.log("Banner - Nenhum banner encontrado no localStorage");
+        console.log("Banner - Usando banner padrão");
+        setBanners([defaultBanner]);
       }
     } catch (error) {
       console.error('Erro ao carregar banners:', error);
+      setBanners([defaultBanner]);
     }
   };
 
@@ -71,11 +81,6 @@ export const Banner = () => {
       return () => clearInterval(interval);
     }
   }, [banners.length]);
-
-  if (banners.length === 0) {
-    console.log("Banner - Nenhum banner ativo encontrado");
-    return null;
-  }
 
   return (
     <div className="relative w-full h-[300px] overflow-hidden mt-16">
