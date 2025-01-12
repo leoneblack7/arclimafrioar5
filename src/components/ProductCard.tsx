@@ -10,16 +10,31 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useState } from "react";
+import { useCart } from "@/contexts/CartContext";
+import { useNavigate } from "react-router-dom";
 
 interface ProductCardProps {
+  id: number;
   title: string;
   price: number;
   image: string;
   description: string;
 }
 
-export const ProductCard = ({ title, price, image, description }: ProductCardProps) => {
+export const ProductCard = ({ id, title, price, image, description }: ProductCardProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { addItem } = useCart();
+  const navigate = useNavigate();
+
+  const handleAddToCart = () => {
+    addItem({ id, title, price, image });
+    setIsOpen(false);
+  };
+
+  const handleBuyNow = () => {
+    addItem({ id, title, price, image });
+    navigate("/checkout");
+  };
 
   return (
     <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg">
@@ -73,11 +88,11 @@ export const ProductCard = ({ title, price, image, description }: ProductCardPro
                   <span className="text-sm text-green-600">Em estoque</span>
                 </div>
                 <div className="flex gap-4">
-                  <Button className="flex-1 group">
+                  <Button className="flex-1 group" onClick={handleAddToCart}>
                     <ShoppingCart className="mr-2 h-4 w-4 group-hover:animate-bounce" />
                     Adicionar ao Carrinho
                   </Button>
-                  <Button variant="secondary" className="flex-1">
+                  <Button variant="secondary" className="flex-1" onClick={handleBuyNow}>
                     Comprar Agora
                   </Button>
                 </div>
