@@ -68,7 +68,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <div className="w-full mt-16">
+      <div className="w-full">
         <Banner />
       </div>
       <HeroSection onExploreClick={scrollToProducts} />
