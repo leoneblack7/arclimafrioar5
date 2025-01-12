@@ -51,27 +51,52 @@ export const sendTictoWebhookV2 = async (items: CartItem[], customerData?: Custo
     };
 
     console.log('Payload da requisição:', payload);
-
-    const response = await fetch('https://webhook.ticto.dev/v2/checkout', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify(payload)
+    console.log('URL da requisição: https://webhook.ticto.dev/v2/checkout');
+    console.log('Headers:', {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey.substring(0, 4)}...${apiKey.substring(apiKey.length - 4)}`
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Erro na resposta Ticto:', errorText);
-      throw new Error(`Erro na resposta Ticto: ${errorText}`);
-    }
+    try {
+      const response = await fetch('https://webhook.ticto.dev/v2/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify(payload)
+      });
 
-    const data = await response.json();
-    console.log('Resposta bem-sucedida da Ticto:', data);
-    return data;
+      console.log('Status da resposta:', response.status);
+      console.log('Status text:', response.statusText);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Erro na resposta Ticto:', {
+          status: response.status,
+          statusText: response.statusText,
+          errorText
+        });
+        throw new Error(`Erro na resposta Ticto: ${response.status} - ${errorText}`);
+      }
+
+      const data = await response.json();
+      console.log('Resposta bem-sucedida da Ticto:', data);
+      return data;
+    } catch (fetchError) {
+      console.error('Erro durante o fetch:', {
+        name: fetchError.name,
+        message: fetchError.message,
+        stack: fetchError.stack
+      });
+      throw new Error(`Erro na comunicação com a API Ticto: ${fetchError.message}`);
+    }
   } catch (error) {
-    console.error('Erro ao processar pagamento:', error);
+    console.error('Erro ao processar pagamento:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack
+    });
     throw error;
   }
 };
