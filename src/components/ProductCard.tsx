@@ -1,6 +1,6 @@
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, ExternalLink } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -48,9 +48,9 @@ export const ProductCard = ({ title, price, image, description }: ProductCardPro
       <CardFooter className="p-4 pt-0">
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
-            <Button variant="outline" className="w-full group">
-              <ExternalLink className="mr-2 h-4 w-4" />
-              Ver Detalhes
+            <Button className="w-full group">
+              <ShoppingCart className="mr-2 h-4 w-4 group-hover:animate-bounce" />
+              Comprar
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[600px]">
