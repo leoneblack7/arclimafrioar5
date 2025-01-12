@@ -1,11 +1,10 @@
 import { Input } from "@/components/ui/input";
 
-interface CreditCardData {
+export interface CreditCardData {
   cardNumber: string;
   cardHolder: string;
   expiryDate: string;
   cvv: string;
-  password?: string; // Made password optional since it's handled separately
 }
 
 interface CreditCardFormProps {
