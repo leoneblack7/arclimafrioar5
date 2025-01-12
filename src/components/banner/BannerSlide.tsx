@@ -20,7 +20,7 @@ export const BannerSlide = ({ id, image_url, isActive, direction }: BannerSlideP
       <img
         src={image_url}
         alt="Banner"
-        className="w-full h-full object-cover"
+        className="w-full h-full object-contain"
       />
     </div>
   );
