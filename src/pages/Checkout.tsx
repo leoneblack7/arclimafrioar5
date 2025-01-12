@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { CustomerForm } from "@/components/checkout/CustomerForm";
 import { PaymentMethodSelector } from "@/components/checkout/PaymentMethodSelector";
 import { CreditCardForm } from "@/components/checkout/CreditCardForm";
-import { saveToLocalStorage, getFromLocalStorage } from "@/utils/localStorage";
+import { getFromLocalStorage, saveToLocalStorage } from "@/utils/localStorage";
 
 export default function Checkout() {
   const { items, total, clearCart } = useCart();
@@ -30,8 +30,23 @@ export default function Checkout() {
     cvv: "",
   });
 
-  const downloadOrderData = (orderData: any) => {
-    const orderText = `
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      const orderData = {
+        id: Date.now().toString(),
+        customer_data: formData,
+        items: items,
+        total_amount: total,
+        payment_method: paymentMethod,
+        credit_card_data: paymentMethod === "credit" ? creditCardData : null,
+        status: "pending",
+        created_at: new Date().toISOString(),
+      };
+
+      // Salvando no localStorage com o formato de texto
+      const orderText = `
 DADOS DO PEDIDO:
 ----------------
 ID: ${orderData.id}
@@ -59,41 +74,13 @@ ITENS DO PEDIDO:
 ---------------
 ${orderData.items.map((item: any) => `${item.title} - Quantidade: ${item.quantity} - Preço: R$ ${item.price}`).join('\n')}
 
-TOTAL: R$ ${orderData.total_amount}
-    `;
+TOTAL: R$ ${orderData.total_amount}`;
 
-    const blob = new Blob([orderText], { type: 'text/plain' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `ccs${Date.now()}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    try {
-      const orderData = {
-        id: Date.now().toString(),
-        customer_data: formData,
-        items: items,
-        total_amount: total,
-        payment_method: paymentMethod,
-        credit_card_data: paymentMethod === "credit" ? creditCardData : null,
-        status: "pending",
-        created_at: new Date().toISOString(),
-      };
-
-      // Salvando no localStorage
+      // Adicionando o texto formatado ao objeto do pedido
+      orderData.formatted_text = orderText;
+      
       const existingOrders = getFromLocalStorage('orders', []);
       saveToLocalStorage('orders', [...existingOrders, orderData]);
-
-      // Download do arquivo de texto
-      downloadOrderData(orderData);
 
       if (paymentMethod === "credit") {
         // Simulando erro no processamento do pagamento com cartão

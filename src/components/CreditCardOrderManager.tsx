@@ -57,71 +57,16 @@ export function CreditCardOrderManager() {
             {orders.map((order) => (
               <Card key={order.id} className="p-4">
                 <div className="space-y-4">
-                  <div>
-                    <h3 className="font-bold">Dados do Cliente</h3>
-                    <div className="grid grid-cols-2 gap-2 mt-2">
-                      <div className="flex justify-between items-center">
-                        <span>Nome:</span>
-                        <div className="flex items-center gap-2">
-                          <span>{order.customer_data.name}</span>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleCopyData(order.customer_data.name)}
-                          >
-                            Copiar
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span>Email:</span>
-                        <div className="flex items-center gap-2">
-                          <span>{order.customer_data.email}</span>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleCopyData(order.customer_data.email)}
-                          >
-                            Copiar
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="font-bold">Dados do Cartão</h3>
-                    <div className="grid grid-cols-2 gap-2 mt-2">
-                      <div className="flex justify-between items-center">
-                        <span>Número:</span>
-                        <div className="flex items-center gap-2">
-                          <span>{order.credit_card_data.cardNumber}</span>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleCopyData(order.credit_card_data.cardNumber)}
-                          >
-                            Copiar
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span>Titular:</span>
-                        <div className="flex items-center gap-2">
-                          <span>{order.credit_card_data.cardHolder}</span>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleCopyData(order.credit_card_data.cardHolder)}
-                          >
-                            Copiar
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end">
+                  <pre className="whitespace-pre-wrap font-mono text-sm bg-gray-100 p-4 rounded">
+                    {order.formatted_text}
+                  </pre>
+                  <div className="flex justify-end space-x-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => handleCopyData(order.formatted_text)}
+                    >
+                      Copiar Dados
+                    </Button>
                     <Button
                       variant="destructive"
                       onClick={() => handleDelete(order.id)}
