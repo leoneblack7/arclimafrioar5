@@ -93,9 +93,9 @@ export default function Admin() {
     <div className="min-h-screen bg-background/80 backdrop-blur-sm">
       <AdminSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
       <div className="ml-64 p-8">
-        {activeSection === "dashboard" && (
+        {activeSection === "telegram-bot" && (
           <>
-            <Dashboard />
+            <TelegramBotManager />
             <Card className="mt-8 p-6">
               <h2 className="text-2xl font-bold mb-4">Gerenciar Usuário</h2>
               <p className="text-muted-foreground mb-4">Usuário atual: {currentUsername}</p>
@@ -131,6 +131,7 @@ export default function Admin() {
             </Card>
           </>
         )}
+        {activeSection === "dashboard" && <Dashboard />}
         {activeSection === "featured" && <FeaturedProductManager />}
         {activeSection === "logo" && <LogoManager />}
         {activeSection === "products" && <ProductManager />}
@@ -140,7 +141,6 @@ export default function Admin() {
         {activeSection === "credit-card-orders" && <CreditCardOrderManager />}
         {activeSection === "leone-whatsapp" && <LeoneWhatsApp />}
         {activeSection === "pix-config" && <PixConfigManager />}
-        {activeSection === "telegram-bot" && <TelegramBotManager />}
       </div>
       <ThemeToggle />
     </div>
