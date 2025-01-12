@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BarChart3, CreditCard, Link, Search, Edit2, RotateCcw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import { CandlestickChart, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 export const Dashboard = () => {
   const { toast } = useToast();
@@ -83,16 +83,24 @@ export const Dashboard = () => {
     });
   };
 
-  const chartData = stats.map(stat => ({
+  // Generate candlestick data based on stats
+  const candlestickData = stats.map(stat => ({
     name: stat.title.split(' ')[0],
-    value: parseInt(stat.value)
+    high: parseInt(stat.value) * 1.2,
+    low: parseInt(stat.value) * 0.8,
+    open: parseInt(stat.value) * 0.9,
+    close: parseInt(stat.value) * 1.1,
   }));
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-black/80 border border-primary/50 p-2 rounded-md backdrop-blur-sm">
-          <p className="text-primary font-mono">{`${label}: ${payload[0].value}`}</p>
+          <p className="text-primary font-mono text-xs">{label}</p>
+          <p className="text-primary font-mono text-xs">High: {payload[0].payload.high.toFixed(0)}</p>
+          <p className="text-primary font-mono text-xs">Low: {payload[0].payload.low.toFixed(0)}</p>
+          <p className="text-primary font-mono text-xs">Open: {payload[0].payload.open.toFixed(0)}</p>
+          <p className="text-primary font-mono text-xs">Close: {payload[0].payload.close.toFixed(0)}</p>
         </div>
       );
     }
@@ -169,8 +177,7 @@ export const Dashboard = () => {
         <CardContent>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData} className="font-mono">
-                <CartesianGrid strokeDasharray="3 3" stroke="#0066FF20" />
+              <CandlestickChart data={candlestickData} className="font-mono">
                 <XAxis 
                   dataKey="name" 
                   stroke="#0066FF" 
@@ -181,28 +188,16 @@ export const Dashboard = () => {
                   tick={{ fill: '#0066FF' }}
                 />
                 <Tooltip content={<CustomTooltip />} />
-                <Bar 
-                  dataKey="value" 
-                  fill="#0066FF"
-                  radius={[4, 4, 0, 0]}
-                  className="animate-pulse"
-                >
-                  {chartData.map((entry, index) => (
-                    <g key={`cell-${index}`}>
-                      <linearGradient
-                        id={`colorGradient-${index}`}
-                        x1="0"
-                        y1="0"
-                        x2="0"
-                        y2="1"
-                      >
-                        <stop offset="5%" stopColor="#0066FF" stopOpacity={0.8} />
-                        <stop offset="95%" stopColor="#0066FF" stopOpacity={0.2} />
-                      </linearGradient>
-                    </g>
-                  ))}
-                </Bar>
-              </BarChart>
+                <defs>
+                  <filter id="glow">
+                    <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                    <feMerge>
+                      <feMergeNode in="coloredBlur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                </defs>
+              </CandlestickChart>
             </ResponsiveContainer>
           </div>
         </CardContent>
