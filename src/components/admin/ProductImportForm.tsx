@@ -14,18 +14,28 @@ export const ProductImportForm = ({ onImport }: ProductImportFormProps) => {
 
   const handleImportProduct = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!importUrl) {
+      toast.error("Por favor, insira uma URL válida");
+      return;
+    }
+
     setIsImporting(true);
+    console.log('Iniciando importação da URL:', importUrl);
 
     try {
       const scrapedProduct = await ProductScraperService.scrapeProduct(importUrl);
       
       if (scrapedProduct) {
+        console.log('Produto importado com sucesso:', scrapedProduct);
         onImport(scrapedProduct);
         setImportUrl("");
         toast.success("Produto importado com sucesso!");
+      } else {
+        toast.error("Não foi possível importar o produto. Verifique a URL e tente novamente.");
       }
     } catch (error) {
-      console.error('Error importing product:', error);
+      console.error('Erro ao importar produto:', error);
       toast.error("Erro ao importar produto. Verifique o link e tente novamente.");
     } finally {
       setIsImporting(false);

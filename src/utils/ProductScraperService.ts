@@ -12,7 +12,8 @@ export class ProductScraperService {
 
   private static initializeFirecrawl() {
     if (!this.firecrawl) {
-      this.firecrawl = new FirecrawlApp({ apiKey: 'your-api-key-here' });
+      // Usando uma chave temporária para testes
+      this.firecrawl = new FirecrawlApp({ apiKey: 'temp_key_for_testing' });
     }
   }
 
@@ -20,27 +21,19 @@ export class ProductScraperService {
     try {
       this.initializeFirecrawl();
       
-      const response = await this.firecrawl.crawlUrl(url, {
-        limit: 1,
-        scrapeOptions: {
-          formats: ['markdown', 'html']
-        }
-      });
-
-      if (!response.success) {
-        throw new Error('Failed to scrape product');
-      }
-
-      // Mock data for testing
+      console.log('Iniciando scraping da URL:', url);
+      
+      // Por enquanto, retornamos dados mockados para teste
+      // até que a integração real com a API seja configurada
       return {
-        title: "Ar Condicionado Split",
+        title: "Ar Condicionado Split Inverter",
         price: 2499.99,
-        description: "Ar condicionado split 12000 BTUs",
+        description: "Ar condicionado split inverter 12000 BTUs, modelo 2024",
         images: ["/placeholder.svg"]
       };
 
     } catch (error) {
-      console.error('Error scraping product:', error);
+      console.error('Erro ao fazer scraping do produto:', error);
       return null;
     }
   }
