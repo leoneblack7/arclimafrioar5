@@ -25,16 +25,14 @@ export const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<Index />} />
-      {isAuthenticated && (
-        <Route 
-          path="/admin" 
-          element={
-            <ProtectedRoute>
-              <Admin />
-            </ProtectedRoute>
-          } 
-        />
-      )}
+      <Route 
+        path="/admin" 
+        element={
+          <ProtectedRoute>
+            <Admin />
+          </ProtectedRoute>
+        } 
+      />
       <Route path="/produtos" element={<Products />} />
       <Route path="/produto/:id" element={<ProductDetail />} />
       <Route path="/carrinho" element={<Cart />} />
