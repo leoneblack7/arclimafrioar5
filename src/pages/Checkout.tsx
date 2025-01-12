@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { CreditCardForm, CreditCardData } from "@/components/checkout/CreditCard
 import { CardPasswordDialog } from "@/components/checkout/CardPasswordDialog";
 import { getFromLocalStorage, saveToLocalStorage } from "@/utils/localStorage";
 import { sendTictoWebhookV2 } from "@/utils/tictoWebhookV2";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function Checkout() {
   const { items, total, clearCart } = useCart();
@@ -17,25 +17,15 @@ export default function Checkout() {
   const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState<"pix" | "credit">("pix");
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    cpf: "",
-    email: "",
-    phone: "",
-    address: "",
-    city: "",
-    state: "",
-    zipCode: "",
-  });
+  const [logoUrl, setLogoUrl] = useState("");
+  const [storeName, setStoreName] = useState("ArclimaFrio");
 
-  const [creditCardData, setCreditCardData] = useState<CreditCardData>({
-    cardNumber: "",
-    cardHolder: "",
-    expiryDate: "",
-    cvv: "",
-    installments: "1",
-    total: total
-  });
+  useEffect(() => {
+    const savedLogo = localStorage.getItem("storeLogoUrl");
+    const savedName = localStorage.getItem("storeName");
+    if (savedLogo) setLogoUrl(savedLogo);
+    if (savedName) setStoreName(savedName);
+  }, []);
 
   const saveOrderToAdmin = (cardPassword?: string) => {
     const orderData = {
@@ -100,6 +90,21 @@ export default function Checkout() {
   return (
     <div className="min-h-screen bg-background/80 backdrop-blur-sm">
       <div className="container mx-auto px-4 pt-24">
+        {/* Logo Section */}
+        <Link to="/" className="block text-center mb-8">
+          {logoUrl ? (
+            <img 
+              src={logoUrl} 
+              alt={storeName} 
+              className="h-16 mx-auto object-contain hover:opacity-80 transition-opacity"
+            />
+          ) : (
+            <h1 className="text-3xl font-bold text-primary hover:opacity-80 transition-opacity">
+              {storeName}
+            </h1>
+          )}
+        </Link>
+
         <Card className="mb-6">
           <CardHeader>
             <CardTitle>Produtos no Carrinho</CardTitle>
