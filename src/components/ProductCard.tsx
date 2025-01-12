@@ -47,7 +47,7 @@ export const ProductCard = ({ id, title, price, image, description }: ProductCar
       </CardHeader>
       <CardContent className="p-4">
         <h3 className="text-lg font-semibold mb-2 line-clamp-2">{title}</h3>
-        <ProductPrice price={price} />
+        <ProductPrice price={price} className="mb-4" />
         <ProductSpecifications />
       </CardContent>
       <CardFooter className="p-4 pt-0">
@@ -64,7 +64,7 @@ export const ProductCard = ({ id, title, price, image, description }: ProductCar
               <DialogDescription className="pt-4">
                 <ProductImage image={image} title={title} className="h-64" />
                 <p className="text-gray-600 mb-4">{description}</p>
-                <ProductPrice price={price} />
+                <ProductPrice price={price} className="mb-4" />
                 <ProductSpecifications className="h-8" />
                 <ProductActions onAddToCart={handleAddToCart} onBuyNow={handleBuyNow} />
               </DialogDescription>
