@@ -16,9 +16,11 @@ export const Banner = () => {
     try {
       console.log("Banner - Iniciando carregamento dos banners");
       const storedBanners = localStorage.getItem('banners');
+      console.log("Banner - Dados do localStorage:", storedBanners);
+      
       if (storedBanners) {
         const parsedBanners = JSON.parse(storedBanners);
-        console.log("Banner - Banners carregados:", parsedBanners);
+        console.log("Banner - Banners parseados:", parsedBanners);
         const activeBanners = parsedBanners.filter((banner: Banner) => banner.active);
         console.log("Banner - Banners ativos:", activeBanners);
         setBanners(activeBanners);
@@ -37,6 +39,10 @@ export const Banner = () => {
       window.removeEventListener('bannersUpdated', loadBanners);
     };
   }, []);
+
+  useEffect(() => {
+    console.log("Banner - Estado atual dos banners:", banners);
+  }, [banners]);
 
   const getRandomIndex = (currentIdx: number, length: number) => {
     if (length <= 1) return 0;
@@ -72,7 +78,7 @@ export const Banner = () => {
   }
 
   return (
-    <div className="relative w-full h-[300px] overflow-hidden">
+    <div className="relative w-full h-[300px] overflow-hidden mt-16">
       {banners.map((banner, index) => (
         <BannerSlide
           key={banner.id}
