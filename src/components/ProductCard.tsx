@@ -12,6 +12,10 @@ import {
 import { useState } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
+import { ProductImage } from "./product/ProductImage";
+import { ProductPrice } from "./product/ProductPrice";
+import { ProductSpecifications } from "./product/ProductSpecifications";
+import { ProductActions } from "./product/ProductActions";
 
 interface ProductCardProps {
   id: number;
@@ -39,33 +43,12 @@ export const ProductCard = ({ id, title, price, image, description }: ProductCar
   return (
     <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg">
       <CardHeader className="p-0">
-        <div className="relative group">
-          <img
-            src={image}
-            alt={title}
-            className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-          />
-          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300" />
-        </div>
+        <ProductImage image={image} title={title} />
       </CardHeader>
       <CardContent className="p-4">
         <h3 className="text-lg font-semibold mb-2 line-clamp-2">{title}</h3>
-        <div className="flex items-center justify-between mb-3">
-          <p className="text-primary font-bold text-xl">
-            {price.toLocaleString('pt-BR', { 
-              style: 'currency', 
-              currency: 'BRL' 
-            })}
-          </p>
-          <span className="text-sm text-green-600">Em estoque</span>
-        </div>
-        <div className="flex justify-between items-center gap-2 border-t pt-3">
-          <img
-            src="/lovable-uploads/1358e50a-d563-4d1e-b6ab-78515801abdb.png"
-            alt="Especificações do produto"
-            className="w-full h-6 object-contain"
-          />
-        </div>
+        <ProductPrice price={price} />
+        <ProductSpecifications />
       </CardContent>
       <CardFooter className="p-4 pt-0">
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -79,37 +62,11 @@ export const ProductCard = ({ id, title, price, image, description }: ProductCar
             <DialogHeader>
               <DialogTitle>{title}</DialogTitle>
               <DialogDescription className="pt-4">
-                <img
-                  src={image}
-                  alt={title}
-                  className="w-full h-64 object-cover rounded-lg mb-4"
-                />
+                <ProductImage image={image} title={title} className="h-64" />
                 <p className="text-gray-600 mb-4">{description}</p>
-                <div className="flex items-center justify-between mb-4">
-                  <p className="text-primary font-bold text-2xl">
-                    {price.toLocaleString('pt-BR', { 
-                      style: 'currency', 
-                      currency: 'BRL' 
-                    })}
-                  </p>
-                  <span className="text-sm text-green-600">Em estoque</span>
-                </div>
-                <div className="mb-4">
-                  <img
-                    src="/lovable-uploads/1358e50a-d563-4d1e-b6ab-78515801abdb.png"
-                    alt="Especificações do produto"
-                    className="w-full h-8 object-contain"
-                  />
-                </div>
-                <div className="flex gap-4">
-                  <Button className="flex-1 group" onClick={handleAddToCart}>
-                    <ShoppingCart className="mr-2 h-4 w-4 group-hover:animate-bounce" />
-                    Adicionar ao Carrinho
-                  </Button>
-                  <Button variant="secondary" className="flex-1" onClick={handleBuyNow}>
-                    Comprar Agora
-                  </Button>
-                </div>
+                <ProductPrice price={price} />
+                <ProductSpecifications className="h-8" />
+                <ProductActions onAddToCart={handleAddToCart} onBuyNow={handleBuyNow} />
               </DialogDescription>
             </DialogHeader>
           </DialogContent>
