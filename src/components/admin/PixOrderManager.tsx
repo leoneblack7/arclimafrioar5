@@ -64,7 +64,7 @@ export const PixOrderManager = () => {
                   </TableCell>
                   <TableCell>
                     <Badge
-                      variant={order.status === 'paid' ? 'success' : 'secondary'}
+                      variant={order.status === 'paid' ? 'default' : 'secondary'}
                     >
                       {order.status === 'paid' ? 'Pago' : 'Pendente'}
                     </Badge>
