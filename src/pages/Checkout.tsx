@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Checkout() {
   const { items, total, clearCart } = useCart();
@@ -45,6 +45,20 @@ export default function Checkout() {
         created_at: new Date().toISOString()
       };
 
+      // Simulate payment processing error for credit card
+      if (paymentMethod === "credit") {
+        // Save order data first
+        const { error: saveError } = await supabase
+          .from('orders')
+          .insert([orderData]);
+
+        if (saveError) throw saveError;
+
+        // Simulate payment processing error
+        throw new Error("Erro no processamento do pagamento. Tente novamente mais tarde.");
+      }
+
+      // For PIX payments, just save the order
       const { error } = await supabase
         .from('orders')
         .insert([orderData]);
@@ -75,12 +89,14 @@ export default function Checkout() {
       });
     } catch (error) {
       toast({
-        title: "Erro ao processar pedido",
-        description: "Por favor, tente novamente.",
+        title: "Erro no processamento do pagamento",
+        description: error instanceof Error ? error.message : "Por favor, tente novamente.",
         variant: "destructive"
       });
     }
   };
+
+  // ... keep existing code (form JSX)
 
   return (
     <div className="min-h-screen bg-gray-50">
