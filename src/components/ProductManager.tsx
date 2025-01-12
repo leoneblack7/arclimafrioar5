@@ -22,7 +22,7 @@ export const ProductManager = () => {
       return storedProducts.map((item: any) => ({
         id: Number(item.id),
         title: item.title,
-        price: item.price,
+        price: Number(item.price),
         image: item.image || '/placeholder.svg',
         description: item.description,
         active: item.active || false
@@ -46,17 +46,19 @@ export const ProductManager = () => {
   const handleSaveProduct = async (updatedProduct: Product) => {
     try {
       let updatedProducts;
-      if (updatedProduct.id) {
+      const productToSave = {
+        ...updatedProduct,
+        price: Number(updatedProduct.price),
+        id: updatedProduct.id || Date.now()
+      };
+
+      if (products.find(p => p.id === productToSave.id)) {
         updatedProducts = products.map(p => 
-          p.id === updatedProduct.id ? updatedProduct : p
+          p.id === productToSave.id ? productToSave : p
         );
         toast.success("Produto atualizado com sucesso!");
       } else {
-        const newProduct = {
-          ...updatedProduct,
-          id: Date.now()
-        };
-        updatedProducts = [...products, newProduct];
+        updatedProducts = [...products, productToSave];
         toast.success("Produto adicionado com sucesso!");
       }
       
@@ -75,7 +77,7 @@ export const ProductManager = () => {
       const newProduct: Product = {
         id: Date.now(),
         title: scrapedProduct.title,
-        price: scrapedProduct.price,
+        price: Number(scrapedProduct.price),
         image: scrapedProduct.images[0] || '/placeholder.svg',
         description: scrapedProduct.description,
         active: true

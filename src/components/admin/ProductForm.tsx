@@ -2,16 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { toast } from "sonner";
-
-interface Product {
-  id: number;
-  title: string;
-  price: number;
-  image: string;
-  description: string;
-  active: boolean;
-}
+import { Product } from "@/types/product";
 
 interface ProductFormProps {
   product: Product;
@@ -54,7 +45,7 @@ export const ProductForm = ({ product, onSave, onCancel }: ProductFormProps) => 
           <Input
             type="number"
             value={product.price}
-            onChange={(e) => onSave({ ...product, price: parseFloat(e.target.value) })}
+            onChange={(e) => onSave({ ...product, price: Number(e.target.value) })}
           />
         </div>
         <div className="space-y-2">
@@ -83,10 +74,7 @@ export const ProductForm = ({ product, onSave, onCancel }: ProductFormProps) => 
           <Button variant="outline" onClick={onCancel}>
             Cancelar
           </Button>
-          <Button onClick={() => {
-            toast.success("Produto salvo com sucesso!");
-            onCancel();
-          }}>
+          <Button onClick={() => onSave(product)}>
             Salvar
           </Button>
         </div>
