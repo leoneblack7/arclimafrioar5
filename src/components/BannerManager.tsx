@@ -16,7 +16,7 @@ const defaultBanner: Banner = {
 };
 
 export const BannerManager = () => {
-  const [banners, setBanners] = useState<Banner[]>([]);
+  const [banners, setBanners] = useState<Banner[]>([defaultBanner]);
 
   const loadBanners = () => {
     try {
@@ -30,7 +30,17 @@ export const BannerManager = () => {
       }
       const parsedBanners = JSON.parse(storedBanners);
       console.log("BannerManager - Banners carregados:", parsedBanners);
+      
+      // Verifica se o banner padrão já existe nos banners carregados
+      const hasDefaultBanner = parsedBanners.some((banner: Banner) => banner.id === 'default-banner');
+      
+      // Se não existir, adiciona o banner padrão à lista
+      if (!hasDefaultBanner) {
+        parsedBanners.unshift(defaultBanner);
+      }
+      
       setBanners(parsedBanners);
+      localStorage.setItem('banners', JSON.stringify(parsedBanners));
     } catch (error) {
       console.error('Erro ao carregar banners:', error);
       toast.error('Erro ao carregar os banners');
@@ -60,17 +70,13 @@ export const BannerManager = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      if (id === 'default-banner' && banners.length === 1) {
-        toast.error("Não é possível excluir o banner padrão quando é o único banner");
+      if (id === 'default-banner') {
+        toast.error("Não é possível excluir o banner padrão");
         return;
       }
 
       console.log("BannerManager - Iniciando exclusão do banner:", id);
       const updatedBanners = banners.filter(banner => banner.id !== id);
-      
-      if (updatedBanners.length === 0) {
-        updatedBanners.push(defaultBanner);
-      }
       
       localStorage.setItem('banners', JSON.stringify(updatedBanners));
       window.dispatchEvent(new Event('bannersUpdated'));
