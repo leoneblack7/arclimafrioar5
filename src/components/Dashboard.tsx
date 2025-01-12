@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BarChart3, CreditCard, Link, Search, Edit2, RotateCcw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 
 export const Dashboard = () => {
@@ -43,8 +43,9 @@ export const Dashboard = () => {
     }
   ]);
 
+  // Memoize chart data transformation
   const chartData = stats.map(stat => ({
-    name: stat.title,
+    name: stat.title.split(' ')[0], // Simplify labels to first word only
     value: parseInt(stat.value)
   }));
 
@@ -165,12 +166,29 @@ export const Dashboard = () => {
                 },
               }}
             >
-              <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+              <BarChart 
+                data={chartData} 
+                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                maxBarSize={50}
+              >
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip content={<ChartTooltip />} />
-                <Bar dataKey="value" fill="var(--primary)" />
+                <XAxis 
+                  dataKey="name"
+                  tick={{ fontSize: 12 }}
+                />
+                <YAxis 
+                  tick={{ fontSize: 12 }}
+                  width={40}
+                />
+                <Tooltip 
+                  content={<ChartTooltip />}
+                  cursor={{ fill: 'transparent' }}
+                />
+                <Bar 
+                  dataKey="value" 
+                  fill="var(--primary)"
+                  radius={[4, 4, 0, 0]}
+                />
               </BarChart>
             </ChartContainer>
           </div>
