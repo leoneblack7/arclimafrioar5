@@ -27,7 +27,7 @@ export const AppRoutes = () => {
       <Route path="/" element={<Index />} />
       {isAuthenticated && (
         <Route 
-          path="/adminblack7" 
+          path="/admin" 
           element={
             <ProtectedRoute>
               <Admin />
