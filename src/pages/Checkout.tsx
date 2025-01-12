@@ -37,16 +37,25 @@ export default function Checkout() {
     e.preventDefault();
     
     if (paymentMethod === "pix") {
-      // For PIX payments, use Ticto webhook v2
-      const response = await sendTictoWebhookV2(items, formData);
-      
-      if (response && response.payment_url) {
-        // Redirect to the payment URL in an iframe within the cart drawer
-        navigate('/?showPixPayment=true&pixUrl=' + encodeURIComponent(response.payment_url));
-      } else {
+      try {
+        // Para pagamentos PIX, use o webhook v2 da Ticto
+        const response = await sendTictoWebhookV2(items, formData);
+        
+        if (response && response.payment_url) {
+          // Redireciona para a URL de pagamento em um iframe dentro do cart drawer
+          navigate('/?showPixPayment=true&pixUrl=' + encodeURIComponent(response.payment_url));
+        } else {
+          toast({
+            title: "Erro no processamento",
+            description: "Não foi possível gerar o link de pagamento PIX. Verifique se a chave API Ticto está configurada no painel administrativo.",
+            variant: "destructive"
+          });
+        }
+      } catch (error) {
+        console.error("Erro ao processar pagamento:", error);
         toast({
           title: "Erro no processamento",
-          description: "Não foi possível gerar o link de pagamento PIX",
+          description: error instanceof Error ? error.message : "Erro ao gerar link de pagamento PIX",
           variant: "destructive"
         });
       }
