@@ -17,7 +17,17 @@ interface Product {
 }
 
 export const ProductManager = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>([
+    {
+      id: 1,
+      title: "Ar Condicionado Split 12000 BTUs",
+      price: 2499.99,
+      image: "https://example.com/ac-image.jpg",
+      description: "Ar condicionado split 12000 BTUs com tecnologia inverter",
+      active: true
+    },
+    // Add more sample products here if needed
+  ]);
   const [importUrl, setImportUrl] = useState("");
   const [isImporting, setIsImporting] = useState(false);
 

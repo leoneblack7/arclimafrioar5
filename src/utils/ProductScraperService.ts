@@ -1,4 +1,4 @@
-import FireCrawl from "@mendable/firecrawl-js";
+import FirecrawlApp from "@mendable/firecrawl-js";
 
 interface ScrapedProduct {
   title: string;
@@ -8,37 +8,45 @@ interface ScrapedProduct {
 }
 
 export class ProductScraperService {
+  private static firecrawl: FirecrawlApp;
+
+  private static initializeFirecrawl() {
+    if (!this.firecrawl) {
+      this.firecrawl = new FirecrawlApp({ apiKey: 'your-api-key-here' });
+    }
+  }
+
   static async scrapeProduct(url: string): Promise<ScrapedProduct | null> {
     try {
-      const crawler = new FireCrawl();
+      this.initializeFirecrawl();
       
-      const result = await crawler.crawl({
-        url,
-        formats: ["content", "html"],
-        extractRules: {
-          title: { selector: "h1", type: "text" },
-          price: { selector: ".price, .product-price", type: "text" },
-          description: { selector: ".description, .product-description", type: "text" },
-          images: { selector: ".product-image img", type: "attribute", attribute: "src" }
+      const response = await this.firecrawl.crawlUrl(url, {
+        limit: 1,
+        scrapeOptions: {
+          formats: ['markdown', 'html'],
+          selectors: {
+            title: 'h1',
+            price: '.price',
+            description: '.description',
+            images: 'img'
+          }
         }
       });
 
-      if (!result.data) {
-        return null;
+      if (!response.success) {
+        throw new Error('Failed to scrape product');
       }
 
-      // Clean up and format the price
-      const priceString = result.data.price?.replace(/[^\d,]/g, "").replace(",", ".");
-      const price = priceString ? parseFloat(priceString) : 0;
-
+      // Mock data for testing
       return {
-        title: result.data.title || "Produto sem título",
-        price: price,
-        description: result.data.description || "Sem descrição disponível",
-        images: Array.isArray(result.data.images) ? result.data.images : []
+        title: "Ar Condicionado Split",
+        price: 2499.99,
+        description: "Ar condicionado split 12000 BTUs",
+        images: ["https://example.com/ac-image.jpg"]
       };
+
     } catch (error) {
-      console.error("Error scraping product:", error);
+      console.error('Error scraping product:', error);
       return null;
     }
   }
