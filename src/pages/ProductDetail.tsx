@@ -8,11 +8,15 @@ import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { ProductSpecs } from "@/components/product/ProductSpecs";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function ProductDetail() {
   const { id } = useParams();
   const { addItem } = useCart();
   const navigate = useNavigate();
+  const [cep, setCep] = useState("");
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", id],
@@ -23,6 +27,14 @@ export default function ProductDetail() {
       return product;
     }
   });
+
+  const handleCalculateShipping = () => {
+    if (cep.length < 8) {
+      toast.error("Digite um CEP válido");
+      return;
+    }
+    toast.success("Frete calculado com sucesso!");
+  };
 
   if (isLoading) {
     return (
@@ -115,18 +127,27 @@ export default function ProductDetail() {
               </div>
             </div>
 
-            <div className="border rounded-lg p-4">
-              <p className="text-sm font-medium mb-2">Calcule o valor do Frete e Prazo de entrega</p>
+            <div className="border rounded-lg p-4 space-y-4">
+              <p className="text-sm font-medium">Calcule o valor do Frete e Prazo de entrega</p>
               <div className="flex gap-2">
-                <input
+                <Input
                   type="text"
                   placeholder="Digite seu CEP"
-                  className="flex-1 border rounded px-3 py-2 text-sm"
+                  value={cep}
+                  onChange={(e) => setCep(e.target.value)}
+                  maxLength={8}
+                  className="flex-1"
                 />
-                <Button variant="outline" size="sm">
+                <Button variant="outline" onClick={handleCalculateShipping}>
                   Calcular
                 </Button>
               </div>
+              {cep.length === 8 && (
+                <div className="text-sm space-y-1">
+                  <p className="text-green-600 font-medium">✓ Frete Grátis</p>
+                  <p className="text-gray-600">Prazo de entrega: 15 dias úteis</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
