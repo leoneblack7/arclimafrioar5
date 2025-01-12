@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BannerNavigation } from './banner/BannerNavigation';
 import { BannerSlide } from './banner/BannerSlide';
+import { BannerIndicators } from './banner/BannerIndicators';
 
 interface Banner {
   id: string;
@@ -65,9 +66,14 @@ export const Banner = () => {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + banners.length) % banners.length);
   };
 
+  const selectSlide = (index: number) => {
+    setSlideDirection(index > currentIndex ? 'right' : 'left');
+    setCurrentIndex(index);
+  };
+
   useEffect(() => {
     if (banners.length > 1) {
-      const interval = setInterval(nextSlide, 5000); // Changed to 5000ms (5 seconds)
+      const interval = setInterval(nextSlide, 5000);
       return () => clearInterval(interval);
     }
   }, [banners.length]);
@@ -88,6 +94,12 @@ export const Banner = () => {
         onPrevClick={prevSlide}
         onNextClick={nextSlide}
         showControls={banners.length > 1}
+      />
+
+      <BannerIndicators
+        count={banners.length}
+        currentIndex={currentIndex}
+        onSelect={selectSlide}
       />
     </div>
   );
