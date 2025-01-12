@@ -27,8 +27,16 @@ export default function Admin() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="w-full max-w-md p-8 space-y-6 bg-card rounded-lg shadow-lg border border-border">
+      <div 
+        className="min-h-screen flex items-center justify-center"
+        style={{
+          backgroundImage: 'url("/lovable-uploads/a0789ab6-2c1a-4953-8f38-5c7f5eed8ea1.png")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed'
+        }}
+      >
+        <div className="w-full max-w-md p-8 space-y-6 bg-card/80 backdrop-blur-sm rounded-lg shadow-lg border border-border">
           <h1 className="text-3xl font-bold text-center text-foreground">Login Administrativo</h1>
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
