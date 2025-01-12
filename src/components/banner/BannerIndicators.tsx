@@ -6,7 +6,7 @@ interface BannerIndicatorsProps {
 
 export const BannerIndicators = ({ count, currentIndex, onSelect }: BannerIndicatorsProps) => {
   return (
-    <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-10">
+    <div className="hidden">
       {Array.from({ length: count }).map((_, index) => (
         <button
           key={index}
