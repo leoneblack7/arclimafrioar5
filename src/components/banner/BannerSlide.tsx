@@ -9,7 +9,7 @@ export const BannerSlide = ({ id, image_url, isActive, direction }: BannerSlideP
   return (
     <div
       key={id}
-      className={`absolute w-full h-full transition-all duration-500 ${
+      className={`absolute inset-0 transition-all duration-500 ${
         isActive 
           ? 'opacity-100 translate-x-0' 
           : direction === 'right'
@@ -20,7 +20,7 @@ export const BannerSlide = ({ id, image_url, isActive, direction }: BannerSlideP
       <img
         src={image_url}
         alt="Banner"
-        className="w-full h-full object-cover"
+        className="w-full h-full object-fill"
       />
     </div>
   );
