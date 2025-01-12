@@ -1,7 +1,11 @@
 import { Button } from "./ui/button";
 import { MessageSquare } from "lucide-react";
+import { useBannerManager } from "@/hooks/useBannerManager";
 
 export const LeoneWhatsApp = () => {
+  const { banners } = useBannerManager();
+  const defaultBanners = banners.filter(banner => banner.id.startsWith('default-banner-'));
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">LEONE WHATSAPP</h2>
@@ -19,16 +23,21 @@ export const LeoneWhatsApp = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <MessageSquare className="w-6 h-6" />
+              <MessageSquare className="w-6 h-6 mr-2" />
               <span className="text-lg">WhatsApp</span>
             </a>
           </Button>
 
-          <img 
-            src="/lovable-uploads/b628c938-51f7-44ca-9c86-ff0be454ec82.png"
-            alt="Leone WhatsApp Banner"
-            className="w-full rounded-lg"
-          />
+          <div className="space-y-4">
+            {defaultBanners.slice(0, 3).map((banner, index) => (
+              <img 
+                key={banner.id}
+                src={banner.image_url}
+                alt={`Banner ${index + 1}`}
+                className="w-full rounded-lg"
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>
