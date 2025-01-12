@@ -36,7 +36,7 @@ const defaultBanners: Banner[] = [
 ];
 
 export const useBannerManager = () => {
-  const [banners, setBanners] = useState<Banner[]>(defaultBanners);
+  const [banners, setBanners] = useState<Banner[]>([]);
 
   const loadBanners = () => {
     try {
@@ -51,6 +51,13 @@ export const useBannerManager = () => {
       }
 
       const parsedBanners = JSON.parse(storedBanners);
+      if (parsedBanners.length === 0) {
+        console.log("BannerManager - Array vazio, usando banners padrão");
+        localStorage.setItem('banners', JSON.stringify(defaultBanners));
+        setBanners(defaultBanners);
+        return;
+      }
+
       console.log("BannerManager - Banners carregados:", parsedBanners);
       setBanners(parsedBanners);
     } catch (error) {
