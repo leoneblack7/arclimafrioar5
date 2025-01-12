@@ -5,27 +5,27 @@ interface ProductSpecsProps {
 export function ProductSpecs({ className = "" }: ProductSpecsProps) {
   const specs = [
     {
-      icon: "/lovable-uploads/11bed4e5-4a54-43ce-a386-d5c74e571444.png",
-      label: "INMETRO",
+      icon: "/lovable-uploads/8f7ed58c-4de3-4626-a737-263fd2a13893.png",
+      label: "Classificação INMETRO",
       code: "1234567"
     },
     {
-      icon: "/lovable-uploads/11bed4e5-4a54-43ce-a386-d5c74e571444.png",
+      icon: "/lovable-uploads/8f7ed58c-4de3-4626-a737-263fd2a13893.png",
       label: "Ciclo",
       code: "7654321"
     },
     {
-      icon: "/lovable-uploads/11bed4e5-4a54-43ce-a386-d5c74e571444.png",
+      icon: "/lovable-uploads/8f7ed58c-4de3-4626-a737-263fd2a13893.png",
       label: "220V",
       code: "9876543"
     },
     {
-      icon: "/lovable-uploads/11bed4e5-4a54-43ce-a386-d5c74e571444.png",
+      icon: "/lovable-uploads/8f7ed58c-4de3-4626-a737-263fd2a13893.png",
       label: "Smart Wi-Fi",
       code: "8765432"
     },
     {
-      icon: "/lovable-uploads/11bed4e5-4a54-43ce-a386-d5c74e571444.png",
+      icon: "/lovable-uploads/8f7ed58c-4de3-4626-a737-263fd2a13893.png",
       label: "Serpentina",
       code: "5432109"
     },
