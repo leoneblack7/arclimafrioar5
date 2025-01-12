@@ -47,30 +47,42 @@ export const BannerManager = () => {
       }
 
       try {
+        console.log("Iniciando upload do arquivo:", file.name);
+
         // Upload da imagem para o Storage do Supabase
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('banners')
           .upload(`banner-${Date.now()}`, file);
 
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          console.error('Erro no upload para storage:', uploadError);
+          throw uploadError;
+        }
+
+        console.log("Upload concluído, dados:", uploadData);
 
         // Obter URL pública da imagem
         const { data: { publicUrl } } = supabase.storage
           .from('banners')
           .getPublicUrl(uploadData.path);
 
+        console.log("URL pública gerada:", publicUrl);
+
         // Criar novo banner no banco
         const { error: insertError } = await supabase
           .from('banners')
           .insert([{ image_url: publicUrl, active: true }]);
 
-        if (insertError) throw insertError;
+        if (insertError) {
+          console.error('Erro ao inserir no banco:', insertError);
+          throw insertError;
+        }
 
         toast.success("Banner adicionado e ativado com sucesso!");
         loadBanners();
       } catch (error) {
-        console.error('Erro ao fazer upload do banner:', error);
-        toast.error("Erro ao fazer upload do banner");
+        console.error('Erro detalhado ao fazer upload do banner:', error);
+        toast.error("Erro ao fazer upload do banner. Verifique o console para mais detalhes.");
       }
     }
   };
