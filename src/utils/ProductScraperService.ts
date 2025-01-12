@@ -29,18 +29,21 @@ export class ProductScraperService {
         limit: 1,
         scrapeOptions: {
           formats: ['html'],
-          extractors: {
-            title: { selector: 'h1', type: 'text' },
-            description: { selector: '.product-description, .description', type: 'text' },
-            images: { selector: '.product-images img, .product-gallery img', type: 'attribute', attribute: 'src' },
-            price: { selector: '.product-price, .price-current', type: 'text' },
-            rating: { selector: '.rating-stars', type: 'number' },
+          selectors: {
+            title: 'h1',
+            description: '.product-description, .description',
+            images: {
+              selector: '.product-images img, .product-gallery img',
+              attr: 'src'
+            },
+            price: '.product-price, .price-current',
+            rating: '.rating-stars',
             specifications: {
               selector: '.specifications-table tr, .specs-table tr',
-              type: 'list',
+              list: true,
               data: {
-                label: { selector: 'th, td:first-child', type: 'text' },
-                value: { selector: 'td:last-child', type: 'text' }
+                label: 'th, td:first-child',
+                value: 'td:last-child'
               }
             }
           }
