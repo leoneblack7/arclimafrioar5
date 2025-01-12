@@ -12,27 +12,32 @@ interface Banner {
 const defaultBanners: Banner[] = [
   {
     id: 'default-banner-1',
-    image_url: 'https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7',
+    image_url: '/lovable-uploads/be106df6-7f56-49b8-8767-4cf73aa20a7b.png',
     active: true
   },
   {
     id: 'default-banner-2',
-    image_url: 'https://images.unsplash.com/photo-1518770660439-4636190af475',
+    image_url: '/lovable-uploads/3f83f27c-39bc-4118-9240-41e9d4d45fbf.png',
     active: true
   },
   {
     id: 'default-banner-3',
-    image_url: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e',
+    image_url: '/lovable-uploads/b628c938-51f7-44ca-9c86-ff0be454ec82.png',
     active: true
   },
   {
     id: 'default-banner-4',
-    image_url: 'https://images.unsplash.com/photo-1516455590571-18256e5bb9ff',
+    image_url: '/lovable-uploads/cac2472b-8231-4414-8fd3-13200a6cecc9.png',
     active: true
   },
   {
     id: 'default-banner-5',
-    image_url: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4',
+    image_url: '/lovable-uploads/10041c18-fc73-405c-a630-853731dc5792.png',
+    active: true
+  },
+  {
+    id: 'default-banner-6',
+    image_url: '/lovable-uploads/14fcd544-00af-494f-b65d-d120a188f4af.png',
     active: true
   }
 ];
