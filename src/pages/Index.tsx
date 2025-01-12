@@ -6,31 +6,24 @@ import { FeaturesSection } from "@/components/home/FeaturesSection";
 import { ProductsSection } from "@/components/home/ProductsSection";
 import { CTASection } from "@/components/home/CTASection";
 import { Footer } from "@/components/home/Footer";
-import { supabase } from "@/integrations/supabase/client";
-import { Product, DatabaseProduct } from "@/types/product";
+import { Product } from "@/types/product";
+import { getFromLocalStorage } from "@/utils/localStorage";
 
 const Index = () => {
   const { data: products, isLoading } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('active', true);
-      
-      if (error) {
-        console.error('Error fetching products:', error);
-        return [];
-      }
-      
-      return (data || []).map((item: DatabaseProduct) => ({
-        id: item.id,
-        title: item.title,
-        price: item.price,
-        image: item.image_url,
-        description: item.description,
-        active: item.active || false
-      }));
+      const storedProducts = getFromLocalStorage('products', []);
+      return storedProducts
+        .filter((item: Product) => item.active)
+        .map((item: any) => ({
+          id: item.id,
+          title: item.title,
+          price: item.price,
+          image: item.image || '/placeholder.svg',
+          description: item.description,
+          active: item.active
+        }));
     }
   });
 

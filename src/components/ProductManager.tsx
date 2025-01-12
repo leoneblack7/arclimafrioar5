@@ -5,10 +5,10 @@ import { Dialog } from "./ui/dialog";
 import { ProductForm } from "./admin/ProductForm";
 import { ProductImportForm } from "./admin/ProductImportForm";
 import { ProductsTable } from "./admin/ProductsTable";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Product, DatabaseProduct } from "@/types/product";
+import { Product } from "@/types/product";
+import { saveToLocalStorage, getFromLocalStorage } from "@/utils/localStorage";
 
 export const ProductManager = () => {
   const queryClient = useQueryClient();
@@ -18,20 +18,12 @@ export const ProductManager = () => {
   const { data: products = [], isLoading } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*');
-      
-      if (error) {
-        toast.error("Erro ao carregar produtos");
-        throw error;
-      }
-      
-      return (data || []).map((item: DatabaseProduct) => ({
+      const storedProducts = getFromLocalStorage('products', []);
+      return storedProducts.map((item: any) => ({
         id: item.id,
         title: item.title,
         price: item.price,
-        image: item.image_url,
+        image: item.image || '/placeholder.svg',
         description: item.description,
         active: item.active || false
       }));
@@ -40,7 +32,7 @@ export const ProductManager = () => {
 
   const handleNewProduct = () => {
     const newProduct: Product = {
-      id: "",
+      id: Date.now().toString(),
       title: "Novo Produto",
       price: 0,
       image: "/placeholder.svg",
@@ -53,31 +45,22 @@ export const ProductManager = () => {
 
   const handleSaveProduct = async (updatedProduct: Product) => {
     try {
-      const productData = {
-        title: updatedProduct.title,
-        price: updatedProduct.price,
-        image_url: updatedProduct.image,
-        description: updatedProduct.description,
-        active: updatedProduct.active
-      };
-
+      let updatedProducts;
       if (updatedProduct.id) {
-        const { error } = await supabase
-          .from('products')
-          .update(productData)
-          .eq('id', updatedProduct.id);
-
-        if (error) throw error;
+        updatedProducts = products.map(p => 
+          p.id === updatedProduct.id ? updatedProduct : p
+        );
         toast.success("Produto atualizado com sucesso!");
       } else {
-        const { error } = await supabase
-          .from('products')
-          .insert([productData]);
-
-        if (error) throw error;
+        const newProduct = {
+          ...updatedProduct,
+          id: Date.now().toString()
+        };
+        updatedProducts = [...products, newProduct];
         toast.success("Produto adicionado com sucesso!");
       }
       
+      saveToLocalStorage('products', updatedProducts);
       queryClient.invalidateQueries({ queryKey: ["products"] });
       setEditingProduct(null);
       setIsDialogOpen(false);
@@ -89,18 +72,17 @@ export const ProductManager = () => {
 
   const handleImportProduct = async (scrapedProduct: any) => {
     try {
-      const { error } = await supabase
-        .from('products')
-        .insert([{
-          title: scrapedProduct.title,
-          price: scrapedProduct.price,
-          image_url: scrapedProduct.images[0] || '/placeholder.svg',
-          description: scrapedProduct.description,
-          active: true
-        }]);
-
-      if (error) throw error;
+      const newProduct = {
+        id: Date.now().toString(),
+        title: scrapedProduct.title,
+        price: scrapedProduct.price,
+        image: scrapedProduct.images[0] || '/placeholder.svg',
+        description: scrapedProduct.description,
+        active: true
+      };
       
+      const updatedProducts = [...products, newProduct];
+      saveToLocalStorage('products', updatedProducts);
       queryClient.invalidateQueries({ queryKey: ["products"] });
       toast.success("Produto importado com sucesso!");
     } catch (error) {
@@ -146,13 +128,8 @@ export const ProductManager = () => {
         }}
         onDelete={async (productId) => {
           try {
-            const { error } = await supabase
-              .from('products')
-              .delete()
-              .eq('id', productId);
-
-            if (error) throw error;
-            
+            const updatedProducts = products.filter(p => p.id !== productId);
+            saveToLocalStorage('products', updatedProducts);
             queryClient.invalidateQueries({ queryKey: ["products"] });
             toast.success("Produto removido com sucesso!");
           } catch (error) {
@@ -165,13 +142,10 @@ export const ProductManager = () => {
           if (!product) return;
 
           try {
-            const { error } = await supabase
-              .from('products')
-              .update({ active: !product.active })
-              .eq('id', productId);
-
-            if (error) throw error;
-            
+            const updatedProducts = products.map(p => 
+              p.id === productId ? { ...p, active: !p.active } : p
+            );
+            saveToLocalStorage('products', updatedProducts);
             queryClient.invalidateQueries({ queryKey: ["products"] });
             toast.success("Status do produto atualizado!");
           } catch (error) {
