@@ -26,18 +26,21 @@ export const Banner = () => {
       const storedBanners = localStorage.getItem('banners');
       console.log("Banner - Dados do localStorage:", storedBanners);
       
+      let activeBanners = [defaultBanner];
+      
       if (storedBanners) {
         const parsedBanners = JSON.parse(storedBanners);
         console.log("Banner - Banners parseados:", parsedBanners);
-        const activeBanners = parsedBanners.filter((banner: Banner) => banner.active);
-        console.log("Banner - Banners ativos:", activeBanners);
-        if (activeBanners.length > 0) {
-          setBanners(activeBanners);
-        }
-      } else {
-        console.log("Banner - Usando banner padrão");
-        setBanners([defaultBanner]);
+        
+        // Filtra apenas os banners ativos
+        const additionalActiveBanners = parsedBanners.filter((banner: Banner) => banner.active);
+        
+        // Combina o banner padrão com os banners adicionais ativos
+        activeBanners = [defaultBanner, ...additionalActiveBanners];
       }
+      
+      console.log("Banner - Banners ativos finais:", activeBanners);
+      setBanners(activeBanners);
     } catch (error) {
       console.error('Erro ao carregar banners:', error);
       setBanners([defaultBanner]);
