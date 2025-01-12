@@ -20,13 +20,44 @@ export const ProductManager = () => {
   const [products, setProducts] = useState<Product[]>([
     {
       id: 1,
-      title: "Ar Condicionado Split 12000 BTUs",
+      title: "Ar Condicionado Split 12000 BTUs Inverter",
       price: 2499.99,
-      image: "https://example.com/ac-image.jpg",
-      description: "Ar condicionado split 12000 BTUs com tecnologia inverter",
+      image: "/placeholder.svg",
+      description: "Ar condicionado split 12000 BTUs com tecnologia inverter, economia de energia",
       active: true
     },
-    // Add more sample products here if needed
+    {
+      id: 2,
+      title: "Ar Condicionado Split 9000 BTUs",
+      price: 1899.99,
+      image: "/placeholder.svg",
+      description: "Ar condicionado split 9000 BTUs ideal para ambientes pequenos",
+      active: true
+    },
+    {
+      id: 3,
+      title: "Ar Condicionado Portátil 12000 BTUs",
+      price: 3299.99,
+      image: "/placeholder.svg",
+      description: "Ar condicionado portátil com mobilidade e praticidade",
+      active: true
+    },
+    {
+      id: 4,
+      title: "Ar Condicionado Split 18000 BTUs",
+      price: 3599.99,
+      image: "/placeholder.svg",
+      description: "Ar condicionado split 18000 BTUs para ambientes grandes",
+      active: true
+    },
+    {
+      id: 5,
+      title: "Ar Condicionado Split 24000 BTUs",
+      price: 4299.99,
+      image: "/placeholder.svg",
+      description: "Ar condicionado split 24000 BTUs para áreas extensas",
+      active: true
+    }
   ]);
   const [importUrl, setImportUrl] = useState("");
   const [isImporting, setIsImporting] = useState(false);

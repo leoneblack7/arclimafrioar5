@@ -23,13 +23,7 @@ export class ProductScraperService {
       const response = await this.firecrawl.crawlUrl(url, {
         limit: 1,
         scrapeOptions: {
-          formats: ['markdown', 'html'],
-          selectors: {
-            title: 'h1',
-            price: '.price',
-            description: '.description',
-            images: 'img'
-          }
+          formats: ['markdown', 'html']
         }
       });
 
@@ -42,7 +36,7 @@ export class ProductScraperService {
         title: "Ar Condicionado Split",
         price: 2499.99,
         description: "Ar condicionado split 12000 BTUs",
-        images: ["https://example.com/ac-image.jpg"]
+        images: ["/placeholder.svg"]
       };
 
     } catch (error) {
