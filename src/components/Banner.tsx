@@ -14,15 +14,28 @@ export const Banner = () => {
 
   useEffect(() => {
     try {
+      console.log('Iniciando carregamento dos banners...');
       const savedBanners = localStorage.getItem("siteBanners");
+      console.log('Dados do localStorage:', savedBanners);
+      
       if (savedBanners) {
         const parsedBanners = JSON.parse(savedBanners);
+        console.log('Banners parseados:', parsedBanners);
+        
         const activeBanners = parsedBanners.filter((banner: Banner) => banner.active);
-        setBanners(activeBanners);
-        console.log('Banners carregados:', parsedBanners);
         console.log('Banners ativos:', activeBanners);
+        
+        setBanners(activeBanners);
       } else {
-        console.log('Nenhum banner encontrado no localStorage');
+        // Adicionar banner de exemplo se não houver banners
+        const defaultBanner: Banner = {
+          id: 1,
+          imageUrl: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
+          active: true
+        };
+        console.log('Adicionando banner padrão:', defaultBanner);
+        setBanners([defaultBanner]);
+        localStorage.setItem("siteBanners", JSON.stringify([defaultBanner]));
       }
     } catch (error) {
       console.error('Erro ao carregar banners:', error);
@@ -45,6 +58,8 @@ export const Banner = () => {
     }
   }, [banners.length]);
 
+  console.log('Renderizando Banner component. Número de banners:', banners.length);
+  
   if (banners.length === 0) {
     console.log('Nenhum banner ativo encontrado');
     return null;

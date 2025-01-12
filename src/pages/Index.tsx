@@ -66,7 +66,9 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <Banner />
+      <div className="mt-16">
+        <Banner />
+      </div>
       
       {/* Hero Section */}
       <section className="pt-16 pb-12 px-4 bg-gradient-to-b from-white to-blue-50">
