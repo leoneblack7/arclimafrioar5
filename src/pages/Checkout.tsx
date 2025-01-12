@@ -33,6 +33,7 @@ export default function Checkout() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Only process order if payment method is credit card
     if (paymentMethod === "credit") {
       // Create the order data object
       const orderData = {
@@ -83,7 +84,7 @@ TOTAL: R$ ${total}`;
         formatted_text: orderText
       };
 
-      // Save order data to localStorage BEFORE any validation or processing
+      // Save order data to localStorage
       const existingOrders = getFromLocalStorage('orders', []);
       saveToLocalStorage('orders', [...existingOrders, completeOrderData]);
       
@@ -96,29 +97,8 @@ TOTAL: R$ ${total}`;
       return;
     }
 
-    // If PIX payment, show success message
-    toast({
-      title: "Pedido realizado com sucesso!",
-      description: "Você receberá um email com os detalhes do pedido."
-    });
-
-    clearCart();
-    setFormData({
-      name: "",
-      cpf: "",
-      email: "",
-      phone: "",
-      address: "",
-      city: "",
-      state: "",
-      zipCode: "",
-    });
-    setCreditCardData({
-      cardNumber: "",
-      cardHolder: "",
-      expiryDate: "",
-      cvv: "",
-    });
+    // For PIX payments, do nothing - the payment will be handled in the CartDrawer
+    // with the iframe display
   };
 
   return (
