@@ -29,8 +29,8 @@ export const Navbar = () => {
             <a href="/sobre" className="text-gray-600 hover:text-primary transition-colors">
               Sobre
             </a>
-            <a href="/contato" className="text-gray-600 hover:text-primary transition-colors">
-              Contato
+            <a href="/rastreio" className="text-gray-600 hover:text-primary transition-colors">
+              Rastrear Pedido
             </a>
             <CartDrawer />
           </div>
