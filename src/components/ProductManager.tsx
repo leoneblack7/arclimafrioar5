@@ -43,7 +43,10 @@ export const ProductManager = () => {
       <ProductsTable
         products={products}
         onEdit={(product) => {
-          setEditingProduct(product);
+          setEditingProduct({
+            ...product,
+            images: product.images || [product.image]
+          });
           setIsDialogOpen(true);
         }}
         onDelete={handleDeleteProduct}

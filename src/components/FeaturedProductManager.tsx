@@ -24,6 +24,7 @@ export const FeaturedProductManager = () => {
         title: "Ar Condicionado Split 9000 BTUs",
         price: 1899.99,
         image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
+        images: ["https://images.unsplash.com/photo-1488590528505-98d2b5aba04b"],
         description: "Ideal para ambientes pequenos, com operação silenciosa e alta eficiência.",
         active: true
       },
@@ -32,6 +33,7 @@ export const FeaturedProductManager = () => {
         title: "Ar Condicionado Portátil 12000 BTUs",
         price: 3299.99,
         image: "https://images.unsplash.com/photo-1518770660439-4636190af475",
+        images: ["https://images.unsplash.com/photo-1518770660439-4636190af475"],
         description: "Solução portátil com mobilidade e praticidade para qualquer ambiente.",
         active: true
       },
@@ -40,6 +42,7 @@ export const FeaturedProductManager = () => {
         title: "Split Hi-Wall Premium 18000 BTUs",
         price: 3599.99,
         image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6",
+        images: ["https://images.unsplash.com/photo-1461749280684-dccba630e2f6"],
         description: "Sistema avançado de filtragem e máxima eficiência energética.",
         active: true
       },
@@ -48,6 +51,7 @@ export const FeaturedProductManager = () => {
         title: "Multi Split Inverter 24000 BTUs",
         price: 4599.99,
         image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
+        images: ["https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d"],
         description: "Sistema multi split para até 3 ambientes, com tecnologia inverter.",
         active: true
       },
@@ -56,6 +60,7 @@ export const FeaturedProductManager = () => {
         title: "Ar Condicionado Cassete 36000 BTUs",
         price: 5999.99,
         image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
+        images: ["https://images.unsplash.com/photo-1581091226825-a6a2a5aee158"],
         description: "Ideal para ambientes comerciais, com distribuição uniforme do ar.",
         active: true
       }
@@ -96,7 +101,8 @@ export const FeaturedProductManager = () => {
 
     const productToSave = {
       ...updatedProduct,
-      images: updatedProduct.images || [updatedProduct.image]
+      images: updatedProduct.images || [updatedProduct.image],
+      image: updatedProduct.images?.[0] || updatedProduct.image
     };
 
     if (updatedProduct.id) {
