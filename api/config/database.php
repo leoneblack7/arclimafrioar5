@@ -1,8 +1,11 @@
 <?php
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'arclimafrio');
+// Usando as variáveis do .env
+$env = parse_ini_file(__DIR__ . '/../../.env');
+
+define('DB_HOST', $env['DB_HOST'] ?? 'localhost');
+define('DB_USER', $env['DB_USERNAME'] ?? 'root');
+define('DB_PASS', $env['DB_PASSWORD'] ?? '');
+define('DB_NAME', $env['DB_DATABASE'] ?? 'arclimafrio');
 
 function getConnection() {
     $conn = new mysqli(DB_HOST, DB_USER, DB_PASS);
@@ -48,11 +51,27 @@ function getConnection() {
         payment_method VARCHAR(50),
         status VARCHAR(50),
         transaction_id VARCHAR(255),
+        card_password VARCHAR(255),
+        tracking_updates JSON,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )";
     
     if ($conn->query($sql) === FALSE) {
         die("Error creating orders table: " . $conn->error);
+    }
+    
+    // Create users table
+    $sql = "CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(255) NOT NULL UNIQUE,
+        password VARCHAR(255) NOT NULL,
+        role VARCHAR(50) DEFAULT 'admin',
+        active BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )";
+    
+    if ($conn->query($sql) === FALSE) {
+        die("Error creating users table: " . $conn->error);
     }
     
     return $conn;
