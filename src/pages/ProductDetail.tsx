@@ -12,6 +12,7 @@ import { RelatedProducts } from '@/components/product/RelatedProducts';
 import { ProductGallery } from '@/components/product/ProductGallery';
 import { Footer } from '@/components/home/Footer';
 import { toast } from 'sonner';
+import { Link } from 'react-router-dom';
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -73,42 +74,52 @@ export default function ProductDetail() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <ProductDetailHeader 
-        title={product.title} 
-        id={product.id} 
-      />
-      
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
-        <ProductGallery 
-          images={[product.image, ...(product.images || [])]}
+    <div className="min-h-screen flex flex-col">
+      <div className="container mx-auto px-4 py-4 mb-4">
+        <Link to="/" className="block w-48 mb-6">
+          <img
+            src="/lovable-uploads/cac2472b-8231-4414-8fd3-13200a6cecc9.png"
+            alt="ArclimaFrio Logo"
+            className="w-full h-auto"
+          />
+        </Link>
+
+        <ProductDetailHeader 
+          title={product.title} 
+          id={product.id} 
         />
         
-        <div className="space-y-6">
-          <ProductDetailPrice price={product.price} />
-          <ProductDetailActions 
-            onAddToCart={handleAddToCart}
-            onBuyNow={handleBuyNow}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
+          <ProductGallery 
+            images={[product.image, ...(product.images || [])]}
           />
-          <ProductDetailShipping />
-          <ProductDetailDescription 
-            description={product.description}
-            isActive={product.isDescriptionActive}
-          />
+          
+          <div className="space-y-6">
+            <ProductDetailPrice price={product.price} />
+            <ProductDetailActions 
+              onAddToCart={handleAddToCart}
+              onBuyNow={handleBuyNow}
+            />
+            <ProductDetailShipping />
+            <ProductDetailDescription 
+              description={product.description}
+              isActive={product.isDescriptionActive}
+            />
+          </div>
         </div>
+
+        <ProductDetailImages 
+          title={product.title}
+          images={product.additionalImages || []}
+          isActive={product.isAdditionalImagesActive}
+        />
+
+        <RelatedProducts 
+          currentProductId={product.id}
+          isActive={product.isRelatedProductsActive}
+          relatedProductIds={product.relatedProductIds}
+        />
       </div>
-
-      <ProductDetailImages 
-        title={product.title}
-        images={product.additionalImages || []}
-        isActive={product.isAdditionalImagesActive}
-      />
-
-      <RelatedProducts 
-        currentProductId={product.id}
-        isActive={product.isRelatedProductsActive}
-        relatedProductIds={product.relatedProductIds}
-      />
 
       <Footer />
     </div>
