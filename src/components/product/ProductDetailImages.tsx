@@ -11,7 +11,7 @@ export const ProductDetailImages = ({ title, images, isActive }: ProductDetailIm
 
   return (
     <div className="border rounded-lg p-4">
-      <h2 className="text-lg font-semibold mb-4">Imagens Adicionais</h2>
+      <h2 className="text-lg font-semibold mb-4">{title}</h2>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {images.map((image, index) => (
           <img

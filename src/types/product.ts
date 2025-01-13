@@ -4,10 +4,12 @@ export interface Product {
   price: number;
   image: string;
   images: string[];
+  additionalImages?: string[];
   description: string;
   isDescriptionActive?: boolean;
   isImagesActive?: boolean;
   isSpecificationsActive?: boolean;
+  isAdditionalImagesActive?: boolean;
   specifications?: string;
   active: boolean;
   pixLink?: string;

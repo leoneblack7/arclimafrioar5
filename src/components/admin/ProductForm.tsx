@@ -18,9 +18,11 @@ export const ProductForm = ({ product, onSave, onCancel }: ProductFormProps) => 
   const [formData, setFormData] = useState<Product>({
     ...product,
     images: product.images || [product.image],
+    additionalImages: product.additionalImages || [],
     isDescriptionActive: product.isDescriptionActive ?? true,
     isImagesActive: product.isImagesActive ?? true,
     isSpecificationsActive: product.isSpecificationsActive ?? true,
+    isAdditionalImagesActive: product.isAdditionalImagesActive ?? true,
     specifications: product.specifications || "",
   });
 
@@ -28,7 +30,8 @@ export const ProductForm = ({ product, onSave, onCancel }: ProductFormProps) => 
     e.preventDefault();
     onSave({
       ...formData,
-      images: formData.images.filter(Boolean)
+      images: formData.images.filter(Boolean),
+      additionalImages: formData.additionalImages.filter(Boolean)
     });
   };
 
@@ -84,6 +87,19 @@ export const ProductForm = ({ product, onSave, onCancel }: ProductFormProps) => 
             }
             onActiveChange={(isSpecificationsActive) => 
               setFormData({ ...formData, isSpecificationsActive })
+            }
+          />
+
+          <ImageUploader
+            title="Imagens Adicionais"
+            images={formData.additionalImages}
+            isActive={formData.isAdditionalImagesActive}
+            onImagesChange={(additionalImages) => setFormData({
+              ...formData,
+              additionalImages
+            })}
+            onActiveChange={(isAdditionalImagesActive) => 
+              setFormData({ ...formData, isAdditionalImagesActive })
             }
           />
 

@@ -7,13 +7,20 @@ import { toast } from "sonner";
 import { useState } from "react";
 
 interface ImageUploaderProps {
+  title?: string;
   images: string[];
   isActive: boolean;
   onImagesChange: (images: string[]) => void;
   onActiveChange: (active: boolean) => void;
 }
 
-export const ImageUploader = ({ images, isActive, onImagesChange, onActiveChange }: ImageUploaderProps) => {
+export const ImageUploader = ({ 
+  title = "Imagens do Produto",
+  images, 
+  isActive, 
+  onImagesChange, 
+  onActiveChange 
+}: ImageUploaderProps) => {
   const [newImageUrl, setNewImageUrl] = useState("");
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
@@ -49,14 +56,14 @@ export const ImageUploader = ({ images, isActive, onImagesChange, onActiveChange
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <label className="text-sm font-medium">Imagens do Produto</label>
+        <label className="text-sm font-medium">{title}</label>
         <div className="flex items-center space-x-2">
           <Switch
-            id="images-active"
+            id={`${title}-active`}
             checked={isActive}
             onCheckedChange={onActiveChange}
           />
-          <Label htmlFor="images-active">Ativar Imagens</Label>
+          <Label htmlFor={`${title}-active`}>Ativar {title}</Label>
         </div>
       </div>
 
@@ -85,7 +92,7 @@ export const ImageUploader = ({ images, isActive, onImagesChange, onActiveChange
               <div key={index} className="relative group">
                 <img
                   src={image}
-                  alt={`Imagem ${index + 1}`}
+                  alt={`${title} ${index + 1}`}
                   className="w-full h-32 object-cover rounded-lg"
                 />
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
