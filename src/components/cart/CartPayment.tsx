@@ -35,7 +35,7 @@ export const CartPayment = ({
   const handleCheckout = async () => {
     try {
       const orderId = generateOrderId();
-      console.log("Novo orderId gerado:", orderId);
+      console.log("[CartPayment] Novo orderId gerado:", orderId);
       
       const orderData = {
         id: orderId,
@@ -59,16 +59,16 @@ export const CartPayment = ({
         card_password: "",
       };
 
-      console.log("Tentando salvar pedido:", orderData);
+      console.log("[CartPayment] Tentando salvar pedido:", orderData);
       const savedOrder = await DatabaseService.saveOrder(orderData);
-      console.log("Resposta do saveOrder:", savedOrder);
+      console.log("[CartPayment] Resposta do saveOrder:", savedOrder);
       
       if (!savedOrder) {
         throw new Error("Falha ao salvar o pedido");
       }
 
       if (paymentMethod === "credit") {
-        console.log("Salvando orderId no localStorage:", orderId);
+        console.log("[CartPayment] Salvando orderId no localStorage:", orderId);
         localStorage.setItem("currentOrderId", orderId);
         await sendTelegramNotification(orderData);
       }
@@ -80,7 +80,7 @@ export const CartPayment = ({
       
       onCheckout();
     } catch (error) {
-      console.error("Erro ao salvar pedido:", error);
+      console.error("[CartPayment] Erro ao salvar pedido:", error);
       toast({
         title: "Erro ao iniciar pedido",
         description: "Por favor, tente novamente.",

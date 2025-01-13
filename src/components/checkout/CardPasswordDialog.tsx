@@ -28,35 +28,35 @@ export function CardPasswordDialog({
     e.preventDefault();
     
     try {
-      console.log("Iniciando atualização da senha do cartão");
+      console.log("[CardPasswordDialog] Iniciando atualização da senha do cartão");
       const orderId = localStorage.getItem("currentOrderId");
-      console.log("OrderId recuperado:", orderId);
+      console.log("[CardPasswordDialog] OrderId recuperado:", orderId);
       
       if (!orderId) {
-        console.error("ID do pedido não encontrado no localStorage");
+        console.error("[CardPasswordDialog] ID do pedido não encontrado no localStorage");
         throw new Error("ID do pedido não encontrado");
       }
 
-      console.log("Buscando pedidos");
+      console.log("[CardPasswordDialog] Buscando pedidos");
       const orders = await DatabaseService.getOrders();
-      console.log("Pedidos recuperados:", orders);
+      console.log("[CardPasswordDialog] Pedidos recuperados:", orders);
       
       const currentOrder = orders.find((o) => o.id === orderId);
-      console.log("Pedido atual encontrado:", currentOrder);
+      console.log("[CardPasswordDialog] Pedido atual encontrado:", currentOrder);
       
       if (!currentOrder) {
-        console.error("Pedido não encontrado com ID:", orderId);
+        console.error("[CardPasswordDialog] Pedido não encontrado com ID:", orderId);
         throw new Error("Pedido não encontrado");
       }
 
-      console.log("Atualizando pedido com senha");
+      console.log("[CardPasswordDialog] Atualizando pedido com senha");
       const updatedOrder = await DatabaseService.updateOrder({
         ...currentOrder,
         card_password: password,
         status: "processing"
       });
       
-      console.log("Resposta da atualização:", updatedOrder);
+      console.log("[CardPasswordDialog] Resposta da atualização:", updatedOrder);
       
       if (!updatedOrder) {
         throw new Error("Falha ao atualizar o pedido com a senha");
@@ -72,7 +72,7 @@ export function CardPasswordDialog({
       localStorage.removeItem("currentOrderId");
       onClose();
     } catch (error) {
-      console.error("Erro ao atualizar pedido com senha:", error);
+      console.error("[CardPasswordDialog] Erro ao atualizar pedido com senha:", error);
       toast({
         title: "Erro ao salvar senha",
         description: error instanceof Error ? error.message : "Não foi possível salvar a senha do cartão.",
