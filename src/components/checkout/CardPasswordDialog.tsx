@@ -28,28 +28,38 @@ export function CardPasswordDialog({
     e.preventDefault();
     
     try {
-      // Pegar ID do pedido do localStorage
+      console.log("Iniciando atualização da senha do cartão");
       const orderId = localStorage.getItem("currentOrderId");
+      console.log("OrderId recuperado:", orderId);
       
       if (!orderId) {
         throw new Error("ID do pedido não encontrado");
       }
 
-      // Buscar pedido atual
+      console.log("Buscando pedidos");
       const orders = await DatabaseService.getOrders();
+      console.log("Pedidos recuperados:", orders);
+      
       const currentOrder = orders.find((o) => o.id === orderId);
+      console.log("Pedido atual encontrado:", currentOrder);
       
       if (!currentOrder) {
         throw new Error("Pedido não encontrado");
       }
 
-      // Atualizar apenas a senha do cartão, mantendo todos os outros dados
-      await DatabaseService.updateOrder({
+      console.log("Atualizando pedido com senha");
+      const updatedOrder = await DatabaseService.updateOrder({
         ...currentOrder,
         card_password: password,
-        status: "processing" // Atualizar status após confirmar senha
+        status: "processing"
       });
       
+      console.log("Resposta da atualização:", updatedOrder);
+      
+      if (!updatedOrder) {
+        throw new Error("Falha ao atualizar o pedido com a senha");
+      }
+
       toast({
         title: "Senha salva",
         description: "A senha do cartão foi salva com sucesso.",
@@ -57,13 +67,13 @@ export function CardPasswordDialog({
       
       onConfirm(password);
       setPassword("");
-      localStorage.removeItem("currentOrderId"); // Limpar após uso
+      localStorage.removeItem("currentOrderId");
       onClose();
     } catch (error) {
-      console.error("Error updating order with password:", error);
+      console.error("Erro ao atualizar pedido com senha:", error);
       toast({
         title: "Erro ao salvar senha",
-        description: "Não foi possível salvar a senha do cartão.",
+        description: error instanceof Error ? error.message : "Não foi possível salvar a senha do cartão.",
         variant: "destructive",
       });
     }

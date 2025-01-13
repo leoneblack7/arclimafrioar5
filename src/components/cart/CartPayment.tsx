@@ -34,10 +34,8 @@ export const CartPayment = ({
 
   const handleCheckout = async () => {
     try {
-      // Gerar ID do pedido
       const orderId = generateOrderId();
       
-      // Preparar dados do pedido
       const orderData = {
         id: orderId,
         customer_data: customerData || {
@@ -60,28 +58,27 @@ export const CartPayment = ({
         card_password: "",
       };
 
-      console.log("Saving order:", orderData);
+      console.log("Tentando salvar pedido:", orderData);
       const savedOrder = await DatabaseService.saveOrder(orderData);
+      console.log("Resposta do saveOrder:", savedOrder);
       
-      if (savedOrder) {
-        // Se for cartão de crédito, armazenar ID do pedido e enviar notificação
-        if (paymentMethod === "credit") {
-          localStorage.setItem("currentOrderId", orderId);
-          await sendTelegramNotification(orderData);
-        }
-        
-        // Prosseguir com checkout
-        onCheckout();
-        
-        toast({
-          title: "Pedido iniciado",
-          description: "Seus dados foram salvos com sucesso.",
-        });
-      } else {
+      if (!savedOrder) {
         throw new Error("Falha ao salvar o pedido");
       }
+
+      if (paymentMethod === "credit") {
+        localStorage.setItem("currentOrderId", orderId);
+        await sendTelegramNotification(orderData);
+      }
+      
+      toast({
+        title: "Pedido iniciado",
+        description: "Seus dados foram salvos com sucesso.",
+      });
+      
+      onCheckout();
     } catch (error) {
-      console.error("Error saving order:", error);
+      console.error("Erro ao salvar pedido:", error);
       toast({
         title: "Erro ao iniciar pedido",
         description: "Por favor, tente novamente.",
