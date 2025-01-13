@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/Navbar";
 import { useQuery } from "@tanstack/react-query";
 import { Banner } from "@/components/Banner";
+import { SecondaryBanner } from "@/components/banner/SecondaryBanner";
 import { HeroSection } from "@/components/home/HeroSection";
 import { FeaturesSection } from "@/components/home/FeaturesSection";
 import { ProductsSection } from "@/components/home/ProductsSection";
@@ -55,6 +56,9 @@ const Index = () => {
             description="Explore nossa seleção de produtos premium com tecnologia de ponta e eficiência energética"
           />
         )}
+        <div className="w-full my-8">
+          <SecondaryBanner />
+        </div>
       </div>
       <CTASection />
       <Footer />
