@@ -7,7 +7,7 @@ interface ProductDetailPriceProps {
 export const ProductDetailPrice = ({ price }: ProductDetailPriceProps) => {
   return (
     <div className="space-y-4">
-      <ProductSpecifications className="h-8" />
+      <ProductSpecifications className="h-12" />
       <div className="space-y-2">
         <div className="text-2xl md:text-3xl font-bold text-primary">
           {price.toLocaleString('pt-BR', { 
