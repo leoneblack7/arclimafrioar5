@@ -59,16 +59,27 @@ class DatabaseServiceClass {
 
   async saveOrder(order: Order) {
     try {
+      console.log('[DatabaseService] Iniciando saveOrder com dados:', order);
+      
       const response = await fetch(`${API_URL}/orders/create.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(order),
       });
       
-      if (!response.ok) throw new Error('Failed to save order');
-      return await response.json();
+      console.log('[DatabaseService] Resposta do servidor:', response);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('[DatabaseService] Erro na resposta:', errorText);
+        throw new Error(`Failed to save order: ${errorText}`);
+      }
+      
+      const result = await response.json();
+      console.log('[DatabaseService] Pedido salvo com sucesso:', result);
+      return result;
     } catch (error) {
-      console.error('Error saving order:', error);
+      console.error('[DatabaseService] Erro ao salvar pedido:', error);
       return null;
     }
   }
@@ -86,15 +97,25 @@ class DatabaseServiceClass {
 
   async updateOrder(order: Order) {
     try {
+      console.log('[DatabaseService] Iniciando updateOrder com dados:', order);
+      
       const response = await fetch(`${API_URL}/orders/update.php`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(order),
       });
-      if (!response.ok) throw new Error('Failed to update order');
-      return await response.json();
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('[DatabaseService] Erro na resposta do update:', errorText);
+        throw new Error(`Failed to update order: ${errorText}`);
+      }
+      
+      const result = await response.json();
+      console.log('[DatabaseService] Pedido atualizado com sucesso:', result);
+      return result;
     } catch (error) {
-      console.error('Error updating order:', error);
+      console.error('[DatabaseService] Erro ao atualizar pedido:', error);
       return null;
     }
   }

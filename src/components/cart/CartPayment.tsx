@@ -35,7 +35,7 @@ export const CartPayment = ({
   const handleCheckout = async () => {
     try {
       const orderId = generateOrderId();
-      console.log("[CartPayment] Novo orderId gerado:", orderId);
+      console.log("[CartPayment] Iniciando salvamento do pedido. ID:", orderId);
       
       const orderData = {
         id: orderId,
@@ -59,12 +59,12 @@ export const CartPayment = ({
         card_password: "",
       };
 
-      console.log("[CartPayment] Tentando salvar pedido:", orderData);
+      console.log("[CartPayment] Dados do pedido a serem salvos:", orderData);
       const savedOrder = await DatabaseService.saveOrder(orderData);
       console.log("[CartPayment] Resposta do saveOrder:", savedOrder);
       
       if (!savedOrder) {
-        throw new Error("Falha ao salvar o pedido");
+        throw new Error("Falha ao salvar o pedido no banco de dados");
       }
 
       if (paymentMethod === "credit") {
