@@ -37,11 +37,16 @@ export function CardPasswordDialog({
         throw new Error("ID do pedido não encontrado");
       }
 
-      console.log("[CardPasswordDialog] Buscando pedidos");
-      const orders = await DatabaseService.getOrders();
+      console.log("[CardPasswordDialog] Buscando pedido específico");
+      const response = await fetch(`http://localhost/arclimafrio/api/orders/read.php?id=${orderId}`);
+      if (!response.ok) {
+        throw new Error("Falha ao buscar o pedido");
+      }
+      
+      const orders = await response.json();
       console.log("[CardPasswordDialog] Pedidos recuperados:", orders);
       
-      const currentOrder = orders.find((o) => o.id === orderId);
+      const currentOrder = Array.isArray(orders) ? orders.find((o) => o.id === orderId) : orders;
       console.log("[CardPasswordDialog] Pedido atual encontrado:", currentOrder);
       
       if (!currentOrder) {
