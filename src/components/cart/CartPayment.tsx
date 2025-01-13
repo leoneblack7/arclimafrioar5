@@ -61,7 +61,7 @@ export const CartPayment = ({
         created_at: new Date().toISOString()
       };
 
-      // Salvar pedido no banco
+      // Salvar pedido no banco primeiro
       console.log("Saving order:", orderData);
       await DatabaseService.saveOrder(orderData);
       
