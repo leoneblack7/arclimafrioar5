@@ -11,20 +11,10 @@ export const PixKeyForm = ({ config, onConfigChange }: PixKeyFormProps) => {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="pix-key">Chave PIX</Label>
-        <Input
-          id="pix-key"
-          value={config.pixKey}
-          onChange={(e) => onConfigChange({ ...config, pixKey: e.target.value })}
-          placeholder="CPF, CNPJ, Email ou Telefone"
-        />
-      </div>
-
-      <div className="space-y-2">
         <Label htmlFor="pix-name">Nome do Beneficiário</Label>
         <Input
           id="pix-name"
-          value={config.pixName}
+          value={config.pixName || ""}
           onChange={(e) => onConfigChange({ ...config, pixName: e.target.value })}
           placeholder="Nome completo"
         />
@@ -34,7 +24,7 @@ export const PixKeyForm = ({ config, onConfigChange }: PixKeyFormProps) => {
         <Label htmlFor="pix-city">Cidade</Label>
         <Input
           id="pix-city"
-          value={config.pixCity}
+          value={config.pixCity || ""}
           onChange={(e) => onConfigChange({ ...config, pixCity: e.target.value })}
           placeholder="Cidade do beneficiário"
         />

@@ -9,14 +9,13 @@ const defaultConfig: PixConfig = {
   useCustomKeys: false,
   usePixPay: false,
   usePixUp: false,
-  pixKey: "",
   pixName: "",
   pixCity: "",
   pixPayClientId: "",
   pixPayClientSecret: "",
   pixUpClientId: "",
   pixUpClientSecret: "",
-  maintenanceMode: true,
+  maintenance: true,
 };
 
 export const usePixConfig = () => {
@@ -28,7 +27,7 @@ export const usePixConfig = () => {
   useEffect(() => {
     const savedConfig = getFromLocalStorage("PIX_CONFIG", defaultConfig);
     if (!localStorage.getItem("PIX_CONFIG")) {
-      savedConfig.maintenanceMode = true;
+      savedConfig.maintenance = true;
     }
     dispatch({ type: 'SET_CONFIG', config: savedConfig });
     
@@ -42,7 +41,7 @@ export const usePixConfig = () => {
     saveToLocalStorage("PIX_CONFIG", state.config);
     let message = "";
     
-    if (state.config.maintenanceMode) {
+    if (state.config.maintenance) {
       message = "PIX em manutenção está ativado";
     } else if (state.config.enabled) {
       message = "Integração Ticto PIX está ativada";

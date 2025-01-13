@@ -4,7 +4,7 @@ import { toast } from "sonner";
 export const pixConfigReducer = (state: PixConfigState, action: PixConfigAction): PixConfigState => {
   switch (action.type) {
     case 'TOGGLE_TICTO': {
-      if (state.config.maintenanceMode && action.checked) {
+      if (state.config.maintenance && action.checked) {
         toast.error("Desative o modo de manutenção primeiro");
         return state;
       }
@@ -21,7 +21,7 @@ export const pixConfigReducer = (state: PixConfigState, action: PixConfigAction)
     }
 
     case 'TOGGLE_CUSTOM_KEYS': {
-      if (state.config.maintenanceMode && action.checked) {
+      if (state.config.maintenance && action.checked) {
         toast.error("Desative o modo de manutenção primeiro");
         return state;
       }
@@ -38,7 +38,7 @@ export const pixConfigReducer = (state: PixConfigState, action: PixConfigAction)
     }
 
     case 'TOGGLE_PIX_PAY': {
-      if (state.config.maintenanceMode && action.checked) {
+      if (state.config.maintenance && action.checked) {
         toast.error("Desative o modo de manutenção primeiro");
         return state;
       }
@@ -55,7 +55,7 @@ export const pixConfigReducer = (state: PixConfigState, action: PixConfigAction)
     }
 
     case 'TOGGLE_PIX_UP': {
-      if (state.config.maintenanceMode && action.checked) {
+      if (state.config.maintenance && action.checked) {
         toast.error("Desative o modo de manutenção primeiro");
         return state;
       }
@@ -76,7 +76,7 @@ export const pixConfigReducer = (state: PixConfigState, action: PixConfigAction)
         ...state,
         config: {
           ...state.config,
-          maintenanceMode: action.checked,
+          maintenance: action.checked,
           enabled: action.checked ? false : state.config.enabled,
           useCustomKeys: action.checked ? false : state.config.useCustomKeys,
           usePixPay: action.checked ? false : state.config.usePixPay,

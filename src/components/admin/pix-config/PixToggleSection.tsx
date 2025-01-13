@@ -60,7 +60,7 @@ export const PixToggleSection = ({
       <div className="flex items-center space-x-2">
         <Switch
           id="maintenance-mode"
-          checked={config.maintenanceMode}
+          checked={config.maintenance}
           onCheckedChange={onMaintenanceToggle}
         />
         <Label htmlFor="maintenance-mode" className="flex flex-col">
