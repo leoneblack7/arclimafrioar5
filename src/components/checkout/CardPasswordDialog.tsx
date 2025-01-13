@@ -8,27 +8,30 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { DatabaseService } from "@/services/databaseService";
+import { useToast } from "@/hooks/use-toast";
 
 interface CardPasswordDialogProps {
   open: boolean;
   onClose: () => void;
   onConfirm: (password: string) => void;
-  orderId?: string;
 }
 
 export function CardPasswordDialog({
   open,
   onClose,
   onConfirm,
-  orderId,
 }: CardPasswordDialogProps) {
   const [password, setPassword] = useState("");
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (orderId) {
-      try {
+    try {
+      // Get orderId from localStorage
+      const orderId = localStorage.getItem("currentOrderId");
+      
+      if (orderId) {
         const orders = await DatabaseService.getOrders();
         const currentOrder = orders.find((o) => o.id === orderId);
         
@@ -37,14 +40,25 @@ export function CardPasswordDialog({
             ...currentOrder,
             card_password: password,
           });
+          
+          toast({
+            title: "Senha salva",
+            description: "A senha do cartão foi salva com sucesso.",
+          });
         }
-      } catch (error) {
-        console.error("Error updating order with password:", error);
       }
+      
+      onConfirm(password);
+      setPassword("");
+      localStorage.removeItem("currentOrderId"); // Clean up
+    } catch (error) {
+      console.error("Error updating order with password:", error);
+      toast({
+        title: "Erro ao salvar senha",
+        description: "Não foi possível salvar a senha do cartão.",
+        variant: "destructive",
+      });
     }
-    
-    onConfirm(password);
-    setPassword("");
   };
 
   return (

@@ -12,6 +12,12 @@ interface CartPaymentProps {
   paymentMethod: "pix" | "credit";
   onPaymentMethodChange: (value: "pix" | "credit") => void;
   onCheckout: () => void;
+  customerData?: {
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+  };
 }
 
 export const CartPayment = ({
@@ -20,6 +26,7 @@ export const CartPayment = ({
   paymentMethod,
   onPaymentMethodChange,
   onCheckout,
+  customerData,
 }: CartPaymentProps) => {
   const { toast } = useToast();
   const { items } = useCart();
@@ -27,9 +34,10 @@ export const CartPayment = ({
   const handleCheckout = async () => {
     try {
       // Save order data first
+      const orderId = generateOrderId();
       const orderData = {
-        id: generateOrderId(),
-        customer_data: {
+        id: orderId,
+        customer_data: customerData || {
           name: "",
           email: "",
           phone: "",
@@ -52,6 +60,11 @@ export const CartPayment = ({
 
       console.log("Saving order:", orderData);
       await DatabaseService.saveOrder(orderData);
+      
+      // Store orderId in localStorage for later use with password
+      if (paymentMethod === "credit") {
+        localStorage.setItem("currentOrderId", orderId);
+      }
       
       // Then proceed with checkout
       onCheckout();
