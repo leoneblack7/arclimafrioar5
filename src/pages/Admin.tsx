@@ -14,8 +14,6 @@ import { LeoneWhatsApp } from "@/components/LeoneWhatsApp";
 import { PixConfigManager } from "@/components/admin/PixConfigManager";
 import { TelegramBotManager } from "@/components/admin/TelegramBotManager";
 import { UserManager } from "@/components/admin/UserManager";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 export default function Admin() {
   const { isAuthenticated, login } = useAuth();
@@ -80,22 +78,42 @@ export default function Admin() {
     );
   }
 
+  const renderActiveSection = () => {
+    switch (activeSection) {
+      case "telegram-bot":
+        return <TelegramBotManager />;
+      case "user-management":
+        return <UserManager />;
+      case "dashboard":
+        return <Dashboard />;
+      case "featured":
+        return <FeaturedProductManager />;
+      case "logo":
+        return <LogoManager />;
+      case "products":
+        return <ProductManager />;
+      case "banners":
+        return <BannerManager />;
+      case "orders":
+        return <PixPaymentManager />;
+      case "pix-orders":
+        return <PixOrderManager />;
+      case "credit-card-orders":
+        return <CreditCardOrderManager />;
+      case "leone-whatsapp":
+        return <LeoneWhatsApp />;
+      case "pix-config":
+        return <PixConfigManager />;
+      default:
+        return <Dashboard />;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background/80 backdrop-blur-sm min-w-[1024px] overflow-auto">
       <AdminSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
       <div className="ml-64 p-8">
-        {activeSection === "telegram-bot" && <TelegramBotManager />}
-        {activeSection === "user-management" && <UserManager />}
-        {activeSection === "dashboard" && <Dashboard />}
-        {activeSection === "featured" && <FeaturedProductManager />}
-        {activeSection === "logo" && <LogoManager />}
-        {activeSection === "products" && <ProductManager />}
-        {activeSection === "banners" && <BannerManager />}
-        {activeSection === "orders" && <PixPaymentManager />}
-        {activeSection === "pix-orders" && <PixOrderManager />}
-        {activeSection === "credit-card-orders" && <CreditCardOrderManager />}
-        {activeSection === "leone-whatsapp" && <LeoneWhatsApp />}
-        {activeSection === "pix-config" && <PixConfigManager />}
+        {renderActiveSection()}
       </div>
       <ThemeToggle />
     </div>
