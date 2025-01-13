@@ -9,11 +9,12 @@ import { ProductDetailPrice } from '@/components/product/ProductDetailPrice';
 import { ProductDetailActions } from '@/components/product/ProductDetailActions';
 import { ProductDetailShipping } from '@/components/product/ProductDetailShipping';
 import { RelatedProducts } from '@/components/product/RelatedProducts';
+import { toast } from 'sonner';
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   
-  const { data: product, isLoading, isError } = useQuery<Product>({
+  const { data: product, isLoading, isError } = useQuery({
     queryKey: ['product', id],
     queryFn: async () => {
       const products = getFromLocalStorage('products', []) as Product[];
@@ -40,9 +41,17 @@ export default function ProductDetail() {
         active: foundProduct.active ?? true,
         additionalImages: foundProduct.additionalImages || [],
         pixLink: foundProduct.pixLink || ''
-      };
+      } as Product;
     }
   });
+
+  const handleAddToCart = () => {
+    toast.success('Produto adicionado ao carrinho!');
+  };
+
+  const handleBuyNow = () => {
+    toast.success('Redirecionando para o pagamento...');
+  };
 
   if (isLoading) {
     return (
@@ -63,34 +72,37 @@ export default function ProductDetail() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <ProductDetailHeader title={product.title} />
+      <ProductDetailHeader 
+        title={product.title} 
+        id={product.id} 
+      />
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
         <ProductDetailImages 
-          mainImage={product.image}
-          additionalImages={product.additionalImages}
-          isAdditionalImagesActive={product.isAdditionalImagesActive}
+          title={product.title}
+          images={[product.image, ...(product.additionalImages || [])]}
+          isActive={product.isAdditionalImagesActive}
         />
         
         <div className="space-y-6">
           <ProductDetailPrice price={product.price} />
-          <ProductDetailActions product={product} />
+          <ProductDetailActions 
+            onAddToCart={handleAddToCart}
+            onBuyNow={handleBuyNow}
+          />
           <ProductDetailShipping />
           <ProductDetailDescription 
             description={product.description}
-            specifications={product.specifications}
-            isDescriptionActive={product.isDescriptionActive}
-            isSpecificationsActive={product.isSpecificationsActive}
+            isActive={product.isDescriptionActive}
           />
         </div>
       </div>
 
-      {product.isRelatedProductsActive && product.relatedProductIds && (
-        <RelatedProducts 
-          productIds={product.relatedProductIds}
-          currentProductId={product.id}
-        />
-      )}
+      <RelatedProducts 
+        currentProductId={product.id}
+        isActive={product.isRelatedProductsActive}
+        relatedProductIds={product.relatedProductIds}
+      />
     </div>
   );
 }
