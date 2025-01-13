@@ -1,22 +1,22 @@
-import { useParams } from "react-router-dom";
-import { Navbar } from "@/components/Navbar";
-import { useCart } from "@/contexts/CartContext";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { useCart } from "@/contexts/CartContext";
 import { getFromLocalStorage } from "@/utils/localStorage";
-import { Heart } from "lucide-react";
+import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { ProductSpecs } from "@/components/product/ProductSpecs";
-import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import { toast } from "sonner";
+import { ProductDetailHeader } from "@/components/product/ProductDetailHeader";
+import { ProductDetailPrice } from "@/components/product/ProductDetailPrice";
+import { ProductDetailActions } from "@/components/product/ProductDetailActions";
+import { ProductDetailShipping } from "@/components/product/ProductDetailShipping";
+import { ProductDetailDescription } from "@/components/product/ProductDetailDescription";
+import { ProductDetailImages } from "@/components/product/ProductDetailImages";
 
 export default function ProductDetail() {
   const { id } = useParams();
   const { addItem } = useCart();
   const navigate = useNavigate();
-  const [cep, setCep] = useState("");
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", id],
@@ -27,14 +27,6 @@ export default function ProductDetail() {
       return product;
     }
   });
-
-  const handleCalculateShipping = () => {
-    if (cep.length < 8) {
-      toast.error("Digite um CEP válido");
-      return;
-    }
-    toast.success("Frete calculado com sucesso!");
-  };
 
   if (isLoading) {
     return (
@@ -89,100 +81,25 @@ export default function ProductDetail() {
             <ProductGallery images={productImages} />
           </div>
           <div className="space-y-4 md:space-y-6">
-            <div className="flex justify-between items-start">
-              <div>
-                <h1 className="text-xl md:text-2xl font-bold text-gray-900">{product.title}</h1>
-                <p className="text-sm text-gray-500">Código: {product.id}</p>
-              </div>
-              <Button variant="ghost" size="icon">
-                <Heart className="h-6 w-6" />
-              </Button>
-            </div>
-            
-            <div className="space-y-2">
-              <div className="text-2xl md:text-3xl font-bold text-primary">
-                {product.price.toLocaleString('pt-BR', { 
-                  style: 'currency', 
-                  currency: 'BRL' 
-                })}
-              </div>
-              <p className="text-sm text-gray-500">
-                Ou 12x de {(product.price / 12).toLocaleString('pt-BR', { 
-                  style: 'currency', 
-                  currency: 'BRL' 
-                })} sem juros
-              </p>
-              <div className="flex flex-col md:flex-row gap-3">
-                <Button 
-                  className="w-full bg-green-500 hover:bg-green-600 text-lg py-6" 
-                  onClick={handleBuyNow}
-                >
-                  COMPRAR AGORA
-                </Button>
-                <Button 
-                  variant="outline"
-                  className="w-full text-lg py-6" 
-                  onClick={handleAddToCart}
-                >
-                  Adicionar ao Carrinho
-                </Button>
-              </div>
-            </div>
-
-            <div className="border rounded-lg p-4 space-y-4">
-              <p className="text-sm font-medium">Calcule o valor do Frete e Prazo de entrega</p>
-              <div className="flex gap-2">
-                <Input
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  placeholder="Digite seu CEP"
-                  value={cep}
-                  onChange={(e) => setCep(e.target.value)}
-                  maxLength={8}
-                  className="flex-1"
-                />
-                <Button variant="outline" onClick={handleCalculateShipping}>
-                  Calcular
-                </Button>
-              </div>
-              {cep.length === 8 && (
-                <div className="text-sm space-y-1">
-                  <p className="text-green-600 font-medium">✓ Frete Grátis</p>
-                  <p className="text-gray-600">Prazo de entrega: 15 dias úteis</p>
-                </div>
-              )}
-            </div>
-
-            <div className="border rounded-lg p-4">
-              <h2 className="text-lg font-semibold mb-2">Descrição do Produto</h2>
-              <p className="text-gray-600 whitespace-pre-wrap">{product.description}</p>
-            </div>
-
+            <ProductDetailHeader title={product.title} id={product.id} />
+            <ProductDetailPrice price={product.price} />
+            <ProductDetailActions 
+              onBuyNow={handleBuyNow}
+              onAddToCart={handleAddToCart}
+            />
+            <ProductDetailShipping />
+            <ProductDetailDescription description={product.description} />
             {product.isSpecificationsActive && product.specifications && (
-              <div className="border rounded-lg p-4">
-                <ProductSpecs 
-                  specifications={product.specifications}
-                  isActive={product.isSpecificationsActive}
-                />
-              </div>
+              <ProductSpecs 
+                specifications={product.specifications}
+                isActive={product.isSpecificationsActive}
+              />
             )}
-
-            {product.isImagesActive && product.images && product.images.length > 0 && (
-              <div className="border rounded-lg p-4">
-                <h2 className="text-lg font-semibold mb-4">Imagens Adicionais</h2>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {product.images.map((image, index) => (
-                    <img
-                      key={index}
-                      src={image}
-                      alt={`${product.title} - Imagem ${index + 1}`}
-                      className="w-full h-48 object-cover rounded-lg hover:scale-105 transition-transform duration-300"
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
+            <ProductDetailImages 
+              title={product.title}
+              images={product.images}
+              isActive={product.isImagesActive}
+            />
           </div>
         </div>
       </div>
