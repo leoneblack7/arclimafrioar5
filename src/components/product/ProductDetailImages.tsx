@@ -12,7 +12,7 @@ export const ProductDetailImages = ({ title, images, isActive }: ProductDetailIm
   return (
     <div className="border rounded-lg p-4">
       <h2 className="text-lg font-semibold mb-4">Produto de qualidade</h2>
-      <div className="flex flex-col space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {images.map((image, index) => (
           <div key={index} className="w-full flex justify-center">
             <img
