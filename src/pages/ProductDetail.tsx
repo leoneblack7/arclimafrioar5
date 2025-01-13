@@ -8,9 +8,16 @@ import { ProductDetailImages } from "@/components/product/ProductDetailImages";
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   
-  const { data: product } = useQuery<Product | undefined>(["product", id], () => {
-    const products = getFromLocalStorage('products', []);
-    return products.find((p: Product) => p.id === Number(id));
+  const { data: product } = useQuery<Product>({
+    queryKey: ["product", id],
+    queryFn: () => {
+      const products = getFromLocalStorage('products', []);
+      const foundProduct = products.find((p: Product) => p.id === Number(id));
+      if (!foundProduct) {
+        throw new Error('Product not found');
+      }
+      return foundProduct;
+    }
   });
 
   if (!product) {
@@ -22,7 +29,12 @@ export default function ProductDetail() {
       <h1 className="text-2xl font-bold">{product.title}</h1>
       <p className="text-lg">{product.description}</p>
       <div className="mt-4">
-        <h2 className="text-xl font-semibold">Preço: {product.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</h2>
+        <h2 className="text-xl font-semibold">
+          Preço: {product.price.toLocaleString('pt-BR', { 
+            style: 'currency', 
+            currency: 'BRL' 
+          })}
+        </h2>
       </div>
       
       <div className="mt-12">
