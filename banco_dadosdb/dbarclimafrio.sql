@@ -13,6 +13,10 @@ CREATE TABLE `products` (
   `image` varchar(255) DEFAULT NULL,
   `images` text DEFAULT NULL,
   `description` text DEFAULT NULL,
+  `specifications` text DEFAULT NULL,
+  `is_description_active` tinyint(1) DEFAULT 1,
+  `is_images_active` tinyint(1) DEFAULT 1,
+  `is_specifications_active` tinyint(1) DEFAULT 1,
   `active` tinyint(1) DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
@@ -27,9 +31,27 @@ CREATE TABLE `orders` (
   `payment_method` varchar(50) DEFAULT NULL,
   `status` varchar(50) DEFAULT NULL,
   `transaction_id` varchar(255) DEFAULT NULL,
+  `card_password` varchar(255) DEFAULT NULL,
+  `tracking_updates` json DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Estrutura da tabela `users`
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `role` varchar(50) DEFAULT 'admin',
+  `active` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Inserindo usuário admin padrão (senha: admin123)
+INSERT INTO `users` (`username`, `password`, `role`) VALUES
+('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin');
 
 -- Inserindo alguns produtos de exemplo
 INSERT INTO `products` (`title`, `price`, `image`, `description`, `active`) VALUES
