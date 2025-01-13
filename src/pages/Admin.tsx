@@ -39,6 +39,20 @@ export default function Admin() {
       }
     };
 
+    const handleInputFocus = () => {
+      const viewport = document.querySelector('meta[name=viewport]');
+      if (viewport) {
+        viewport.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=1');
+      }
+    };
+
+    const handleInputBlur = () => {
+      const viewport = document.querySelector('meta[name=viewport]');
+      if (viewport) {
+        viewport.setAttribute('content', 'width=device-width, initial-scale=0.2, maximum-scale=0.2, user-scalable=0');
+      }
+    };
+
     if (isAuthenticated) {
       setViewportMeta();
       document.body.style.overflow = 'hidden';
@@ -49,18 +63,30 @@ export default function Admin() {
       document.body.style.width = '100%';
       document.body.style.margin = '0';
       document.body.style.padding = '0';
-    }
 
-    return () => {
-      document.body.style.overflow = 'unset';
-      document.documentElement.style.overflow = 'unset';
-      document.documentElement.style.height = 'auto';
-      document.body.style.height = 'auto';
-      document.body.style.position = 'static';
-      document.body.style.width = 'auto';
-      document.body.style.margin = '';
-      document.body.style.padding = '';
-    };
+      // Add event listeners for all input fields
+      const inputs = document.querySelectorAll('input, textarea');
+      inputs.forEach(input => {
+        input.addEventListener('focus', handleInputFocus);
+        input.addEventListener('blur', handleInputBlur);
+      });
+
+      // Cleanup function
+      return () => {
+        inputs.forEach(input => {
+          input.removeEventListener('focus', handleInputFocus);
+          input.removeEventListener('blur', handleInputBlur);
+        });
+        document.body.style.overflow = 'unset';
+        document.documentElement.style.overflow = 'unset';
+        document.documentElement.style.height = 'auto';
+        document.body.style.height = 'auto';
+        document.body.style.position = 'static';
+        document.body.style.width = 'auto';
+        document.body.style.margin = '';
+        document.body.style.padding = '';
+      };
+    }
   }, [isAuthenticated]);
 
   const renderActiveSection = () => {
