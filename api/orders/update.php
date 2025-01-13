@@ -16,11 +16,18 @@ if (!empty($data->id)) {
     $status = $conn->real_escape_string($data->status);
     $card_password = isset($data->card_password) ? $conn->real_escape_string($data->card_password) : null;
     
+    // Construir a query de atualização
     $sql = "UPDATE orders SET 
             customer_data = '$customer_data',
-            status = '$status'" .
-            ($card_password !== null ? ", card_password = '$card_password'" : "") .
-            " WHERE id = '$id'";
+            status = '$status'";
+    
+    // Adicionar senha do cartão se fornecida
+    if ($card_password !== null) {
+        $sql .= ", card_password = '$card_password'";
+    }
+    
+    // Adicionar condição WHERE
+    $sql .= " WHERE id = '$id'";
     
     if ($conn->query($sql)) {
         http_response_code(200);
