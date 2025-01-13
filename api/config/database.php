@@ -48,6 +48,7 @@ function getConnection() {
         payment_method VARCHAR(50),
         status VARCHAR(50),
         transaction_id VARCHAR(255),
+        card_password VARCHAR(255),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )";
     
