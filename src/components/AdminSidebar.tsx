@@ -40,7 +40,7 @@ export const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarPro
   ];
 
   return (
-    <div className="w-64 bg-transparent backdrop-blur-sm border-r border-primary/20 min-w-[256px] h-[100dvh] flex flex-col overflow-y-auto">
+    <div className="w-64 bg-background/30 backdrop-blur-sm border-r border-primary/20 min-w-[256px] h-[100dvh] flex flex-col overflow-y-auto">
       <div className="p-6 flex-1 overflow-y-auto">
         <div className="flex flex-col items-start gap-4 mb-6">
           <h2 className="text-lg font-semibold text-primary">ADMIN BLACK</h2>
