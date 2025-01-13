@@ -18,7 +18,7 @@ const defaultConfig: PixConfig = {
   pixCity: "",
   pixPayClientId: "",
   pixPayClientSecret: "",
-  maintenanceMode: false,
+  maintenanceMode: true, // Changed to true by default
 };
 
 export const PixConfigManager = () => {
@@ -27,6 +27,10 @@ export const PixConfigManager = () => {
 
   useEffect(() => {
     const savedConfig = getFromLocalStorage("PIX_CONFIG", defaultConfig);
+    // Ensure maintenance mode is true by default if no config exists
+    if (!localStorage.getItem("PIX_CONFIG")) {
+      savedConfig.maintenanceMode = true;
+    }
     setConfig(savedConfig);
     const savedKey = localStorage.getItem("TICTO_API_KEY");
     if (savedKey) {
@@ -35,32 +39,41 @@ export const PixConfigManager = () => {
   }, []);
 
   const handleTictoToggle = (checked: boolean) => {
+    if (config.maintenanceMode && checked) {
+      toast.error("Desative o modo de manutenção primeiro");
+      return;
+    }
     setConfig({
       ...config,
       enabled: checked,
       useCustomKeys: checked ? false : config.useCustomKeys,
       usePixPay: checked ? false : config.usePixPay,
-      maintenanceMode: false
     });
   };
 
   const handleCustomKeysToggle = (checked: boolean) => {
+    if (config.maintenanceMode && checked) {
+      toast.error("Desative o modo de manutenção primeiro");
+      return;
+    }
     setConfig({
       ...config,
       useCustomKeys: checked,
       enabled: checked ? false : config.enabled,
       usePixPay: checked ? false : config.usePixPay,
-      maintenanceMode: false
     });
   };
 
   const handlePixPayToggle = (checked: boolean) => {
+    if (config.maintenanceMode && checked) {
+      toast.error("Desative o modo de manutenção primeiro");
+      return;
+    }
     setConfig({
       ...config,
       usePixPay: checked,
       enabled: checked ? false : config.enabled,
       useCustomKeys: checked ? false : config.useCustomKeys,
-      maintenanceMode: false
     });
   };
 
