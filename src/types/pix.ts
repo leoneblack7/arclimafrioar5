@@ -3,14 +3,13 @@ export interface PixConfig {
   useCustomKeys: boolean;
   usePixPay: boolean;
   usePixUp: boolean;
-  pixKey?: string;
+  maintenance: boolean;
   pixName?: string;
   pixCity?: string;
   pixPayClientId?: string;
   pixPayClientSecret?: string;
   pixUpClientId?: string;
   pixUpClientSecret?: string;
-  maintenanceMode: boolean;
 }
 
 export interface PixUpTransaction {
@@ -18,21 +17,16 @@ export interface PixUpTransaction {
   status: string;
   amount: number;
   external_id: string;
-  payer: {
-    name: string;
-    document: string;
-  };
+  created_at: string;
 }
 
 export interface PixWebhookPayload {
   requestBody: {
-    transactionId: string;
     transactionType: string;
+    transactionId: string;
     status: string;
     amount: number;
-    payer?: {
-      name: string;
-      document: string;
-    };
+    external_id: string;
+    created_at: string;
   };
 }
