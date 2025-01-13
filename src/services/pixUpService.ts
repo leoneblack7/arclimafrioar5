@@ -26,10 +26,15 @@ interface PixUpQRCodeResponse {
   created_at: string;
 }
 
+const PROXY_BASE_URL = 'https://api.allorigins.win/raw?url=';
+const API_BASE_URL = 'https://api.pixupbr.com/v2';
+
 export const pixUpService = {
   async authenticate(clientId: string, clientSecret: string): Promise<PixUpAuthResponse> {
     const credentials = btoa(`${clientId}:${clientSecret}`);
-    const response = await fetch('https://api.pixupbr.com/v2/authentication', {
+    const url = `${PROXY_BASE_URL}${encodeURIComponent(`${API_BASE_URL}/authentication`)}`;
+    
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Authorization': `Basic ${credentials}`,
@@ -62,7 +67,9 @@ export const pixUpService = {
       }
     };
 
-    const response = await fetch('https://api.pixupbr.com/v2/payment/pix/create', {
+    const url = `${PROXY_BASE_URL}${encodeURIComponent(`${API_BASE_URL}/payment/pix/create`)}`;
+    
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
@@ -83,7 +90,9 @@ export const pixUpService = {
     accessToken: string,
     transactionId: string
   ): Promise<{ status: string }> {
-    const response = await fetch(`https://api.pixupbr.com/v2/payment/pix/status/${transactionId}`, {
+    const url = `${PROXY_BASE_URL}${encodeURIComponent(`${API_BASE_URL}/payment/pix/status/${transactionId}`)}`;
+    
+    const response = await fetch(url, {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
       }

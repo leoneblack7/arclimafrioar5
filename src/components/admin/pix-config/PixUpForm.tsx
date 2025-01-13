@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PixConfig } from "@/types/pix";
 import { toast } from "sonner";
+import { pixUpService } from "@/services/pixUpService";
 
 interface PixUpFormProps {
   config: PixConfig;
@@ -34,25 +35,19 @@ export const PixUpForm = ({ config, onConfigChange }: PixUpFormProps) => {
     try {
       toast.info("Testando conexão com PixUp...");
       
-      const credentials = btoa(`${config.pixUpClientId}:${config.pixUpClientSecret}`);
-      const response = await fetch('https://api.pixupbr.com/v2/authentication', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Basic ${credentials}`,
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: 'grant_type=client_credentials'
-      });
+      const response = await pixUpService.authenticate(
+        config.pixUpClientId,
+        config.pixUpClientSecret
+      );
 
-      if (response.ok) {
+      if (response.access_token) {
         toast.success("Conexão com PixUp estabelecida com sucesso!");
       } else {
-        const errorData = await response.json();
-        toast.error(`Erro ao conectar com PixUp: ${errorData.message || 'Verifique suas credenciais'}`);
+        toast.error("Erro ao conectar com PixUp: Resposta inválida");
       }
     } catch (error) {
       console.error("PixUp connection error:", error);
-      toast.error("Erro ao testar conexão com PixUp. Verifique se o serviço está disponível.");
+      toast.error("Erro ao testar conexão com PixUp. Verifique suas credenciais.");
     }
   };
 
