@@ -1,3 +1,5 @@
+import { saveToLocalStorage, getFromLocalStorage } from '@/utils/localStorage';
+
 interface Product {
   id?: number;
   title: string;
@@ -21,7 +23,7 @@ interface Order {
 
 const API_URL = 'http://localhost/arclimafrio/api';
 
-export const DatabaseService = {
+class DatabaseServiceClass {
   async getProducts(): Promise<Product[]> {
     try {
       const response = await fetch(`${API_URL}/products/read.php`);
@@ -35,7 +37,7 @@ export const DatabaseService = {
       console.error('Error fetching products:', error);
       return getFromLocalStorage('products', []);
     }
-  },
+  }
 
   async saveProduct(product: Product) {
     try {
@@ -68,7 +70,7 @@ export const DatabaseService = {
       console.error('Error saving product:', error);
       return this.saveProductToLocalStorage(product);
     }
-  },
+  }
 
   private saveProductToLocalStorage(product: Product) {
     const products = getFromLocalStorage('products', []);
@@ -81,7 +83,7 @@ export const DatabaseService = {
     }
     saveToLocalStorage('products', products);
     return newProduct;
-  },
+  }
 
   async saveOrder(order: Order) {
     try {
@@ -111,7 +113,7 @@ export const DatabaseService = {
       console.error('Error saving order:', error);
       return this.saveOrderToLocalStorage(order);
     }
-  },
+  }
 
   private saveOrderToLocalStorage(order: Order) {
     const orders = getFromLocalStorage('orders', []);
@@ -123,7 +125,7 @@ export const DatabaseService = {
     }
     saveToLocalStorage('orders', orders);
     return order;
-  },
+  }
 
   async deleteProduct(productId: number) {
     try {
@@ -138,12 +140,12 @@ export const DatabaseService = {
       return response.json();
     } catch (error) {
       console.error('Error deleting product:', error);
-      const products = JSON.parse(localStorage.getItem('products') || '[]');
+      const products = getFromLocalStorage('products', []);
       const filteredProducts = products.filter((p: Product) => p.id !== productId);
-      localStorage.setItem('products', JSON.stringify(filteredProducts));
+      saveToLocalStorage('products', filteredProducts);
       return { message: 'Product deleted successfully' };
     }
-  },
+  }
 
   async getOrders(): Promise<Order[]> {
     try {
@@ -152,9 +154,9 @@ export const DatabaseService = {
       return response.json();
     } catch (error) {
       console.error('Error fetching orders:', error);
-      return JSON.parse(localStorage.getItem('orders') || '[]');
+      return getFromLocalStorage('orders', []);
     }
-  },
+  }
 
   async updateOrder(order: Order) {
     try {
@@ -169,13 +171,13 @@ export const DatabaseService = {
       return response.json();
     } catch (error) {
       console.error('Error updating order:', error);
-      const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+      const orders = getFromLocalStorage('orders', []);
       const index = orders.findIndex((o: Order) => o.id === order.id);
       if (index !== -1) orders[index] = order;
-      localStorage.setItem('orders', JSON.stringify(orders));
+      saveToLocalStorage('orders', orders);
       return order;
     }
-  },
+  }
 
   async deleteOrder(orderId: string) {
     try {
@@ -190,10 +192,12 @@ export const DatabaseService = {
       return response.json();
     } catch (error) {
       console.error('Error deleting order:', error);
-      const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+      const orders = getFromLocalStorage('orders', []);
       const filteredOrders = orders.filter((o: Order) => o.id !== orderId);
-      localStorage.setItem('orders', JSON.stringify(filteredOrders));
+      saveToLocalStorage('orders', filteredOrders);
       return { message: 'Order deleted successfully' };
     }
   }
-};
+}
+
+export const DatabaseService = new DatabaseServiceClass();
