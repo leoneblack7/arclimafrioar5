@@ -18,6 +18,20 @@ export const PixUpForm = ({ config, onConfigChange }: PixUpFormProps) => {
     });
   };
 
+  const handleClientIdChange = (value: string) => {
+    onConfigChange({
+      ...config,
+      pixUpClientId: value,
+    });
+  };
+
+  const handleClientSecretChange = (value: string) => {
+    onConfigChange({
+      ...config,
+      pixUpClientSecret: value,
+    });
+  };
+
   const testConnection = async () => {
     if (!config.pixUpApiKey) {
       toast.error("Por favor, insira a chave API do PixUp");
@@ -51,6 +65,25 @@ export const PixUpForm = ({ config, onConfigChange }: PixUpFormProps) => {
           value={config.pixUpApiKey || ""}
           onChange={(e) => handleApiKeyChange(e.target.value)}
           placeholder="Insira sua chave API do PixUp"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="pixup-client-id">Client ID</Label>
+        <Input
+          id="pixup-client-id"
+          value={config.pixUpClientId || ""}
+          onChange={(e) => handleClientIdChange(e.target.value)}
+          placeholder="Insira seu Client ID do PixUp"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="pixup-client-secret">Client Secret</Label>
+        <Input
+          id="pixup-client-secret"
+          type="password"
+          value={config.pixUpClientSecret || ""}
+          onChange={(e) => handleClientSecretChange(e.target.value)}
+          placeholder="Insira seu Client Secret do PixUp"
         />
       </div>
       <Button 

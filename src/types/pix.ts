@@ -11,6 +11,8 @@ export interface PixConfig {
   pixPayClientId?: string;
   pixPayClientSecret?: string;
   pixUpApiKey?: string;
+  pixUpClientId?: string;
+  pixUpClientSecret?: string;
   maintenanceMode: boolean;
 }
 
