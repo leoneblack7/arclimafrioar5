@@ -6,6 +6,7 @@ import { PixPayForm } from "./pix-config/PixPayForm";
 import { PixUpForm } from "./pix-config/PixUpForm";
 import { PixApiKeySection } from "./pix-config/PixApiKeySection";
 import { usePixConfig } from "./pix-config/usePixConfig";
+import { getFromLocalStorage } from "@/utils/localStorage";
 
 export const PixConfigManager = () => {
   const {
@@ -20,6 +21,24 @@ export const PixConfigManager = () => {
     handleMaintenanceToggle,
     handleSave,
   } = usePixConfig();
+
+  const pixLinksEnabled = getFromLocalStorage('pix-links-enabled', false);
+
+  if (pixLinksEnabled) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Configurações do PIX</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground">
+            As configurações do PIX estão desativadas porque os Links PIX estão ativos.
+            Desative os Links PIX para acessar estas configurações.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
