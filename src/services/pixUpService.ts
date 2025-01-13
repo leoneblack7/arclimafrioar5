@@ -39,16 +39,24 @@ const makeRequest = async (endpoint: string, options: RequestInit) => {
       headers: {
         ...options.headers,
         'Accept': 'application/json',
-        'Content-Type': 'application/json',
+        'Content-Type': options.method === 'POST' ? 'application/x-www-form-urlencoded' : 'application/json',
       },
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`API request failed: ${errorText}`);
+    const responseText = await response.text();
+    let responseData;
+    
+    try {
+      responseData = JSON.parse(responseText);
+    } catch {
+      responseData = responseText;
     }
 
-    return await response.json();
+    if (!response.ok) {
+      throw new Error(`API request failed: ${responseText}`);
+    }
+
+    return responseData;
   } catch (error) {
     console.error('API request error:', error);
     throw error;
@@ -88,6 +96,7 @@ export const pixUpService = {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload)
     });
