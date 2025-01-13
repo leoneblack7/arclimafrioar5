@@ -1,6 +1,6 @@
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { SearchBar } from "./SearchBar";
 import { CartDrawer } from "./CartDrawer";
 import { Link } from "react-router-dom";
@@ -9,15 +9,6 @@ import { useLocation } from "react-router-dom";
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
-  const [logoUrl, setLogoUrl] = useState("");
-  const [storeName, setStoreName] = useState("ArclimaFrio");
-
-  useEffect(() => {
-    const storedLogoUrl = localStorage.getItem("storeLogoUrl");
-    const storedName = localStorage.getItem("storeName");
-    if (storedLogoUrl) setLogoUrl(storedLogoUrl);
-    if (storedName) setStoreName(storedName);
-  }, []);
 
   const scrollToProducts = () => {
     if (location.pathname === '/') {
@@ -35,12 +26,8 @@ export const Navbar = () => {
           <div className="flex items-center justify-between h-16">
             {/* Logo Section */}
             <div className="flex-shrink-0">
-              <Link to="/" className="text-2xl font-bold text-primary flex items-center h-16">
-                {logoUrl ? (
-                  <img src={logoUrl} alt={storeName} className="h-12 w-auto object-contain" />
-                ) : (
-                  <span>{storeName}</span>
-                )}
+              <Link to="/" className="text-2xl font-bold text-primary">
+                ArclimaFrio
               </Link>
             </div>
 
