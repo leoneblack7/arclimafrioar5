@@ -35,21 +35,29 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loadCartFromDatabase = async () => {
     try {
-      const response = await fetch('api/store-config/get-cart.php');
-      if (response.ok) {
-        const data = await response.json();
-        if (data.cart_data) {
-          setItems(JSON.parse(data.cart_data));
-        }
+      const response = await fetch('/api/store-config/get-cart.php');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      if (data.cart_data) {
+        const parsedCart = JSON.parse(data.cart_data);
+        console.log('Loaded cart from database:', parsedCart);
+        setItems(parsedCart);
       }
     } catch (error) {
       console.error('Error loading cart:', error);
+      // Fallback to localStorage if API fails
+      const savedCart = localStorage.getItem('cart');
+      if (savedCart) {
+        setItems(JSON.parse(savedCart));
+      }
     }
   };
 
   const saveCartToDatabase = async () => {
     try {
-      await fetch('api/store-config/save-cart.php', {
+      const response = await fetch('/api/store-config/save-cart.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -58,8 +66,18 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           cart_data: items
         })
       });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      // Save to localStorage as backup
+      localStorage.setItem('cart', JSON.stringify(items));
+      console.log('Cart saved successfully:', items);
     } catch (error) {
       console.error('Error saving cart:', error);
+      // Fallback to localStorage if API fails
+      localStorage.setItem('cart', JSON.stringify(items));
     }
   };
 
@@ -96,6 +114,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const clearCart = () => {
     setItems([]);
+    localStorage.removeItem('cart');
   };
 
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);

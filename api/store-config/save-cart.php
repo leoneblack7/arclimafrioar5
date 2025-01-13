@@ -9,6 +9,18 @@ include_once '../config/database.php';
 
 $conn = getConnection();
 
+if (!$conn) {
+    http_response_code(500);
+    echo json_encode(array("message" => "Database connection failed."));
+    exit();
+}
+
+// Handle preflight requests
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
+
 $data = json_decode(file_get_contents("php://input"));
 
 if (!empty($data->cart_data)) {
