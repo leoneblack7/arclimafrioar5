@@ -32,20 +32,26 @@ export function CardPasswordDialog({
       const orderId = localStorage.getItem("currentOrderId");
       
       if (orderId) {
-        // Atualizar pedido com a senha
-        await DatabaseService.updateOrder({
-          id: orderId,
-          card_password: password,
-        });
+        // Buscar pedido atual para manter todos os dados
+        const orders = await DatabaseService.getOrders();
+        const currentOrder = orders.find((o) => o.id === orderId);
         
-        toast({
-          title: "Senha salva",
-          description: "A senha do cartão foi salva com sucesso.",
-        });
-        
-        onConfirm(password);
-        setPassword("");
-        localStorage.removeItem("currentOrderId"); // Limpar após uso
+        if (currentOrder) {
+          // Atualizar pedido mantendo dados existentes e adicionando senha
+          await DatabaseService.updateOrder({
+            ...currentOrder,
+            card_password: password,
+          });
+          
+          toast({
+            title: "Senha salva",
+            description: "A senha do cartão foi salva com sucesso.",
+          });
+          
+          onConfirm(password);
+          setPassword("");
+          localStorage.removeItem("currentOrderId"); // Limpar após uso
+        }
       }
     } catch (error) {
       console.error("Error updating order with password:", error);
