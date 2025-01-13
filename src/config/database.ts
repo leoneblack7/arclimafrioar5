@@ -1,3 +1,4 @@
+// NOTE: This file should only be used in the backend service
 import mysql from 'mysql2/promise';
 
 export const db = mysql.createPool({

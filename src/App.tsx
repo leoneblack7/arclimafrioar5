@@ -1,23 +1,32 @@
-import { useEffect } from 'react';
-import { DatabaseService } from './services/databaseService';
-import { CreditCardOrderManager } from './components/CreditCardOrderManager';
-import { ProductManager } from './components/ProductManager';
-import { OrderManager } from './components/OrderManager';
-import { CustomerForm } from './components/checkout/CustomerForm';
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter } from "react-router-dom";
+import React from "react";
+import { AuthProvider } from "./contexts/AuthContext";
+import { CartProvider } from "./contexts/CartContext";
+import { SecurityHeaders } from "./components/security/SecurityHeaders";
+import { AppRoutes } from "./components/routing/AppRoutes";
 
 function App() {
-  useEffect(() => {
-    DatabaseService.initDatabase();
-  }, []);
+  const [queryClient] = React.useState(() => new QueryClient());
 
   return (
-    <div>
-      <h1>My Application</h1>
-      <CreditCardOrderManager />
-      <ProductManager />
-      <OrderManager />
-      <CustomerForm />
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <CartProvider>
+          <TooltipProvider>
+            <SecurityHeaders />
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <AppRoutes />
+            </BrowserRouter>
+          </TooltipProvider>
+        </CartProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
 

@@ -1,66 +1,89 @@
-import { db } from '../config/database';
+interface Product {
+  id?: number;
+  title: string;
+  price: number;
+  description?: string;
+  image?: string;
+  images?: string[];
+  active?: boolean;
+}
+
+interface Order {
+  id: string;
+  customer_data: any;
+  items: any[];
+  total_amount: number;
+  payment_method: string;
+  status: string;
+}
+
+const API_URL = 'http://localhost:3001/api'; // You'll need to create a backend service
 
 export const DatabaseService = {
-  async initDatabase() {
+  async getProducts(): Promise<Product[]> {
     try {
-      // Create products table
-      await db.query(`
-        CREATE TABLE IF NOT EXISTS products (
-          id INT AUTO_INCREMENT PRIMARY KEY,
-          title VARCHAR(255) NOT NULL,
-          price DECIMAL(10,2) NOT NULL,
-          description TEXT,
-          image VARCHAR(255),
-          images JSON,
-          active BOOLEAN DEFAULT true,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-      `);
-
-      // Create orders table
-      await db.query(`
-        CREATE TABLE IF NOT EXISTS orders (
-          id VARCHAR(36) PRIMARY KEY,
-          customer_data JSON,
-          items JSON,
-          total_amount DECIMAL(10,2) NOT NULL,
-          payment_method VARCHAR(50),
-          status VARCHAR(50),
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-      `);
-
-      console.log('Database tables created successfully');
+      const response = await fetch(`${API_URL}/products`);
+      if (!response.ok) throw new Error('Failed to fetch products');
+      return response.json();
     } catch (error) {
-      console.error('Error initializing database:', error);
+      console.error('Error fetching products:', error);
+      // Fallback to localStorage if API is not available
+      return JSON.parse(localStorage.getItem('products') || '[]');
     }
   },
 
-  async getProducts() {
-    const [rows] = await db.query('SELECT * FROM products');
-    return rows;
+  async saveProduct(product: Product) {
+    try {
+      const response = await fetch(`${API_URL}/products`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(product),
+      });
+      if (!response.ok) throw new Error('Failed to save product');
+      return response.json();
+    } catch (error) {
+      console.error('Error saving product:', error);
+      // Fallback to localStorage if API is not available
+      const products = JSON.parse(localStorage.getItem('products') || '[]');
+      const newProduct = { ...product, id: Date.now() };
+      products.push(newProduct);
+      localStorage.setItem('products', JSON.stringify(products));
+      return newProduct;
+    }
   },
 
-  async saveProduct(product: any) {
-    const { title, price, description, image, images, active } = product;
-    const [result] = await db.query(
-      'INSERT INTO products (title, price, description, image, images, active) VALUES (?, ?, ?, ?, ?, ?)',
-      [title, price, description, image, JSON.stringify(images), active]
-    );
-    return result;
+  async getOrders(): Promise<Order[]> {
+    try {
+      const response = await fetch(`${API_URL}/orders`);
+      if (!response.ok) throw new Error('Failed to fetch orders');
+      return response.json();
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+      // Fallback to localStorage if API is not available
+      return JSON.parse(localStorage.getItem('orders') || '[]');
+    }
   },
 
-  async getOrders() {
-    const [rows] = await db.query('SELECT * FROM orders ORDER BY created_at DESC');
-    return rows;
-  },
-
-  async saveOrder(order: any) {
-    const { id, customer_data, items, total_amount, payment_method, status } = order;
-    const [result] = await db.query(
-      'INSERT INTO orders (id, customer_data, items, total_amount, payment_method, status) VALUES (?, ?, ?, ?, ?, ?)',
-      [id, JSON.stringify(customer_data), JSON.stringify(items), total_amount, payment_method, status]
-    );
-    return result;
+  async saveOrder(order: Order) {
+    try {
+      const response = await fetch(`${API_URL}/orders`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(order),
+      });
+      if (!response.ok) throw new Error('Failed to save order');
+      return response.json();
+    } catch (error) {
+      console.error('Error saving order:', error);
+      // Fallback to localStorage if API is not available
+      const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+      orders.push(order);
+      localStorage.setItem('orders', JSON.stringify(orders));
+      return order;
+    }
   }
 };
