@@ -4,9 +4,9 @@ interface ProductSpecificationsProps {
 
 export const ProductSpecifications = ({ className = "h-6" }: ProductSpecificationsProps) => {
   return (
-    <div className="flex justify-between items-center gap-2 border-t pt-3">
+    <div className="flex justify-between items-center gap-2">
       <img
-        src="/lovable-uploads/5275c902-4f65-478a-847b-67042b1e63c6.png"
+        src="/lovable-uploads/c251d96b-9a7a-489a-98a3-57ed17134b00.png"
         alt="Especificações do produto"
         className={`w-full object-contain ${className}`}
       />
