@@ -27,12 +27,21 @@ export default function Admin() {
   };
 
   useEffect(() => {
-    // Previne o scroll do body quando o admin está ativo
     if (isAuthenticated) {
       document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+      document.documentElement.style.height = '100%';
+      document.body.style.height = '100%';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
     }
     return () => {
       document.body.style.overflow = 'unset';
+      document.documentElement.style.overflow = 'unset';
+      document.documentElement.style.height = 'auto';
+      document.body.style.height = 'auto';
+      document.body.style.position = 'static';
+      document.body.style.width = 'auto';
     };
   }, [isAuthenticated]);
 
@@ -108,7 +117,7 @@ export default function Admin() {
   };
 
   return (
-    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex overflow-hidden md:overflow-hidden">
+    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex h-[100dvh] w-screen overflow-hidden touch-none">
       <AdminSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
       <div className="flex-1 p-8 overflow-y-auto scrollbar-none">
         <div className="max-w-6xl mx-auto space-y-6">
