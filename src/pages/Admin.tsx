@@ -30,11 +30,11 @@ export default function Admin() {
     const setViewportMeta = () => {
       const viewport = document.querySelector('meta[name=viewport]');
       if (viewport) {
-        viewport.setAttribute('content', 'width=1366, initial-scale=1.0, maximum-scale=1.0, user-scalable=0');
+        viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0');
       } else {
         const meta = document.createElement('meta');
         meta.name = 'viewport';
-        meta.content = 'width=1366, initial-scale=1.0, maximum-scale=1.0, user-scalable=0';
+        meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0';
         document.head.appendChild(meta);
       }
     };
@@ -43,10 +43,12 @@ export default function Admin() {
       setViewportMeta();
       document.body.style.overflow = 'hidden';
       document.documentElement.style.overflow = 'hidden';
-      document.documentElement.style.height = '100%';
-      document.body.style.height = '100%';
+      document.documentElement.style.height = '100vh';
+      document.body.style.height = '100vh';
       document.body.style.position = 'fixed';
       document.body.style.width = '100%';
+      document.body.style.margin = '0';
+      document.body.style.padding = '0';
     }
 
     return () => {
@@ -56,6 +58,8 @@ export default function Admin() {
       document.body.style.height = 'auto';
       document.body.style.position = 'static';
       document.body.style.width = 'auto';
+      document.body.style.margin = '';
+      document.body.style.padding = '';
     };
   }, [isAuthenticated]);
 
@@ -131,7 +135,7 @@ export default function Admin() {
   }
 
   return (
-    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex h-[100dvh] w-screen overflow-hidden touch-none">
+    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex h-screen w-screen overflow-hidden touch-none">
       <AdminSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
       <div className="flex-1 p-4 md:p-8 overflow-y-auto scrollbar-none">
         <div className="max-w-6xl mx-auto space-y-6">
