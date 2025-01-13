@@ -10,6 +10,7 @@ import { ProductDetailActions } from '@/components/product/ProductDetailActions'
 import { ProductDetailShipping } from '@/components/product/ProductDetailShipping';
 import { RelatedProducts } from '@/components/product/RelatedProducts';
 import { ProductGallery } from '@/components/product/ProductGallery';
+import { Footer } from '@/components/home/Footer';
 import { toast } from 'sonner';
 
 export default function ProductDetail() {
@@ -108,6 +109,8 @@ export default function ProductDetail() {
         isActive={product.isRelatedProductsActive}
         relatedProductIds={product.relatedProductIds}
       />
+
+      <Footer />
     </div>
   );
 }
