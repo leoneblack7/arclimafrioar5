@@ -40,8 +40,8 @@ export const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarPro
   ];
 
   return (
-    <div className="w-64 bg-background/80 backdrop-blur-sm border-r border-primary/20 min-w-[256px] h-screen overflow-y-auto">
-      <div className="p-6">
+    <div className="w-64 bg-background/80 backdrop-blur-sm border-r border-primary/20 min-w-[256px] h-screen flex flex-col">
+      <div className="p-6 flex-1 overflow-y-auto">
         <div className="flex flex-col items-start gap-4 mb-6">
           <h2 className="text-lg font-semibold text-primary">ADMIN BLACK</h2>
         </div>
@@ -66,13 +66,15 @@ export const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarPro
           })}
         </nav>
       </div>
-      <button
-        onClick={logout}
-        className="absolute bottom-6 left-6 flex items-center gap-2 px-4 py-2 rounded-lg text-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-      >
-        <LogOut className="w-4 h-4" />
-        <span>Sair</span>
-      </button>
+      <div className="p-6 border-t border-primary/20">
+        <button
+          onClick={logout}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg text-foreground hover:text-primary hover:bg-primary/10 transition-colors w-full"
+        >
+          <LogOut className="w-4 h-4" />
+          <span>Sair</span>
+        </button>
+      </div>
     </div>
   );
 };
