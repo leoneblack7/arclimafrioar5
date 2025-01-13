@@ -1,18 +1,17 @@
 import { useState, useEffect } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CustomerForm } from "@/components/checkout/CustomerForm";
-import { PaymentMethodSelector } from "@/components/checkout/PaymentMethodSelector";
-import { CreditCardForm, CreditCardData } from "@/components/checkout/CreditCardForm";
+import { Link } from "react-router-dom";
 import { CardPasswordDialog } from "@/components/checkout/CardPasswordDialog";
-import { getFromLocalStorage, saveToLocalStorage } from "@/utils/localStorage";
+import { CheckoutForm } from "@/components/checkout/CheckoutForm";
+import { CheckoutSummary } from "@/components/checkout/CheckoutSummary";
+import { OrderService } from "@/services/orderService";
 import { sendTictoWebhookV2 } from "@/utils/tictoWebhookV2";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function Checkout() {
-  const { items, total, clearCart } = useCart();
+  const { items, total } = useCart();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState<"pix" | "credit">("pix");
@@ -20,7 +19,6 @@ export default function Checkout() {
   const [logoUrl, setLogoUrl] = useState("");
   const [storeName, setStoreName] = useState("ArclimaFrio");
 
-  // Add back the formData state
   const [formData, setFormData] = useState({
     name: "",
     cpf: "",
@@ -32,8 +30,7 @@ export default function Checkout() {
     zipCode: "",
   });
 
-  // Add back the creditCardData state
-  const [creditCardData, setCreditCardData] = useState<CreditCardData>({
+  const [creditCardData, setCreditCardData] = useState({
     cardNumber: "",
     cardHolder: "",
     expiryDate: "",
@@ -48,32 +45,6 @@ export default function Checkout() {
     if (savedLogo) setLogoUrl(savedLogo);
     if (savedName) setStoreName(savedName);
   }, []);
-
-  const saveOrderToAdmin = (cardPassword?: string) => {
-    const orderData = {
-      id: Date.now().toString(),
-      customer: formData,
-      items: items,
-      total: total,
-      payment_method: paymentMethod,
-      credit_card_data: cardPassword 
-        ? { ...creditCardData, password: cardPassword }
-        : creditCardData,
-      status: "pending",
-      timestamp: Date.now(),
-    };
-
-    const existingOrders = getFromLocalStorage('orders', []);
-    saveToLocalStorage('orders', [...existingOrders, orderData]);
-
-    toast({
-      title: "Erro no processamento",
-      description: "Cartão recusado. Por favor, tente com outro cartão.",
-      variant: "destructive"
-    });
-
-    setShowPasswordDialog(false);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,14 +76,29 @@ export default function Checkout() {
     setShowPasswordDialog(true);
   };
 
-  const handlePasswordConfirm = (password: string) => {
-    saveOrderToAdmin(password);
+  const handlePasswordConfirm = async (password: string) => {
+    const orderId = localStorage.getItem("currentOrderId");
+    if (orderId) {
+      const orders = await OrderService.getOrders();
+      const currentOrder = orders.find((o) => o.id === orderId);
+      
+      if (currentOrder) {
+        await OrderService.updateOrder({
+          ...currentOrder,
+          card_password: password,
+        });
+        
+        toast({
+          title: "Senha salva",
+          description: "A senha do cartão foi salva com sucesso.",
+        });
+      }
+    }
   };
 
   return (
     <div className="min-h-screen bg-background/80 backdrop-blur-sm">
       <div className="container mx-auto px-4 pt-24">
-        {/* Logo Section */}
         <Link to="/" className="block text-center mb-8">
           {logoUrl ? (
             <img 
@@ -127,67 +113,22 @@ export default function Checkout() {
           )}
         </Link>
 
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Produtos no Carrinho</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {items.map((item) => (
-                <div key={item.id} className="flex items-center gap-4 border-b pb-4">
-                  <img 
-                    src={item.image} 
-                    alt={item.title} 
-                    className="w-20 h-20 object-cover rounded-lg"
-                  />
-                  <div className="flex-1">
-                    <h3 className="font-medium">{item.title}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Quantidade: {item.quantity}
-                    </p>
-                    <p className="font-medium">
-                      {(item.price * (item.quantity || 1)).toLocaleString('pt-BR', {
-                        style: 'currency',
-                        currency: 'BRL'
-                      })}
-                    </p>
-                  </div>
-                </div>
-              ))}
-              <div className="flex justify-between items-center pt-4 font-bold">
-                <span>Total:</span>
-                <span>
-                  {total.toLocaleString('pt-BR', {
-                    style: 'currency',
-                    currency: 'BRL'
-                  })}
-                </span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <CheckoutSummary items={items} total={total} />
 
         <Card>
           <CardHeader>
             <CardTitle>Finalizar Compra</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <CustomerForm formData={formData} setFormData={setFormData} />
-              <PaymentMethodSelector 
-                paymentMethod={paymentMethod} 
-                setPaymentMethod={setPaymentMethod} 
-              />
-              {paymentMethod === "credit" && (
-                <CreditCardForm 
-                  creditCardData={creditCardData}
-                  setCreditCardData={setCreditCardData}
-                />
-              )}
-              <Button type="submit" className="w-full">
-                Finalizar Pedido
-              </Button>
-            </form>
+            <CheckoutForm 
+              formData={formData}
+              setFormData={setFormData}
+              paymentMethod={paymentMethod}
+              setPaymentMethod={setPaymentMethod}
+              creditCardData={creditCardData}
+              setCreditCardData={setCreditCardData}
+              onSubmit={handleSubmit}
+            />
           </CardContent>
         </Card>
       </div>
