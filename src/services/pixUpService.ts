@@ -1,3 +1,5 @@
+import { pixWebhookService } from "./pixWebhookService";
+
 interface PixUpPaymentRequest {
   amount: number;
   external_id: string;

@@ -1,7 +1,12 @@
 export interface PixConfig {
   enabled: boolean;
-  pixKey?: string;
+  useCustomKeys: boolean;
+  usePixPay: boolean;
+  usePixUp: boolean;
+  pixKey: string;
   pixKeyType?: string;
+  pixName: string;
+  pixCity: string;
   pixPayApiKey?: string;
   pixPayClientId?: string;
   pixPayClientSecret?: string;

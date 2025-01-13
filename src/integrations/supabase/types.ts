@@ -48,6 +48,32 @@ export type Database = {
         }
         Relationships: []
       }
+
+      transactions: {
+        Row: {
+          id: string
+          transaction_id: string
+          status: string
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          transaction_id: string
+          status: string
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          transaction_id?: string
+          status?: string
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+
       banners: {
         Row: {
           active: boolean | null
@@ -277,3 +303,4 @@ export type CompositeTypes<
   : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
     ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
+
