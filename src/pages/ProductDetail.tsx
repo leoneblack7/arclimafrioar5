@@ -8,15 +8,34 @@ import { ProductDetailImages } from "@/components/product/ProductDetailImages";
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   
-  const { data: product, isError, error } = useQuery<Product>({
-    queryKey: ["product", id],
+  const { data: product, isError, error } = useQuery<Product, Error>({
+    queryKey: ['product', id],
     queryFn: async () => {
       const products = getFromLocalStorage('products', []) as Product[];
       const foundProduct = products.find((p) => p.id === Number(id));
+      
       if (!foundProduct) {
         throw new Error('Product not found');
       }
-      return foundProduct;
+      
+      return {
+        id: foundProduct.id,
+        title: foundProduct.title,
+        price: foundProduct.price,
+        image: foundProduct.image,
+        images: foundProduct.images,
+        description: foundProduct.description,
+        isDescriptionActive: foundProduct.isDescriptionActive,
+        isImagesActive: foundProduct.isImagesActive,
+        isSpecificationsActive: foundProduct.isSpecificationsActive,
+        isAdditionalImagesActive: foundProduct.isAdditionalImagesActive,
+        isRelatedProductsActive: foundProduct.isRelatedProductsActive,
+        relatedProductIds: foundProduct.relatedProductIds,
+        specifications: foundProduct.specifications,
+        active: foundProduct.active,
+        additionalImages: foundProduct.additionalImages,
+        pixLink: foundProduct.pixLink
+      } as Product;
     }
   });
 
