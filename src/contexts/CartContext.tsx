@@ -35,7 +35,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loadCartFromDatabase = async () => {
     try {
-      const response = await fetch('/api/store-config/get-cart.php');
+      const response = await fetch('./api/store-config/get-cart.php');
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -57,7 +57,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const saveCartToDatabase = async () => {
     try {
-      const response = await fetch('/api/store-config/save-cart.php', {
+      const response = await fetch('./api/store-config/save-cart.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
