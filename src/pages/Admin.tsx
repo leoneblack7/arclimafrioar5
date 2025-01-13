@@ -81,7 +81,7 @@ export default function Admin() {
   }
 
   return (
-    <div className="min-h-screen bg-background/80 backdrop-blur-sm">
+    <div className="min-h-screen bg-background/80 backdrop-blur-sm min-w-[1024px] overflow-auto">
       <AdminSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
       <div className="ml-64 p-8">
         {activeSection === "telegram-bot" && <TelegramBotManager />}
