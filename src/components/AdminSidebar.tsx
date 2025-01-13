@@ -15,7 +15,6 @@ import {
   Settings,
   User,
 } from "lucide-react";
-import { Button } from "./ui/button";
 
 interface AdminSidebarProps {
   activeSection: string;
@@ -61,7 +60,7 @@ export const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarPro
                 }`}
               >
                 <Icon className="w-4 h-4" />
-                <span>{item.label}</span>
+                <span className="whitespace-nowrap">{item.label}</span>
               </Link>
             );
           })}

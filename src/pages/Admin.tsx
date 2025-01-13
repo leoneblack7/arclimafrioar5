@@ -100,8 +100,10 @@ export default function Admin() {
   return (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex">
       <AdminSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
-      <div className="flex-1 p-8 overflow-hidden">
-        {renderActiveSection()}
+      <div className="flex-1 p-8 overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+        <div className="max-w-6xl mx-auto space-y-6">
+          {renderActiveSection()}
+        </div>
       </div>
       <ThemeToggle />
     </div>
