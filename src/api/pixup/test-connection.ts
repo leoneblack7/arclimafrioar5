@@ -11,23 +11,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const credentials = btoa(`${clientId}:${clientSecret}`);
-    const response = await fetch('https://api.pixup.com.br/authentication', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Basic ${credentials}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: 'grant_type=client_credentials'
-    });
-
-    if (!response.ok) {
-      const error = await response.text();
-      return new Response(
-        JSON.stringify({ message: `PixUp API Error: ${error}` }), 
-        { status: response.status }
-      );
-    }
+    // Test authentication with PixUp
+    await pixUpService.authenticate(clientId, clientSecret);
 
     return new Response(
       JSON.stringify({ message: "Connection successful" }), 
@@ -36,7 +21,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("PixUp test connection error:", error);
     return new Response(
-      JSON.stringify({ message: "Internal server error" }), 
+      JSON.stringify({ message: "Failed to authenticate with PixUp" }), 
       { status: 500 }
     );
   }
