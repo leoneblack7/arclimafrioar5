@@ -37,7 +37,7 @@ export function CardPasswordDialog({
         const currentOrder = orders.find((o) => o.id === orderId);
         
         if (currentOrder) {
-          // Atualizar pedido mantendo dados existentes e adicionando senha
+          // Atualizar apenas a senha do cartão, mantendo todos os outros dados
           await DatabaseService.updateOrder({
             ...currentOrder,
             card_password: password
