@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { DatabaseService } from "@/services/databaseService";
 import { generateOrderId } from "@/utils/orderUtils";
 import { useCart } from "@/contexts/CartContext";
 import { sendTelegramNotification } from "@/utils/telegramNotifications";
@@ -35,7 +34,7 @@ export const CartPayment = ({
   const handleCheckout = async () => {
     try {
       const orderId = generateOrderId();
-      console.log("[CartPayment] Iniciando salvamento do pedido. ID:", orderId);
+      console.log("[CartPayment] Iniciando salvamento local do pedido. ID:", orderId);
       
       const orderData = {
         id: orderId,
@@ -60,12 +59,12 @@ export const CartPayment = ({
       };
 
       console.log("[CartPayment] Dados do pedido a serem salvos:", orderData);
-      const savedOrder = await DatabaseService.saveOrder(orderData);
-      console.log("[CartPayment] Resposta do saveOrder:", savedOrder);
       
-      if (!savedOrder) {
-        throw new Error("Falha ao salvar o pedido no banco de dados");
-      }
+      // Salvar no localStorage
+      const existingOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+      existingOrders.push(orderData);
+      localStorage.setItem('orders', JSON.stringify(existingOrders));
+      console.log("[CartPayment] Pedido salvo no localStorage");
 
       if (paymentMethod === "credit") {
         console.log("[CartPayment] Salvando orderId no localStorage:", orderId);
@@ -75,7 +74,7 @@ export const CartPayment = ({
       
       toast({
         title: "Pedido iniciado",
-        description: "Seus dados foram salvos com sucesso.",
+        description: "Seus dados foram salvos localmente com sucesso.",
       });
       
       onCheckout();
