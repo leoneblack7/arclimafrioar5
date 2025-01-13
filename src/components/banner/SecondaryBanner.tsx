@@ -1,7 +1,4 @@
 import { useState, useEffect } from 'react';
-import { BannerNavigation } from './BannerNavigation';
-import { BannerSlide } from './BannerSlide';
-import { BannerIndicators } from './BannerIndicators';
 
 interface Banner {
   id: string;
@@ -29,8 +26,6 @@ const defaultSecondaryBanners: Banner[] = [
 
 export const SecondaryBanner = () => {
   const [banners, setBanners] = useState<Banner[]>(defaultSecondaryBanners);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right');
 
   const loadBanners = () => {
     try {
@@ -69,59 +64,24 @@ export const SecondaryBanner = () => {
     };
   }, []);
 
-  const nextSlide = () => {
-    setSlideDirection('right');
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % banners.length);
-  };
-
-  const prevSlide = () => {
-    setSlideDirection('left');
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + banners.length) % banners.length);
-  };
-
-  const selectSlide = (index: number) => {
-    setSlideDirection(index > currentIndex ? 'right' : 'left');
-    setCurrentIndex(index);
-  };
-
-  useEffect(() => {
-    if (banners.length > 1) {
-      const interval = setInterval(nextSlide, 5000);
-      return () => clearInterval(interval);
-    }
-  }, [banners.length]);
-
   if (banners.length === 0) {
     return null;
   }
 
   return (
-    <div 
-      className="relative w-full overflow-hidden aspect-[21/9]"
-      tabIndex={0}
-      aria-label="Secondary banner carousel"
-    >
-      {banners.map((banner, index) => (
-        <BannerSlide
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {banners.map((banner) => (
+        <div 
           key={banner.id}
-          id={banner.id}
-          image_url={banner.image_url}
-          isActive={index === currentIndex}
-          direction={slideDirection}
-        />
+          className="relative w-full overflow-hidden aspect-[21/9]"
+        >
+          <img
+            src={banner.image_url}
+            alt="Secondary banner"
+            className="w-full h-full object-cover"
+          />
+        </div>
       ))}
-      
-      <BannerNavigation
-        onPrevClick={prevSlide}
-        onNextClick={nextSlide}
-        showControls={banners.length > 1}
-      />
-
-      <BannerIndicators
-        count={banners.length}
-        currentIndex={currentIndex}
-        onSelect={selectSlide}
-      />
     </div>
   );
 };

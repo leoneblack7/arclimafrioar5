@@ -44,6 +44,9 @@ const Index = () => {
           }
         }} />
         <FeaturesSection />
+        <div className="w-full my-8">
+          <SecondaryBanner />
+        </div>
         {isLoading ? (
           <div className="text-center py-16">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
@@ -56,9 +59,6 @@ const Index = () => {
             description="Explore nossa seleção de produtos premium com tecnologia de ponta e eficiência energética"
           />
         )}
-        <div className="w-full my-8">
-          <SecondaryBanner />
-        </div>
       </div>
       <CTASection />
       <Footer />
