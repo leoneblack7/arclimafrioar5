@@ -13,9 +13,13 @@ import { ProductGallery } from '@/components/product/ProductGallery';
 import { Footer } from '@/components/home/Footer';
 import { toast } from 'sonner';
 import { Navbar } from '@/components/Navbar';
+import { useCart } from '@/contexts/CartContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
+  const { addItem } = useCart();
+  const navigate = useNavigate();
   
   const { data: product, isLoading, isError } = useQuery({
     queryKey: ['product', id],
@@ -49,11 +53,29 @@ export default function ProductDetail() {
   });
 
   const handleAddToCart = () => {
-    toast.success('Produto adicionado ao carrinho!');
+    if (product) {
+      addItem({
+        id: product.id,
+        title: product.title,
+        price: product.price,
+        image: product.image,
+        quantity: 1
+      });
+      toast.success('Produto adicionado ao carrinho!');
+    }
   };
 
   const handleBuyNow = () => {
-    toast.success('Redirecionando para o pagamento...');
+    if (product) {
+      addItem({
+        id: product.id,
+        title: product.title,
+        price: product.price,
+        image: product.image,
+        quantity: 1
+      });
+      navigate('/checkout');
+    }
   };
 
   if (isLoading) {
