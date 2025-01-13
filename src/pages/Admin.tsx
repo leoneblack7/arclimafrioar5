@@ -26,6 +26,16 @@ export default function Admin() {
     await login(username, password);
   };
 
+  useEffect(() => {
+    // Previne o scroll do body quando o admin está ativo
+    if (isAuthenticated) {
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isAuthenticated]);
+
   if (!isAuthenticated) {
     return (
       <div 
@@ -98,9 +108,9 @@ export default function Admin() {
   };
 
   return (
-    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex">
+    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex overflow-hidden md:overflow-hidden">
       <AdminSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
-      <div className="flex-1 p-8 overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+      <div className="flex-1 p-8 overflow-y-auto scrollbar-none">
         <div className="max-w-6xl mx-auto space-y-6">
           {renderActiveSection()}
         </div>
