@@ -98,9 +98,9 @@ export default function Admin() {
   };
 
   return (
-    <div className="min-h-screen bg-background/80 backdrop-blur-sm min-w-[1024px]">
+    <div className="min-h-screen bg-background/80 backdrop-blur-sm min-w-[1024px] flex">
       <AdminSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
-      <div className="ml-64 h-screen overflow-y-auto">
+      <div className="flex-1 overflow-auto h-screen">
         <div className="p-8">
           {renderActiveSection()}
         </div>
