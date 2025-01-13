@@ -10,20 +10,61 @@ export const LogoManager = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const savedLogo = localStorage.getItem("storeLogoUrl");
-    const savedName = localStorage.getItem("storeName");
-    if (savedLogo) setLogoUrl(savedLogo);
-    if (savedName) setStoreName(savedName);
+    fetchStoreConfig();
   }, []);
 
-  const handleSave = () => {
+  const fetchStoreConfig = async () => {
+    try {
+      const response = await fetch('api/store-config/read.php');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.logo_url) setLogoUrl(data.logo_url);
+        if (data.store_name) setStoreName(data.store_name);
+      }
+    } catch (error) {
+      console.error('Error fetching store config:', error);
+      // Fallback to localStorage
+      const savedLogo = localStorage.getItem("storeLogoUrl");
+      const savedName = localStorage.getItem("storeName");
+      if (savedLogo) setLogoUrl(savedLogo);
+      if (savedName) setStoreName(savedName);
+    }
+  };
+
+  const handleSave = async () => {
     if (!logoUrl && !storeName) {
       toast.error("Por favor, insira um nome ou selecione uma logo");
       return;
     }
-    localStorage.setItem("storeLogoUrl", logoUrl);
-    localStorage.setItem("storeName", storeName);
-    toast.success("Configurações atualizadas com sucesso!");
+
+    try {
+      const response = await fetch('api/store-config/update.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          logo_url: logoUrl,
+          store_name: storeName
+        })
+      });
+
+      if (response.ok) {
+        // Backup em localStorage
+        localStorage.setItem("storeLogoUrl", logoUrl);
+        localStorage.setItem("storeName", storeName);
+        toast.success("Configurações atualizadas com sucesso!");
+      } else {
+        throw new Error('Falha ao atualizar configurações');
+      }
+    } catch (error) {
+      console.error('Error saving store config:', error);
+      toast.error("Erro ao salvar configurações. Tentando salvar localmente...");
+      // Fallback para localStorage
+      localStorage.setItem("storeLogoUrl", logoUrl);
+      localStorage.setItem("storeName", storeName);
+      toast.success("Configurações salvas localmente!");
+    }
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
