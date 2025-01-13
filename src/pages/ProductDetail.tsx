@@ -12,6 +12,7 @@ import { ProductDetailActions } from "@/components/product/ProductDetailActions"
 import { ProductDetailShipping } from "@/components/product/ProductDetailShipping";
 import { ProductDetailDescription } from "@/components/product/ProductDetailDescription";
 import { ProductDetailImages } from "@/components/product/ProductDetailImages";
+import { Footer } from "@/components/home/Footer";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -55,6 +56,7 @@ export default function ProductDetail() {
             </Button>
           </div>
         </div>
+        <Footer />
       </div>
     );
   }
@@ -104,6 +106,7 @@ export default function ProductDetail() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
