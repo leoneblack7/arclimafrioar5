@@ -6,22 +6,23 @@ export async function POST(request: Request) {
 
     if (!clientId || !clientSecret) {
       return new Response(
-        JSON.stringify({ message: "Client ID and Client Secret are required" }), 
+        JSON.stringify({ message: "Client ID e Client Secret são obrigatórios" }), 
         { status: 400 }
       );
     }
 
-    // Test authentication with PixUp
+    // Testa autenticação com PixUp
     await pixUpService.authenticate(clientId, clientSecret);
 
     return new Response(
-      JSON.stringify({ message: "Connection successful" }), 
+      JSON.stringify({ message: "Conexão estabelecida com sucesso" }), 
       { status: 200 }
     );
   } catch (error) {
-    console.error("PixUp test connection error:", error);
+    console.error("Erro ao testar conexão com PixUp:", error);
+    const errorMessage = error instanceof Error ? error.message : "Falha ao autenticar com PixUp";
     return new Response(
-      JSON.stringify({ message: "Failed to authenticate with PixUp" }), 
+      JSON.stringify({ message: errorMessage }), 
       { status: 500 }
     );
   }

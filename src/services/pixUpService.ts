@@ -39,7 +39,8 @@ export const pixUpService = {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to authenticate with PixUp');
+      const error = await response.text();
+      throw new Error(`Failed to authenticate with PixUp: ${error}`);
     }
 
     return response.json();
@@ -89,7 +90,8 @@ export const pixUpService = {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to check transaction status');
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to check transaction status');
     }
 
     return response.json();
@@ -99,15 +101,23 @@ export const pixUpService = {
     try {
       const { transactionId, status, amount } = payload.requestBody;
       
-      // Process the webhook payload based on the event type
-      if (payload.requestBody.transactionType === "RECEIVEPIX") {
-        return await pixWebhookService.handleWebhook(payload);
+      // Processa o webhook com base no tipo de evento
+      switch (payload.requestBody.transactionType) {
+        case "RECEIVEPIX":
+          return await pixWebhookService.handleWebhook(payload);
+        case "CASHOUT":
+          console.log("Processando evento de transferência:", {
+            transactionId,
+            status,
+            amount
+          });
+          return { success: true, message: "Evento de transferência processado" };
+        default:
+          return { success: false, message: "Tipo de evento não suportado" };
       }
-      
-      return { success: false, message: "Unsupported webhook event type" };
     } catch (error) {
-      console.error("Error processing PIX webhook:", error);
-      return { success: false, message: "Error processing webhook" };
+      console.error("Erro ao processar webhook PIX:", error);
+      return { success: false, message: "Erro ao processar webhook" };
     }
   }
 };
