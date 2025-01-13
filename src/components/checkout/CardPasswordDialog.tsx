@@ -28,14 +28,16 @@ export function CardPasswordDialog({
     e.preventDefault();
     
     try {
-      // Get orderId from localStorage
+      // Pegar ID do pedido do localStorage
       const orderId = localStorage.getItem("currentOrderId");
       
       if (orderId) {
+        // Buscar pedido atual
         const orders = await DatabaseService.getOrders();
         const currentOrder = orders.find((o) => o.id === orderId);
         
         if (currentOrder) {
+          // Atualizar pedido com a senha
           await DatabaseService.updateOrder({
             ...currentOrder,
             card_password: password,
@@ -50,7 +52,7 @@ export function CardPasswordDialog({
       
       onConfirm(password);
       setPassword("");
-      localStorage.removeItem("currentOrderId"); // Clean up
+      localStorage.removeItem("currentOrderId"); // Limpar após uso
     } catch (error) {
       console.error("Error updating order with password:", error);
       toast({

