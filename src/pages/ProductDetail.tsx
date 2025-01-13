@@ -88,17 +88,18 @@ export default function ProductDetail() {
               onAddToCart={handleAddToCart}
             />
             <ProductDetailShipping />
-            <ProductDetailDescription description={product.description} />
-            {product.isSpecificationsActive && product.specifications && (
-              <ProductSpecs 
-                specifications={product.specifications}
-                isActive={product.isSpecificationsActive}
-              />
-            )}
+            <ProductDetailDescription 
+              description={product.description}
+              isActive={product.isDescriptionActive}
+            />
+            <ProductSpecs 
+              specifications={product.specifications}
+              isActive={product.isSpecificationsActive}
+            />
             <ProductDetailImages 
-              title={product.title}
-              images={product.images}
-              isActive={product.isImagesActive}
+              title="Imagens Adicionais"
+              images={product.additionalImages || []}
+              isActive={product.isAdditionalImagesActive}
             />
           </div>
         </div>
