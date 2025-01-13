@@ -98,12 +98,10 @@ export default function Admin() {
   };
 
   return (
-    <div className="min-h-screen bg-background/80 backdrop-blur-sm min-w-[1024px] flex">
+    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex">
       <AdminSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
-      <div className="flex-1">
-        <div className="p-8">
-          {renderActiveSection()}
-        </div>
+      <div className="flex-1 p-8 overflow-hidden">
+        {renderActiveSection()}
       </div>
       <ThemeToggle />
     </div>
