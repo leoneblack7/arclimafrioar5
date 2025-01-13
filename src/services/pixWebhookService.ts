@@ -1,6 +1,6 @@
-import { supabase } from "@/integrations/supabase/client";
 import { PixWebhookPayload } from "@/types/pix";
 import { toast } from "sonner";
+import { getFromLocalStorage, saveToLocalStorage } from "@/utils/localStorage";
 
 export const pixWebhookService = {
   async handleWebhook(payload: PixWebhookPayload) {
@@ -13,31 +13,22 @@ export const pixWebhookService = {
         return { success: false, message: "Invalid transaction type" };
       }
 
-      // Update transaction status in database
-      const { error: updateError } = await supabase
-        .from('orders')
-        .update({ status: 'paid' })
-        .eq('transaction_id', transactionId);
-
-      if (updateError) {
-        console.error("Error updating transaction:", updateError);
-        return { success: false, message: "Error updating transaction" };
+      // Update order status in localStorage
+      const orders = getFromLocalStorage('orders', []);
+      const orderIndex = orders.findIndex((order: any) => order.transaction_id === transactionId);
+      
+      if (orderIndex === -1) {
+        console.error("Order not found:", transactionId);
+        return { success: false, message: "Order not found" };
       }
 
-      // Get the order details
-      const { data: order, error: orderError } = await supabase
-        .from('orders')
-        .select('*')
-        .eq('transaction_id', transactionId)
-        .single();
+      // Update order status to paid
+      orders[orderIndex].status = 'paid';
+      saveToLocalStorage('orders', orders);
 
-      if (orderError || !order) {
-        console.error("Error fetching order:", orderError);
-        return { success: false, message: "Error fetching order" };
-      }
+      const order = orders[orderIndex];
 
       // Update customer balance if needed
-      // This would be equivalent to the enviarSaldo function in PHP
       try {
         await this.updateCustomerBalance(order);
         console.log("Customer balance updated for order:", transactionId);
@@ -61,35 +52,41 @@ export const pixWebhookService = {
   },
 
   async updateCustomerBalance(order: any) {
-    // Implement balance update logic here
-    // This would connect to your balance API
+    // Get current balances from localStorage
+    const balances = getFromLocalStorage('customer-balances', {});
+    
+    // Update customer balance
+    balances[order.customer.id] = (balances[order.customer.id] || 0) + order.total_amount;
+    
+    // Save updated balances
+    saveToLocalStorage('customer-balances', balances);
+    
     return { status: 1, msg: "SUCCESS" };
   },
 
   async processAffiliateCommission(order: any) {
     try {
-      // Get affiliate info if exists
-      const { data: customer } = await supabase
-        .from('customers')
-        .select('affiliate_id')
-        .eq('id', order.customer_id)
-        .single();
+      // Get affiliates from localStorage
+      const affiliates = getFromLocalStorage('affiliates', {});
+      const customer = order.customer;
 
-      if (customer?.affiliate_id) {
-        // Process CPA commission
-        const { error: commissionError } = await supabase
-          .from('affiliate_commissions')
-          .insert({
-            affiliate_id: customer.affiliate_id,
-            order_id: order.id,
-            amount: 50, // Example fixed CPA amount
-            type: 'cpa',
-            status: 'pending'
-          });
+      if (customer?.affiliate_id && affiliates[customer.affiliate_id]) {
+        // Get current commissions from localStorage
+        const commissions = getFromLocalStorage('affiliate-commissions', []);
+        
+        // Add new commission
+        commissions.push({
+          id: Date.now().toString(),
+          affiliate_id: customer.affiliate_id,
+          order_id: order.id,
+          amount: 50, // Example fixed CPA amount
+          type: 'cpa',
+          status: 'pending',
+          created_at: new Date().toISOString()
+        });
 
-        if (commissionError) {
-          console.error("Error processing affiliate commission:", commissionError);
-        }
+        // Save updated commissions
+        saveToLocalStorage('affiliate-commissions', commissions);
       }
     } catch (error) {
       console.error("Error in affiliate commission processing:", error);
