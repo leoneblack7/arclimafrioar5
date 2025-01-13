@@ -8,9 +8,9 @@ import { ProductDetailImages } from "@/components/product/ProductDetailImages";
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   
-  const { data: product, isError, error } = useQuery<Product, Error>({
+  const { data: product, isError, error } = useQuery({
     queryKey: ['product', id],
-    queryFn: async () => {
+    queryFn: async (): Promise<Product> => {
       const products = getFromLocalStorage('products', []) as Product[];
       const foundProduct = products.find((p) => p.id === Number(id));
       
@@ -23,19 +23,19 @@ export default function ProductDetail() {
         title: foundProduct.title,
         price: foundProduct.price,
         image: foundProduct.image,
-        images: foundProduct.images,
-        description: foundProduct.description,
-        isDescriptionActive: foundProduct.isDescriptionActive,
-        isImagesActive: foundProduct.isImagesActive,
-        isSpecificationsActive: foundProduct.isSpecificationsActive,
-        isAdditionalImagesActive: foundProduct.isAdditionalImagesActive,
-        isRelatedProductsActive: foundProduct.isRelatedProductsActive,
-        relatedProductIds: foundProduct.relatedProductIds,
-        specifications: foundProduct.specifications,
-        active: foundProduct.active,
-        additionalImages: foundProduct.additionalImages,
+        images: foundProduct.images || [],
+        description: foundProduct.description || '',
+        isDescriptionActive: foundProduct.isDescriptionActive ?? true,
+        isImagesActive: foundProduct.isImagesActive ?? true,
+        isSpecificationsActive: foundProduct.isSpecificationsActive ?? true,
+        isAdditionalImagesActive: foundProduct.isAdditionalImagesActive ?? true,
+        isRelatedProductsActive: foundProduct.isRelatedProductsActive ?? true,
+        relatedProductIds: foundProduct.relatedProductIds || [],
+        specifications: foundProduct.specifications || '',
+        active: foundProduct.active ?? true,
+        additionalImages: foundProduct.additionalImages || [],
         pixLink: foundProduct.pixLink
-      } as Product;
+      };
     }
   });
 
