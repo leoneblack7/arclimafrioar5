@@ -17,6 +17,10 @@ if (!empty($data->id)) {
     $image = $conn->real_escape_string($data->image ?? '');
     $images = $conn->real_escape_string(json_encode($data->images ?? []));
     $description = $conn->real_escape_string($data->description ?? '');
+    $specifications = $conn->real_escape_string($data->specifications ?? '');
+    $is_description_active = $data->isDescriptionActive ? 1 : 0;
+    $is_images_active = $data->isImagesActive ? 1 : 0;
+    $is_specifications_active = $data->isSpecificationsActive ? 1 : 0;
     $active = $data->active ? 1 : 0;
     
     $sql = "UPDATE products SET 
@@ -25,6 +29,10 @@ if (!empty($data->id)) {
             image = '$image',
             images = '$images',
             description = '$description',
+            specifications = '$specifications',
+            is_description_active = $is_description_active,
+            is_images_active = $is_images_active,
+            is_specifications_active = $is_specifications_active,
             active = $active
             WHERE id = $id";
     

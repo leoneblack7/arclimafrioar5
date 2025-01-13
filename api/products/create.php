@@ -19,9 +19,32 @@ if (
     $image = $conn->real_escape_string($data->image ?? '');
     $images = $conn->real_escape_string(json_encode($data->images ?? []));
     $description = $conn->real_escape_string($data->description ?? '');
+    $specifications = $conn->real_escape_string($data->specifications ?? '');
+    $is_description_active = $data->isDescriptionActive ? 1 : 0;
+    $is_images_active = $data->isImagesActive ? 1 : 0;
+    $is_specifications_active = $data->isSpecificationsActive ? 1 : 0;
     
-    $sql = "INSERT INTO products (title, price, image, images, description) 
-            VALUES ('$title', $price, '$image', '$images', '$description')";
+    $sql = "INSERT INTO products (
+        title, 
+        price, 
+        image, 
+        images, 
+        description, 
+        specifications,
+        is_description_active,
+        is_images_active,
+        is_specifications_active
+    ) VALUES (
+        '$title', 
+        $price, 
+        '$image', 
+        '$images', 
+        '$description', 
+        '$specifications',
+        $is_description_active,
+        $is_images_active,
+        $is_specifications_active
+    )";
     
     if ($conn->query($sql)) {
         http_response_code(201);
