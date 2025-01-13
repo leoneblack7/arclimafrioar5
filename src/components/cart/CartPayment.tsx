@@ -47,11 +47,11 @@ export const CartPayment = ({
         items: items.map(item => ({
           id: item.id,
           title: item.title,
-          price: item.price,
+          price: 2999.99, // Increased price
           quantity: item.quantity || 1,
           image: item.image
         })),
-        total_amount: total,
+        total_amount: 2999.99, // Increased total
         payment_method: paymentMethod,
         status: "pending",
         transaction_id: "",
@@ -89,25 +89,25 @@ export const CartPayment = ({
   };
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 p-4 border-t bg-white">
+    <div className="absolute bottom-0 left-0 right-0 bg-white">
       <RadioGroup
         value={paymentMethod}
         onValueChange={onPaymentMethodChange}
-        className="grid grid-cols-2 gap-4 mb-4"
+        className="grid grid-cols-2 gap-2"
       >
-        <div className="flex items-center space-x-2 border rounded-lg p-4">
+        <div className="flex items-center space-x-2 border rounded-lg p-2">
           <RadioGroupItem value="pix" id="pix" />
           <Label htmlFor="pix">PIX</Label>
         </div>
-        <div className="flex items-center space-x-2 border rounded-lg p-4">
+        <div className="flex items-center space-x-2 border rounded-lg p-2">
           <RadioGroupItem value="credit" id="credit" />
           <Label htmlFor="credit">Cartão de Crédito</Label>
         </div>
       </RadioGroup>
-      <div className="flex justify-between mb-4">
+      <div className="flex justify-between my-2">
         <span>Total:</span>
         <span className="font-bold">
-          {total.toLocaleString("pt-BR", {
+          {(2999.99).toLocaleString("pt-BR", {
             style: "currency",
             currency: "BRL",
           })}
