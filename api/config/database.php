@@ -39,7 +39,7 @@ function getConnection() {
         die("Error creating products table: " . $conn->error);
     }
     
-    // Create orders table
+    // Create orders table with all necessary fields
     $sql = "CREATE TABLE IF NOT EXISTS orders (
         id VARCHAR(36) PRIMARY KEY,
         customer_data JSON,
