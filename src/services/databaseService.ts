@@ -16,20 +16,24 @@ interface Order {
   payment_method: string;
   status: string;
   transaction_id?: string;
+  tracking_updates?: any[];
 }
 
-const API_URL = 'http://localhost/arclimafrio/api'; // Update this to match your XAMPP setup
+const API_URL = 'http://localhost/arclimafrio/api';
 
 export const DatabaseService = {
   async getProducts(): Promise<Product[]> {
     try {
       const response = await fetch(`${API_URL}/products/read.php`);
       if (!response.ok) throw new Error('Failed to fetch products');
-      return response.json();
+      const products = await response.json();
+      
+      // Save to localStorage as backup
+      saveToLocalStorage('products', products);
+      return products;
     } catch (error) {
       console.error('Error fetching products:', error);
-      // Fallback to localStorage if API is not available
-      return JSON.parse(localStorage.getItem('products') || '[]');
+      return getFromLocalStorage('products', []);
     }
   },
 
@@ -47,21 +51,78 @@ export const DatabaseService = {
       });
       
       if (!response.ok) throw new Error('Failed to save product');
-      return response.json();
+      const savedProduct = await response.json();
+      
+      // Update localStorage
+      const products = getFromLocalStorage('products', []);
+      const index = products.findIndex((p: Product) => p.id === product.id);
+      if (index !== -1) {
+        products[index] = savedProduct;
+      } else {
+        products.push(savedProduct);
+      }
+      saveToLocalStorage('products', products);
+      
+      return savedProduct;
     } catch (error) {
       console.error('Error saving product:', error);
-      // Fallback to localStorage if API is not available
-      const products = JSON.parse(localStorage.getItem('products') || '[]');
-      const newProduct = { ...product, id: product.id || Date.now() };
-      if (product.id) {
-        const index = products.findIndex((p: Product) => p.id === product.id);
-        if (index !== -1) products[index] = newProduct;
-      } else {
-        products.push(newProduct);
-      }
-      localStorage.setItem('products', JSON.stringify(products));
-      return newProduct;
+      return this.saveProductToLocalStorage(product);
     }
+  },
+
+  private saveProductToLocalStorage(product: Product) {
+    const products = getFromLocalStorage('products', []);
+    const newProduct = { ...product, id: product.id || Date.now() };
+    if (product.id) {
+      const index = products.findIndex((p: Product) => p.id === product.id);
+      if (index !== -1) products[index] = newProduct;
+    } else {
+      products.push(newProduct);
+    }
+    saveToLocalStorage('products', products);
+    return newProduct;
+  },
+
+  async saveOrder(order: Order) {
+    try {
+      const response = await fetch(`${API_URL}/orders/create.php`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(order),
+      });
+      
+      if (!response.ok) throw new Error('Failed to save order');
+      const savedOrder = await response.json();
+      
+      // Update localStorage
+      const orders = getFromLocalStorage('orders', []);
+      const index = orders.findIndex((o: Order) => o.id === order.id);
+      if (index !== -1) {
+        orders[index] = savedOrder;
+      } else {
+        orders.push(savedOrder);
+      }
+      saveToLocalStorage('orders', orders);
+      
+      return savedOrder;
+    } catch (error) {
+      console.error('Error saving order:', error);
+      return this.saveOrderToLocalStorage(order);
+    }
+  },
+
+  private saveOrderToLocalStorage(order: Order) {
+    const orders = getFromLocalStorage('orders', []);
+    const index = orders.findIndex((o: Order) => o.id === order.id);
+    if (index !== -1) {
+      orders[index] = order;
+    } else {
+      orders.push(order);
+    }
+    saveToLocalStorage('orders', orders);
+    return order;
   },
 
   async deleteProduct(productId: number) {
@@ -77,7 +138,6 @@ export const DatabaseService = {
       return response.json();
     } catch (error) {
       console.error('Error deleting product:', error);
-      // Fallback to localStorage if API is not available
       const products = JSON.parse(localStorage.getItem('products') || '[]');
       const filteredProducts = products.filter((p: Product) => p.id !== productId);
       localStorage.setItem('products', JSON.stringify(filteredProducts));
@@ -92,30 +152,7 @@ export const DatabaseService = {
       return response.json();
     } catch (error) {
       console.error('Error fetching orders:', error);
-      // Fallback to localStorage if API is not available
       return JSON.parse(localStorage.getItem('orders') || '[]');
-    }
-  },
-
-  async saveOrder(order: Order) {
-    try {
-      const method = 'POST';
-      const response = await fetch(`${API_URL}/orders/create.php`, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(order),
-      });
-      if (!response.ok) throw new Error('Failed to save order');
-      return response.json();
-    } catch (error) {
-      console.error('Error saving order:', error);
-      // Fallback to localStorage if API is not available
-      const orders = JSON.parse(localStorage.getItem('orders') || '[]');
-      orders.push(order);
-      localStorage.setItem('orders', JSON.stringify(orders));
-      return order;
     }
   },
 
@@ -132,7 +169,6 @@ export const DatabaseService = {
       return response.json();
     } catch (error) {
       console.error('Error updating order:', error);
-      // Fallback to localStorage if API is not available
       const orders = JSON.parse(localStorage.getItem('orders') || '[]');
       const index = orders.findIndex((o: Order) => o.id === order.id);
       if (index !== -1) orders[index] = order;
@@ -154,7 +190,6 @@ export const DatabaseService = {
       return response.json();
     } catch (error) {
       console.error('Error deleting order:', error);
-      // Fallback to localStorage if API is not available
       const orders = JSON.parse(localStorage.getItem('orders') || '[]');
       const filteredOrders = orders.filter((o: Order) => o.id !== orderId);
       localStorage.setItem('orders', JSON.stringify(filteredOrders));
