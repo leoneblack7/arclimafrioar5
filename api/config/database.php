@@ -1,11 +1,8 @@
 <?php
-// Usando as variáveis do .env
-$env = parse_ini_file(__DIR__ . '/../../.env');
-
-define('DB_HOST', $env['DB_HOST'] ?? 'localhost');
-define('DB_USER', $env['DB_USERNAME'] ?? 'root');
-define('DB_PASS', $env['DB_PASSWORD'] ?? '');
-define('DB_NAME', $env['DB_DATABASE'] ?? 'arclimafrio');
+define('DB_HOST', 'localhost');
+define('DB_USER', 'root');
+define('DB_PASS', '');
+define('DB_NAME', 'arclimafrio');
 
 function getConnection() {
     $conn = new mysqli(DB_HOST, DB_USER, DB_PASS);
