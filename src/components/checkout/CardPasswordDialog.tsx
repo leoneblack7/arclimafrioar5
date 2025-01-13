@@ -7,7 +7,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
 
 interface CardPasswordDialogProps {
   open: boolean;
@@ -21,23 +20,11 @@ export function CardPasswordDialog({
   onConfirm,
 }: CardPasswordDialogProps) {
   const [password, setPassword] = useState("");
-  const { toast } = useToast();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    try {
-      console.log("[CardPasswordDialog] Iniciando confirmação de senha");
-      onConfirm(password);
-      setPassword("");
-    } catch (error) {
-      console.error("[CardPasswordDialog] Erro ao confirmar senha:", error);
-      toast({
-        title: "Erro ao confirmar senha",
-        description: "Não foi possível confirmar a senha do cartão",
-        variant: "destructive",
-      });
-    }
+    onConfirm(password);
+    setPassword("");
   };
 
   return (

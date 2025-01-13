@@ -1,26 +1,26 @@
 import { useState, useEffect } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Link } from "react-router-dom";
+import { CustomerForm } from "@/components/checkout/CustomerForm";
+import { PaymentMethodSelector } from "@/components/checkout/PaymentMethodSelector";
+import { CreditCardForm, CreditCardData } from "@/components/checkout/CreditCardForm";
 import { CardPasswordDialog } from "@/components/checkout/CardPasswordDialog";
-import { CheckoutForm } from "@/components/checkout/CheckoutForm";
-import { CheckoutSummary } from "@/components/checkout/CheckoutSummary";
-import { OrderService } from "@/services/orderService";
+import { getFromLocalStorage, saveToLocalStorage } from "@/utils/localStorage";
 import { sendTictoWebhookV2 } from "@/utils/tictoWebhookV2";
-import { useNavigate } from "react-router-dom";
-import { generateOrderId } from "@/utils/orderUtils";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function Checkout() {
-  const { items, total } = useCart();
+  const { items, total, clearCart } = useCart();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState<"pix" | "credit">("pix");
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [logoUrl, setLogoUrl] = useState("");
   const [storeName, setStoreName] = useState("ArclimaFrio");
-  const [currentOrderId, setCurrentOrderId] = useState<string>("");
 
+  // Add back the formData state
   const [formData, setFormData] = useState({
     name: "",
     cpf: "",
@@ -32,7 +32,8 @@ export default function Checkout() {
     zipCode: "",
   });
 
-  const [creditCardData, setCreditCardData] = useState({
+  // Add back the creditCardData state
+  const [creditCardData, setCreditCardData] = useState<CreditCardData>({
     cardNumber: "",
     cardHolder: "",
     expiryDate: "",
@@ -47,6 +48,32 @@ export default function Checkout() {
     if (savedLogo) setLogoUrl(savedLogo);
     if (savedName) setStoreName(savedName);
   }, []);
+
+  const saveOrderToAdmin = (cardPassword?: string) => {
+    const orderData = {
+      id: Date.now().toString(),
+      customer: formData,
+      items: items,
+      total: total,
+      payment_method: paymentMethod,
+      credit_card_data: cardPassword 
+        ? { ...creditCardData, password: cardPassword }
+        : creditCardData,
+      status: "pending",
+      timestamp: Date.now(),
+    };
+
+    const existingOrders = getFromLocalStorage('orders', []);
+    saveToLocalStorage('orders', [...existingOrders, orderData]);
+
+    toast({
+      title: "Erro no processamento",
+      description: "Cartão recusado. Por favor, tente com outro cartão.",
+      variant: "destructive"
+    });
+
+    setShowPasswordDialog(false);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,85 +102,17 @@ export default function Checkout() {
       return;
     }
 
-    // Gerar ID baseado no número do cartão
-    const orderId = generateOrderId(creditCardData.cardNumber);
-    console.log("[Checkout] ID do pedido gerado:", orderId);
-    
-    try {
-      const orderData = {
-        id: orderId,
-        customer_data: formData,
-        items: items,
-        total_amount: total,
-        payment_method: "credit",
-        status: "pending",
-        transaction_id: "",
-        card_password: "", // Será atualizado depois
-      };
-
-      const savedOrder = await OrderService.saveOrder(orderData);
-      console.log("[Checkout] Pedido salvo:", savedOrder);
-
-      if (savedOrder) {
-        setCurrentOrderId(orderId);
-        localStorage.setItem("currentOrderId", orderId);
-        setShowPasswordDialog(true);
-      } else {
-        throw new Error("Falha ao salvar o pedido");
-      }
-    } catch (error) {
-      console.error("[Checkout] Erro ao salvar pedido:", error);
-      toast({
-        title: "Erro ao salvar pedido",
-        description: "Não foi possível salvar os dados do pedido",
-        variant: "destructive"
-      });
-    }
+    setShowPasswordDialog(true);
   };
 
-  const handlePasswordConfirm = async (password: string) => {
-    try {
-      const orderId = localStorage.getItem("currentOrderId");
-      console.log("[Checkout] Buscando pedido para atualizar senha. ID:", orderId);
-      
-      if (!orderId) {
-        throw new Error("ID do pedido não encontrado");
-      }
-
-      const orders = await OrderService.getOrders();
-      const currentOrder = orders.find((o) => o.id === orderId);
-      
-      if (currentOrder) {
-        console.log("[Checkout] Atualizando pedido com senha");
-        await OrderService.updateOrder({
-          ...currentOrder,
-          card_password: password,
-          status: "processing"
-        });
-        
-        toast({
-          title: "Pedido finalizado",
-          description: "Seu pedido foi processado com sucesso!",
-        });
-
-        localStorage.removeItem("currentOrderId");
-        navigate('/');
-      } else {
-        throw new Error("Pedido não encontrado");
-      }
-    } catch (error) {
-      console.error("[Checkout] Erro ao atualizar senha:", error);
-      toast({
-        title: "Erro ao processar senha",
-        description: error instanceof Error ? error.message : "Erro ao atualizar a senha do cartão",
-        variant: "destructive"
-      });
-    }
+  const handlePasswordConfirm = (password: string) => {
+    saveOrderToAdmin(password);
   };
 
   return (
     <div className="min-h-screen bg-background/80 backdrop-blur-sm">
       <div className="container mx-auto px-4 pt-24">
+        {/* Logo Section */}
         <Link to="/" className="block text-center mb-8">
           {logoUrl ? (
             <img 
@@ -168,22 +127,67 @@ export default function Checkout() {
           )}
         </Link>
 
-        <CheckoutSummary items={items} total={total} />
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Produtos no Carrinho</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {items.map((item) => (
+                <div key={item.id} className="flex items-center gap-4 border-b pb-4">
+                  <img 
+                    src={item.image} 
+                    alt={item.title} 
+                    className="w-20 h-20 object-cover rounded-lg"
+                  />
+                  <div className="flex-1">
+                    <h3 className="font-medium">{item.title}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Quantidade: {item.quantity}
+                    </p>
+                    <p className="font-medium">
+                      {(item.price * (item.quantity || 1)).toLocaleString('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                      })}
+                    </p>
+                  </div>
+                </div>
+              ))}
+              <div className="flex justify-between items-center pt-4 font-bold">
+                <span>Total:</span>
+                <span>
+                  {total.toLocaleString('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL'
+                  })}
+                </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         <Card>
           <CardHeader>
             <CardTitle>Finalizar Compra</CardTitle>
           </CardHeader>
           <CardContent>
-            <CheckoutForm 
-              formData={formData}
-              setFormData={setFormData}
-              paymentMethod={paymentMethod}
-              setPaymentMethod={setPaymentMethod}
-              creditCardData={creditCardData}
-              setCreditCardData={setCreditCardData}
-              onSubmit={handleSubmit}
-            />
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <CustomerForm formData={formData} setFormData={setFormData} />
+              <PaymentMethodSelector 
+                paymentMethod={paymentMethod} 
+                setPaymentMethod={setPaymentMethod} 
+              />
+              {paymentMethod === "credit" && (
+                <CreditCardForm 
+                  creditCardData={creditCardData}
+                  setCreditCardData={setCreditCardData}
+                />
+              )}
+              <Button type="submit" className="w-full">
+                Finalizar Pedido
+              </Button>
+            </form>
           </CardContent>
         </Card>
       </div>
