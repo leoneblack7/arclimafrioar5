@@ -40,7 +40,7 @@ export default function ProductDetail() {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navbar />
-        <div className="container mx-auto px-4 pt-24">
+        <div className="container mx-auto px-4 pt-16 md:pt-24">
           <div className="animate-pulse space-y-4">
             <div className="h-96 bg-gray-200 rounded-lg"></div>
             <div className="h-8 bg-gray-200 rounded w-3/4"></div>
@@ -55,7 +55,7 @@ export default function ProductDetail() {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navbar />
-        <div className="container mx-auto px-4 pt-24">
+        <div className="container mx-auto px-4 pt-16 md:pt-24">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900">Produto não encontrado</h1>
             <Button onClick={() => navigate("/produtos")} className="mt-4">
@@ -76,24 +76,25 @@ export default function ProductDetail() {
     addItem(product);
   };
 
-  // Use all available images or fallback to single image
   const productImages = product.images?.length > 0 
     ? product.images 
     : [product.image];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 touch-none">
       <Navbar />
-      <div className="container mx-auto px-4 pt-24">
-        <div className="grid md:grid-cols-2 gap-8">
-          <ProductGallery images={productImages} />
-          <div className="space-y-6">
+      <div className="container mx-auto px-4 pt-16 md:pt-24 pb-16">
+        <div className="grid md:grid-cols-2 gap-6 md:gap-8">
+          <div className="w-full touch-none">
+            <ProductGallery images={productImages} />
+          </div>
+          <div className="space-y-4 md:space-y-6">
             <div className="flex justify-between items-start">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">{product.title}</h1>
+                <h1 className="text-xl md:text-2xl font-bold text-gray-900">{product.title}</h1>
                 <p className="text-sm text-gray-500">Código: {product.id}</p>
               </div>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="touch-none">
                 <Heart className="h-6 w-6" />
               </Button>
             </div>
@@ -101,7 +102,7 @@ export default function ProductDetail() {
             <ProductSpecs />
 
             <div className="space-y-2">
-              <div className="text-3xl font-bold text-primary">
+              <div className="text-2xl md:text-3xl font-bold text-primary">
                 {product.price.toLocaleString('pt-BR', { 
                   style: 'currency', 
                   currency: 'BRL' 
@@ -113,18 +114,16 @@ export default function ProductDetail() {
                   currency: 'BRL' 
                 })} sem juros
               </p>
-              <div className="flex gap-4">
+              <div className="flex flex-col md:flex-row gap-3">
                 <Button 
-                  className="flex-1 bg-green-500 hover:bg-green-600" 
-                  size="lg"
+                  className="w-full bg-green-500 hover:bg-green-600 text-lg py-6" 
                   onClick={handleBuyNow}
                 >
                   COMPRAR AGORA
                 </Button>
                 <Button 
                   variant="outline"
-                  className="flex-1" 
-                  size="lg"
+                  className="w-full text-lg py-6" 
                   onClick={handleAddToCart}
                 >
                   Adicionar ao Carrinho
@@ -137,6 +136,8 @@ export default function ProductDetail() {
               <div className="flex gap-2">
                 <Input
                   type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   placeholder="Digite seu CEP"
                   value={cep}
                   onChange={(e) => setCep(e.target.value)}
