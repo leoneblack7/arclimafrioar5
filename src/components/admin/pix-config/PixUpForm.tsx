@@ -35,7 +35,7 @@ export const PixUpForm = ({ config, onConfigChange }: PixUpFormProps) => {
       toast.info("Testando conexão com PixUp...");
       
       const credentials = btoa(`${config.pixUpClientId}:${config.pixUpClientSecret}`);
-      const response = await fetch('https://api.pixpay.pro/authentication', {
+      const response = await fetch('https://api.pixupbr.com/v2/authentication', {
         method: 'POST',
         headers: {
           'Authorization': `Basic ${credentials}`,

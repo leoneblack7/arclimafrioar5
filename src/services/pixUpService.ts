@@ -29,7 +29,7 @@ interface PixUpQRCodeResponse {
 export const pixUpService = {
   async authenticate(clientId: string, clientSecret: string): Promise<PixUpAuthResponse> {
     const credentials = btoa(`${clientId}:${clientSecret}`);
-    const response = await fetch('https://api.pixup.com.br/authentication', {
+    const response = await fetch('https://api.pixupbr.com/v2/authentication', {
       method: 'POST',
       headers: {
         'Authorization': `Basic ${credentials}`,
@@ -62,7 +62,7 @@ export const pixUpService = {
       }
     };
 
-    const response = await fetch('https://api.pixup.com.br/v1/payment/pix/create', {
+    const response = await fetch('https://api.pixupbr.com/v2/payment/pix/create', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
@@ -83,7 +83,7 @@ export const pixUpService = {
     accessToken: string,
     transactionId: string
   ): Promise<{ status: string }> {
-    const response = await fetch(`https://api.pixup.com.br/v1/payment/pix/status/${transactionId}`, {
+    const response = await fetch(`https://api.pixupbr.com/v2/payment/pix/status/${transactionId}`, {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
       }
