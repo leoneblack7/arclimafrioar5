@@ -1,6 +1,9 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { PixConfig } from "@/types/pix";
+import { pixUpService } from "@/services/pixUpService";
 
 interface PixUpFormProps {
   config: PixConfig;
@@ -15,6 +18,29 @@ export const PixUpForm = ({ config, onConfigChange }: PixUpFormProps) => {
     });
   };
 
+  const testConnection = async () => {
+    if (!config.pixUpApiKey) {
+      toast.error("Por favor, insira a chave API do PixUp");
+      return;
+    }
+
+    try {
+      // Test the connection with a minimal transaction
+      await pixUpService.createQrCode(
+        config.pixUpApiKey,
+        1.00,
+        "Test User",
+        "12345678900",
+        "test-transaction"
+      );
+      
+      toast.success("Conexão com PixUp estabelecida com sucesso!");
+    } catch (error) {
+      toast.error("Erro ao conectar com PixUp. Verifique sua chave API.");
+      console.error("PixUp connection error:", error);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="space-y-2">
@@ -27,6 +53,13 @@ export const PixUpForm = ({ config, onConfigChange }: PixUpFormProps) => {
           placeholder="Insira sua chave API do PixUp"
         />
       </div>
+      <Button 
+        variant="outline" 
+        onClick={testConnection}
+        className="w-full"
+      >
+        Testar Conexão
+      </Button>
     </div>
   );
 };
