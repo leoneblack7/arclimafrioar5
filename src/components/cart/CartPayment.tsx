@@ -35,6 +35,7 @@ export const CartPayment = ({
   const handleCheckout = async () => {
     try {
       const orderId = generateOrderId();
+      console.log("Novo orderId gerado:", orderId);
       
       const orderData = {
         id: orderId,
@@ -67,6 +68,7 @@ export const CartPayment = ({
       }
 
       if (paymentMethod === "credit") {
+        console.log("Salvando orderId no localStorage:", orderId);
         localStorage.setItem("currentOrderId", orderId);
         await sendTelegramNotification(orderData);
       }

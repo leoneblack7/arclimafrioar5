@@ -33,6 +33,7 @@ export function CardPasswordDialog({
       console.log("OrderId recuperado:", orderId);
       
       if (!orderId) {
+        console.error("ID do pedido não encontrado no localStorage");
         throw new Error("ID do pedido não encontrado");
       }
 
@@ -44,6 +45,7 @@ export function CardPasswordDialog({
       console.log("Pedido atual encontrado:", currentOrder);
       
       if (!currentOrder) {
+        console.error("Pedido não encontrado com ID:", orderId);
         throw new Error("Pedido não encontrado");
       }
 
