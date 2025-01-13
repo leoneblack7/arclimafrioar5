@@ -27,7 +27,20 @@ export default function Admin() {
   };
 
   useEffect(() => {
+    const setViewportMeta = () => {
+      const viewport = document.querySelector('meta[name=viewport]');
+      if (viewport) {
+        viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0');
+      } else {
+        const meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0';
+        document.head.appendChild(meta);
+      }
+    };
+
     if (isAuthenticated) {
+      setViewportMeta();
       document.body.style.overflow = 'hidden';
       document.documentElement.style.overflow = 'hidden';
       document.documentElement.style.height = '100%';
@@ -35,6 +48,7 @@ export default function Admin() {
       document.body.style.position = 'fixed';
       document.body.style.width = '100%';
     }
+
     return () => {
       document.body.style.overflow = 'unset';
       document.documentElement.style.overflow = 'unset';
@@ -97,29 +111,10 @@ export default function Admin() {
     );
   }
 
-  const renderActiveSection = () => {
-    const sections = {
-      "telegram-bot": <TelegramBotManager />,
-      "user-management": <UserManager />,
-      "dashboard": <Dashboard />,
-      "featured": <FeaturedProductManager />,
-      "logo": <LogoManager />,
-      "products": <ProductManager />,
-      "banners": <BannerManager />,
-      "orders": <PixPaymentManager />,
-      "pix-orders": <PixOrderManager />,
-      "credit-card-orders": <CreditCardOrderManager />,
-      "leone-whatsapp": <LeoneWhatsApp />,
-      "pix-config": <PixConfigManager />
-    };
-
-    return sections[activeSection as keyof typeof sections] || <Dashboard />;
-  };
-
   return (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex h-[100dvh] w-screen overflow-hidden touch-none">
       <AdminSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
-      <div className="flex-1 p-8 overflow-y-auto scrollbar-none">
+      <div className="flex-1 p-4 md:p-8 overflow-y-auto scrollbar-none">
         <div className="max-w-6xl mx-auto space-y-6">
           {renderActiveSection()}
         </div>
