@@ -105,7 +105,7 @@ function getConnection() {
         pix_token VARCHAR(255),
         telegram_bot_token VARCHAR(255),
         telegram_chat_id VARCHAR(255),
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE current_timestamp
     )";
     
     if ($conn->query($sql) === FALSE) {
