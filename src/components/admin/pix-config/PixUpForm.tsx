@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PixConfig } from "@/types/pix";
 import { toast } from "sonner";
 import { pixUpService } from "@/services/pixUpService";
+import { useState } from "react";
 
 interface PixUpFormProps {
   config: PixConfig;
@@ -12,6 +13,8 @@ interface PixUpFormProps {
 }
 
 export const PixUpForm = ({ config, onConfigChange }: PixUpFormProps) => {
+  const [testCpf, setTestCpf] = useState("");
+
   const handleClientIdChange = (value: string) => {
     onConfigChange({
       ...config,
@@ -29,6 +32,11 @@ export const PixUpForm = ({ config, onConfigChange }: PixUpFormProps) => {
   const generateTestPix = async () => {
     if (!config.pixUpClientId || !config.pixUpClientSecret) {
       toast.error("Por favor, preencha o Client ID e Client Secret");
+      return;
+    }
+
+    if (!testCpf || testCpf.length !== 11) {
+      toast.error("Por favor, insira um CPF válido (somente números)");
       return;
     }
 
@@ -51,7 +59,7 @@ export const PixUpForm = ({ config, onConfigChange }: PixUpFormProps) => {
         authResponse.access_token,
         5000, // R$ 50,00 em centavos
         "Cliente Teste",
-        "12345678900", // CPF de teste
+        testCpf,
         `TEST-${Date.now()}` // ID único para o teste
       );
 
@@ -93,6 +101,13 @@ export const PixUpForm = ({ config, onConfigChange }: PixUpFormProps) => {
     }
   };
 
+  const handleCpfChange = (value: string) => {
+    // Remove tudo que não for número
+    const cpfNumbers = value.replace(/\D/g, '');
+    // Limita a 11 dígitos
+    setTestCpf(cpfNumbers.slice(0, 11));
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -116,6 +131,16 @@ export const PixUpForm = ({ config, onConfigChange }: PixUpFormProps) => {
             value={config.pixUpClientSecret || ""}
             onChange={(e) => handleClientSecretChange(e.target.value)}
             placeholder="Insira seu Client Secret do PixUp"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="test-cpf">CPF para Teste</Label>
+          <Input
+            id="test-cpf"
+            value={testCpf}
+            onChange={(e) => handleCpfChange(e.target.value)}
+            placeholder="Digite o CPF para teste (somente números)"
+            maxLength={11}
           />
         </div>
         <div className="flex flex-col gap-2">
