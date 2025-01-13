@@ -1,4 +1,5 @@
 import { pixWebhookService } from "./pixWebhookService";
+import { PixUpTransaction, PixWebhookPayload } from "@/types/pix";
 
 interface PixUpPaymentRequest {
   amount: number;
@@ -65,12 +66,8 @@ export const pixUpService = {
     return response.json();
   },
 
-  async processWebhook(payload: any) {
-    // Validate webhook signature if provided by PixUp
-    // Process the webhook payload
-    const { requestBody } = payload;
-    
-    if (requestBody?.transactionType === "RECEIVEPIX" && requestBody?.transactionId) {
+  async processWebhook(payload: PixWebhookPayload) {
+    if (payload?.requestBody?.transactionType === "RECEIVEPIX" && payload?.requestBody?.transactionId) {
       return await pixWebhookService.handleWebhook(payload);
     }
     
