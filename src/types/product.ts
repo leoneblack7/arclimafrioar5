@@ -5,11 +5,8 @@ export interface Product {
   image: string;
   images: string[];
   description: string;
+  isDescriptionActive?: boolean;
+  specifications?: string;
   active: boolean;
   pixLink?: string;
-  specifications?: {
-    warranty: string;
-    technical: Record<string, string>;
-    components: Record<string, string>;
-  };
 }
