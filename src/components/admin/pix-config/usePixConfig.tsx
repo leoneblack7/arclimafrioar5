@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useReducer, useEffect } from "react";
 import { toast } from "sonner";
 import { PixConfig } from "@/types/pix";
 import { saveToLocalStorage, getFromLocalStorage } from "@/utils/localStorage";
+import { pixConfigReducer } from "@/hooks/pixConfig/pixConfigReducer";
 
 const defaultConfig: PixConfig = {
   enabled: false,
@@ -18,102 +19,37 @@ const defaultConfig: PixConfig = {
 };
 
 export const usePixConfig = () => {
-  const [config, setConfig] = useState<PixConfig>(defaultConfig);
-  const [tictoApiKey, setTictoApiKey] = useState("");
+  const [state, dispatch] = useReducer(pixConfigReducer, {
+    config: defaultConfig,
+    tictoApiKey: "",
+  });
 
   useEffect(() => {
     const savedConfig = getFromLocalStorage("PIX_CONFIG", defaultConfig);
     if (!localStorage.getItem("PIX_CONFIG")) {
       savedConfig.maintenanceMode = true;
     }
-    setConfig(savedConfig);
+    dispatch({ type: 'SET_CONFIG', config: savedConfig });
     
     const savedKey = localStorage.getItem("TICTO_API_KEY");
     if (savedKey) {
-      setTictoApiKey(savedKey);
+      dispatch({ type: 'SET_TICTO_API_KEY', key: savedKey });
     }
   }, []);
 
-  const handleTictoToggle = (checked: boolean) => {
-    if (config.maintenanceMode && checked) {
-      toast.error("Desative o modo de manutenção primeiro");
-      return;
-    }
-    setConfig({
-      ...config,
-      enabled: checked,
-      useCustomKeys: checked ? false : config.useCustomKeys,
-      usePixPay: checked ? false : config.usePixPay,
-      usePixUp: checked ? false : config.usePixUp,
-    });
-  };
-
-  const handleCustomKeysToggle = (checked: boolean) => {
-    if (config.maintenanceMode && checked) {
-      toast.error("Desative o modo de manutenção primeiro");
-      return;
-    }
-    setConfig({
-      ...config,
-      useCustomKeys: checked,
-      enabled: checked ? false : config.enabled,
-      usePixPay: checked ? false : config.usePixPay,
-      usePixUp: checked ? false : config.usePixUp,
-    });
-  };
-
-  const handlePixPayToggle = (checked: boolean) => {
-    if (config.maintenanceMode && checked) {
-      toast.error("Desative o modo de manutenção primeiro");
-      return;
-    }
-    setConfig({
-      ...config,
-      usePixPay: checked,
-      enabled: checked ? false : config.enabled,
-      useCustomKeys: checked ? false : config.useCustomKeys,
-      usePixUp: checked ? false : config.usePixUp,
-    });
-  };
-
-  const handlePixUpToggle = (checked: boolean) => {
-    if (config.maintenanceMode && checked) {
-      toast.error("Desative o modo de manutenção primeiro");
-      return;
-    }
-    setConfig({
-      ...config,
-      usePixUp: checked,
-      enabled: checked ? false : config.enabled,
-      useCustomKeys: checked ? false : config.useCustomKeys,
-      usePixPay: checked ? false : config.usePixPay,
-    });
-  };
-
-  const handleMaintenanceToggle = (checked: boolean) => {
-    setConfig({
-      ...config,
-      maintenanceMode: checked,
-      enabled: checked ? false : config.enabled,
-      useCustomKeys: checked ? false : config.useCustomKeys,
-      usePixPay: checked ? false : config.usePixPay,
-      usePixUp: checked ? false : config.usePixUp,
-    });
-  };
-
   const handleSave = () => {
-    saveToLocalStorage("PIX_CONFIG", config);
+    saveToLocalStorage("PIX_CONFIG", state.config);
     let message = "";
     
-    if (config.maintenanceMode) {
+    if (state.config.maintenanceMode) {
       message = "PIX em manutenção está ativado";
-    } else if (config.enabled) {
+    } else if (state.config.enabled) {
       message = "Integração Ticto PIX está ativada";
-    } else if (config.useCustomKeys) {
+    } else if (state.config.useCustomKeys) {
       message = "Chaves PIX personalizadas estão ativadas";
-    } else if (config.usePixPay) {
+    } else if (state.config.usePixPay) {
       message = "Integração PixPay.pro está ativada";
-    } else if (config.usePixUp) {
+    } else if (state.config.usePixUp) {
       message = "Integração PixUp está ativada";
     } else {
       message = "Nenhuma integração PIX está ativada";
@@ -125,15 +61,15 @@ export const usePixConfig = () => {
   };
 
   return {
-    config,
-    setConfig,
-    tictoApiKey,
-    setTictoApiKey,
-    handleTictoToggle,
-    handleCustomKeysToggle,
-    handlePixPayToggle,
-    handlePixUpToggle,
-    handleMaintenanceToggle,
+    config: state.config,
+    setConfig: (config: PixConfig) => dispatch({ type: 'SET_CONFIG', config }),
+    tictoApiKey: state.tictoApiKey,
+    setTictoApiKey: (key: string) => dispatch({ type: 'SET_TICTO_API_KEY', key }),
+    handleTictoToggle: (checked: boolean) => dispatch({ type: 'TOGGLE_TICTO', checked }),
+    handleCustomKeysToggle: (checked: boolean) => dispatch({ type: 'TOGGLE_CUSTOM_KEYS', checked }),
+    handlePixPayToggle: (checked: boolean) => dispatch({ type: 'TOGGLE_PIX_PAY', checked }),
+    handlePixUpToggle: (checked: boolean) => dispatch({ type: 'TOGGLE_PIX_UP', checked }),
+    handleMaintenanceToggle: (checked: boolean) => dispatch({ type: 'TOGGLE_MAINTENANCE', checked }),
     handleSave,
   };
 };
