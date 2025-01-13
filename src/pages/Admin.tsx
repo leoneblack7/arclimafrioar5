@@ -79,41 +79,31 @@ export default function Admin() {
   }
 
   const renderActiveSection = () => {
-    switch (activeSection) {
-      case "telegram-bot":
-        return <TelegramBotManager />;
-      case "user-management":
-        return <UserManager />;
-      case "dashboard":
-        return <Dashboard />;
-      case "featured":
-        return <FeaturedProductManager />;
-      case "logo":
-        return <LogoManager />;
-      case "products":
-        return <ProductManager />;
-      case "banners":
-        return <BannerManager />;
-      case "orders":
-        return <PixPaymentManager />;
-      case "pix-orders":
-        return <PixOrderManager />;
-      case "credit-card-orders":
-        return <CreditCardOrderManager />;
-      case "leone-whatsapp":
-        return <LeoneWhatsApp />;
-      case "pix-config":
-        return <PixConfigManager />;
-      default:
-        return <Dashboard />;
-    }
+    const sections = {
+      "telegram-bot": <TelegramBotManager />,
+      "user-management": <UserManager />,
+      "dashboard": <Dashboard />,
+      "featured": <FeaturedProductManager />,
+      "logo": <LogoManager />,
+      "products": <ProductManager />,
+      "banners": <BannerManager />,
+      "orders": <PixPaymentManager />,
+      "pix-orders": <PixOrderManager />,
+      "credit-card-orders": <CreditCardOrderManager />,
+      "leone-whatsapp": <LeoneWhatsApp />,
+      "pix-config": <PixConfigManager />
+    };
+
+    return sections[activeSection as keyof typeof sections] || <Dashboard />;
   };
 
   return (
     <div className="min-h-screen bg-background/80 backdrop-blur-sm min-w-[1024px] overflow-auto">
       <AdminSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
-      <div className="ml-64 p-8">
-        {renderActiveSection()}
+      <div className="ml-64 p-8 relative">
+        <div className="absolute inset-0 p-8 overflow-auto">
+          {renderActiveSection()}
+        </div>
       </div>
       <ThemeToggle />
     </div>
