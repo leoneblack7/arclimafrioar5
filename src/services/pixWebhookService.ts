@@ -1,7 +1,7 @@
 import { PixWebhookPayload } from "@/types/pix";
 import { toast } from "sonner";
 import { getFromLocalStorage, saveToLocalStorage } from "@/utils/localStorage";
-import { DatabaseService } from "@/services/databaseService";
+import { orderService } from "./orderService";
 
 export const pixWebhookService = {
   async handleWebhook(payload: PixWebhookPayload) {
@@ -31,39 +31,36 @@ export const pixWebhookService = {
         description: "Pagamento PIX confirmado"
       }];
       
-      // Save to localStorage
-      saveToLocalStorage('orders', orders);
-
-      // Save to MySQL database
-      const order = orders[orderIndex];
-      await DatabaseService.saveOrder(order);
+      // Save to MySQL using orderService
+      const updatedOrder = orders[orderIndex];
+      await orderService.updateOrder(updatedOrder);
 
       // Save customer data for tracking
       const customerOrders = getFromLocalStorage('customer-orders', {});
-      if (order.customer_data?.cpf) {
-        if (!customerOrders[order.customer_data.cpf]) {
-          customerOrders[order.customer_data.cpf] = [];
+      if (updatedOrder.customer_data?.cpf) {
+        if (!customerOrders[updatedOrder.customer_data.cpf]) {
+          customerOrders[updatedOrder.customer_data.cpf] = [];
         }
-        customerOrders[order.customer_data.cpf].push({
-          orderId: order.id,
+        customerOrders[updatedOrder.customer_data.cpf].push({
+          orderId: updatedOrder.id,
           timestamp: Date.now(),
           status: 'paid',
-          tracking: order.tracking_updates
+          tracking: updatedOrder.tracking_updates
         });
         saveToLocalStorage('customer-orders', customerOrders);
       }
 
       // Update customer balance if needed
       try {
-        await this.updateCustomerBalance(order);
+        await this.updateCustomerBalance(updatedOrder);
         console.log("Customer balance updated for order:", transactionId);
       } catch (error) {
         console.error("Error updating customer balance:", error);
       }
 
       // Process affiliate commissions if applicable
-      if (order.total_amount >= 50) {
-        await this.processAffiliateCommission(order);
+      if (updatedOrder.total_amount >= 50) {
+        await this.processAffiliateCommission(updatedOrder);
       }
 
       toast.success("PIX payment processed successfully");

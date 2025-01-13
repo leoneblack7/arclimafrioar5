@@ -13,7 +13,7 @@ interface Order {
 
 const API_URL = 'http://localhost/arclimafrio/api';
 
-export const orderService = {
+class OrderService {
   async getOrders(): Promise<Order[]> {
     try {
       const response = await fetch(`${API_URL}/orders/read.php`);
@@ -23,7 +23,7 @@ export const orderService = {
       console.error('Error fetching orders:', error);
       return getFromLocalStorage('orders', []);
     }
-  },
+  }
 
   async saveOrder(order: Order) {
     try {
@@ -50,9 +50,9 @@ export const orderService = {
       return savedOrder;
     } catch (error) {
       console.error('Error saving order:', error);
-      return this.saveOrderToLocalStorage(order);
+      return this._saveOrderToLocalStorage(order);
     }
-  },
+  }
 
   async updateOrder(order: Order) {
     try {
@@ -73,7 +73,7 @@ export const orderService = {
       saveToLocalStorage('orders', orders);
       return order;
     }
-  },
+  }
 
   async deleteOrder(orderId: string) {
     try {
@@ -93,9 +93,10 @@ export const orderService = {
       saveToLocalStorage('orders', filteredOrders);
       return { message: 'Order deleted successfully' };
     }
-  },
+  }
 
-  private saveOrderToLocalStorage(order: Order) {
+  // Internal helper method (using underscore prefix instead of private)
+  _saveOrderToLocalStorage(order: Order) {
     const orders = getFromLocalStorage('orders', []);
     const index = orders.findIndex((o: Order) => o.id === order.id);
     if (index !== -1) {
@@ -106,4 +107,6 @@ export const orderService = {
     saveToLocalStorage('orders', orders);
     return order;
   }
-};
+}
+
+export const orderService = new OrderService();

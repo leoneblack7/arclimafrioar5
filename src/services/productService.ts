@@ -3,7 +3,7 @@ import { saveToLocalStorage, getFromLocalStorage } from '@/utils/localStorage';
 
 const API_URL = 'http://localhost/arclimafrio/api';
 
-export const productService = {
+class ProductService {
   async getProducts(): Promise<Product[]> {
     try {
       const response = await fetch(`${API_URL}/products/read.php`);
@@ -16,7 +16,7 @@ export const productService = {
       console.error('Error fetching products:', error);
       return getFromLocalStorage('products', []);
     }
-  },
+  }
 
   async saveProduct(product: Product) {
     try {
@@ -46,9 +46,9 @@ export const productService = {
       return savedProduct;
     } catch (error) {
       console.error('Error saving product:', error);
-      return this.saveProductToLocalStorage(product);
+      return this._saveProductToLocalStorage(product);
     }
-  },
+  }
 
   async deleteProduct(productId: number) {
     try {
@@ -68,9 +68,10 @@ export const productService = {
       saveToLocalStorage('products', filteredProducts);
       return { message: 'Product deleted successfully' };
     }
-  },
+  }
 
-  private saveProductToLocalStorage(product: Product) {
+  // Internal helper method (using underscore prefix instead of private)
+  _saveProductToLocalStorage(product: Product) {
     const products = getFromLocalStorage('products', []);
     const newProduct = { ...product, id: product.id || Date.now() };
     if (product.id) {
@@ -82,4 +83,6 @@ export const productService = {
     saveToLocalStorage('products', products);
     return newProduct;
   }
-};
+}
+
+export const productService = new ProductService();
