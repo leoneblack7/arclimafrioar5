@@ -1,0 +1,15 @@
+Configuração da Conexão MySQL:
+
+Local do arquivo de conexão: api/config/database.php
+
+Para alterar as configurações de conexão, edite as seguintes linhas:
+
+define('DB_HOST', 'localhost');     // Servidor do MySQL (geralmente localhost)
+define('DB_USER', 'root');          // Nome de usuário do MySQL
+define('DB_PASS', '');              // Senha do MySQL
+define('DB_NAME', 'arclimafrio');   // Nome do banco de dados
+
+Observações:
+- Se estiver usando XAMPP, o usuário padrão é 'root' e a senha é vazia
+- O nome do banco de dados padrão é 'arclimafrio'
+- Certifique-se de que o XAMPP (Apache e MySQL) está rodando antes de usar o sistema
