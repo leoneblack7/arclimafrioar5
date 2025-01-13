@@ -19,6 +19,8 @@ export const ProductForm = ({ product, onSave, onCancel }: ProductFormProps) => 
     ...product,
     images: product.images || [product.image],
     isDescriptionActive: product.isDescriptionActive ?? true,
+    isImagesActive: product.isImagesActive ?? true,
+    isSpecificationsActive: product.isSpecificationsActive ?? true,
     specifications: product.specifications || "",
   });
 
@@ -65,17 +67,23 @@ export const ProductForm = ({ product, onSave, onCancel }: ProductFormProps) => 
 
           <ImageUploader
             images={formData.images}
+            isActive={formData.isImagesActive}
             onImagesChange={(images) => setFormData({
               ...formData,
               image: images[0],
               images
             })}
+            onActiveChange={(isImagesActive) => setFormData({ ...formData, isImagesActive })}
           />
 
           <SpecificationsEditor
             specifications={formData.specifications}
+            isActive={formData.isSpecificationsActive}
             onSpecificationsChange={(specifications) => 
               setFormData({ ...formData, specifications })
+            }
+            onActiveChange={(isSpecificationsActive) => 
+              setFormData({ ...formData, isSpecificationsActive })
             }
           />
 

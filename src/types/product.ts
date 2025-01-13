@@ -6,6 +6,8 @@ export interface Product {
   images: string[];
   description: string;
   isDescriptionActive?: boolean;
+  isImagesActive?: boolean;
+  isSpecificationsActive?: boolean;
   specifications?: string;
   active: boolean;
   pixLink?: string;
