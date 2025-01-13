@@ -26,6 +26,48 @@ export const PixUpForm = ({ config, onConfigChange }: PixUpFormProps) => {
     });
   };
 
+  const generateTestPix = async () => {
+    if (!config.pixUpClientId || !config.pixUpClientSecret) {
+      toast.error("Por favor, preencha o Client ID e Client Secret");
+      return;
+    }
+
+    try {
+      toast.info("Gerando PIX de teste...");
+      
+      // Primeiro autenticar
+      const authResponse = await pixUpService.authenticate(
+        config.pixUpClientId,
+        config.pixUpClientSecret
+      );
+
+      if (!authResponse.access_token) {
+        toast.error("Erro na autenticação com PixUp");
+        return;
+      }
+
+      // Gerar QR Code PIX
+      const qrCodeResponse = await pixUpService.createQrCode(
+        authResponse.access_token,
+        5000, // R$ 50,00 em centavos
+        "Cliente Teste",
+        "12345678900", // CPF de teste
+        `TEST-${Date.now()}` // ID único para o teste
+      );
+
+      if (qrCodeResponse.emvqrcps) {
+        toast.success("PIX de teste gerado com sucesso!", {
+          description: `ID da transação: ${qrCodeResponse.transactionId}`
+        });
+      } else {
+        toast.error("Erro ao gerar PIX de teste: Resposta inválida");
+      }
+    } catch (error) {
+      console.error("Erro ao gerar PIX de teste:", error);
+      toast.error("Erro ao gerar PIX de teste. Verifique suas credenciais.");
+    }
+  };
+
   const testConnection = async () => {
     if (!config.pixUpClientId || !config.pixUpClientSecret) {
       toast.error("Por favor, preencha o Client ID e Client Secret");
@@ -76,13 +118,22 @@ export const PixUpForm = ({ config, onConfigChange }: PixUpFormProps) => {
             placeholder="Insira seu Client Secret do PixUp"
           />
         </div>
-        <Button 
-          variant="outline" 
-          onClick={testConnection}
-          className="w-full"
-        >
-          Testar Conexão
-        </Button>
+        <div className="flex flex-col gap-2">
+          <Button 
+            variant="outline" 
+            onClick={testConnection}
+            className="w-full"
+          >
+            Testar Conexão
+          </Button>
+          <Button 
+            variant="default" 
+            onClick={generateTestPix}
+            className="w-full"
+          >
+            Gerar PIX de Teste (R$ 50,00)
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
