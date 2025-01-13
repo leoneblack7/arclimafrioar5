@@ -26,29 +26,46 @@ interface PixUpQRCodeResponse {
   created_at: string;
 }
 
-const PROXY_BASE_URL = 'https://api.allorigins.win/raw?url=';
 const API_BASE_URL = 'https://api.pixupbr.com/v2';
+
+// Helper function to handle API requests
+const makeRequest = async (endpoint: string, options: RequestInit) => {
+  const proxyUrl = 'https://corsproxy.io/';
+  const url = `${proxyUrl}?${encodeURIComponent(API_BASE_URL + endpoint)}`;
+  
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        ...options.headers,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`API request failed: ${errorText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('API request error:', error);
+    throw error;
+  }
+};
 
 export const pixUpService = {
   async authenticate(clientId: string, clientSecret: string): Promise<PixUpAuthResponse> {
     const credentials = btoa(`${clientId}:${clientSecret}`);
-    const url = `${PROXY_BASE_URL}${encodeURIComponent(`${API_BASE_URL}/authentication`)}`;
     
-    const response = await fetch(url, {
+    return makeRequest('/authentication', {
       method: 'POST',
       headers: {
         'Authorization': `Basic ${credentials}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: 'grant_type=client_credentials'
     });
-
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Failed to authenticate with PixUp: ${error}`);
-    }
-
-    return response.json();
   },
 
   async createQrCode(
@@ -67,50 +84,31 @@ export const pixUpService = {
       }
     };
 
-    const url = `${PROXY_BASE_URL}${encodeURIComponent(`${API_BASE_URL}/payment/pix/create`)}`;
-    
-    const response = await fetch(url, {
+    return makeRequest('/payment/pix/create', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload)
     });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Failed to generate PIX QR Code');
-    }
-
-    return response.json();
   },
 
   async checkTransactionStatus(
     accessToken: string,
     transactionId: string
   ): Promise<{ status: string }> {
-    const url = `${PROXY_BASE_URL}${encodeURIComponent(`${API_BASE_URL}/payment/pix/status/${transactionId}`)}`;
-    
-    const response = await fetch(url, {
+    return makeRequest(`/payment/pix/status/${transactionId}`, {
+      method: 'GET',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
       }
     });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Failed to check transaction status');
-    }
-
-    return response.json();
   },
 
   async processWebhook(payload: PixWebhookPayload) {
     try {
       const { transactionId, status, amount } = payload.requestBody;
       
-      // Processa o webhook com base no tipo de evento
       switch (payload.requestBody.transactionType) {
         case "RECEIVEPIX":
           return await pixWebhookService.handleWebhook(payload);
