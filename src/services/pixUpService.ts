@@ -1,5 +1,5 @@
 import { pixWebhookService } from "./pixWebhookService";
-import { PixWebhookPayload } from "@/types/pix";
+import { PixUpTransaction, PixWebhookPayload } from "@/types/pix";
 
 interface PixUpPaymentRequest {
   amount: number;
@@ -12,7 +12,7 @@ interface PixUpPaymentRequest {
 
 interface PixUpResponse {
   transactionId: string;
-  emvqrcps: string; // QR code data
+  emvqrcps: string;
   status: string;
 }
 
@@ -31,7 +31,7 @@ export const pixUpService = {
       external_id: orderId,
       payer: {
         name: payerName,
-        document: document.replace(/\D/g, '') // Remove non-numeric characters
+        document: document.replace(/\D/g, '')
       }
     };
 
