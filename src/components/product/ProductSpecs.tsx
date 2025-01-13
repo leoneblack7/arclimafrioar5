@@ -1,15 +1,20 @@
 interface ProductSpecsProps {
   className?: string;
+  specifications?: string;
+  isActive?: boolean;
 }
 
-export function ProductSpecs({ className = "" }: ProductSpecsProps) {
+export function ProductSpecs({ className = "", specifications, isActive }: ProductSpecsProps) {
+  if (!isActive || !specifications) {
+    return null;
+  }
+
   return (
-    <div className={`flex justify-center ${className}`}>
-      <img
-        src="/lovable-uploads/5275c902-4f65-478a-847b-67042b1e63c6.png"
-        alt="Especificações do produto"
-        className="w-full max-w-md object-contain"
-      />
+    <div className={`space-y-4 ${className}`}>
+      <h2 className="text-lg font-semibold">Especificações Técnicas</h2>
+      <div className="whitespace-pre-wrap font-mono text-sm">
+        {specifications}
+      </div>
     </div>
   );
 }
