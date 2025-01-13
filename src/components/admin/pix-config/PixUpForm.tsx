@@ -32,25 +32,29 @@ export const PixUpForm = ({ config, onConfigChange }: PixUpFormProps) => {
     }
 
     try {
-      // Test connection logic using Client ID and Secret
-      const credentials = btoa(`${config.pixUpClientId}:${config.pixUpClientSecret}`);
-      const response = await fetch('https://api.pixup.com.br/authentication', {
+      toast.info("Testando conexão com PixUp...");
+      
+      // Use a proxy or backend endpoint instead of direct API call
+      const response = await fetch('/api/pixup/test-connection', {
         method: 'POST',
         headers: {
-          'Authorization': `Basic ${credentials}`,
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json',
         },
-        body: 'grant_type=client_credentials'
+        body: JSON.stringify({
+          clientId: config.pixUpClientId,
+          clientSecret: config.pixUpClientSecret,
+        })
       });
 
       if (response.ok) {
         toast.success("Conexão com PixUp estabelecida com sucesso!");
       } else {
-        toast.error("Erro ao conectar com PixUp. Verifique suas credenciais.");
+        const errorData = await response.json();
+        toast.error(`Erro ao conectar com PixUp: ${errorData.message || 'Verifique suas credenciais'}`);
       }
     } catch (error) {
-      toast.error("Erro ao testar conexão com PixUp");
       console.error("PixUp connection error:", error);
+      toast.error("Erro ao testar conexão com PixUp. Verifique se o serviço está disponível.");
     }
   };
 
