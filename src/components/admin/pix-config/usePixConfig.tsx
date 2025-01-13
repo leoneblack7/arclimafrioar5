@@ -14,7 +14,8 @@ const defaultConfig: PixConfig = {
   pixCity: "",
   pixPayClientId: "",
   pixPayClientSecret: "",
-  pixUpApiKey: "",
+  pixUpClientId: "",
+  pixUpClientSecret: "",
   maintenanceMode: true,
 };
 

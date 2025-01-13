@@ -12,3 +12,27 @@ export interface PixConfig {
   pixUpClientSecret?: string;
   maintenanceMode: boolean;
 }
+
+export interface PixUpTransaction {
+  transactionId: string;
+  status: string;
+  amount: number;
+  external_id: string;
+  payer: {
+    name: string;
+    document: string;
+  };
+}
+
+export interface PixWebhookPayload {
+  requestBody: {
+    transactionId: string;
+    transactionType: string;
+    status: string;
+    amount: number;
+    payer?: {
+      name: string;
+      document: string;
+    };
+  };
+}

@@ -1,5 +1,5 @@
 import { pixWebhookService } from "./pixWebhookService";
-import { PixUpTransaction, PixWebhookPayload } from "@/types/pix";
+import { PixWebhookPayload } from "@/types/pix";
 
 interface PixUpPaymentRequest {
   amount: number;
@@ -18,12 +18,14 @@ interface PixUpResponse {
 
 export const pixUpService = {
   async createQrCode(
-    apiKey: string,
+    clientId: string,
+    clientSecret: string,
     amount: number,
     payerName: string,
     document: string,
     orderId: string
   ): Promise<PixUpResponse> {
+    const credentials = btoa(`${clientId}:${clientSecret}`);
     const payload: PixUpPaymentRequest = {
       amount,
       external_id: orderId,
@@ -36,7 +38,7 @@ export const pixUpService = {
     const response = await fetch('https://api.pixup.com.br/v1/payment/pix/create', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        'Authorization': `Basic ${credentials}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload)
@@ -50,12 +52,14 @@ export const pixUpService = {
   },
 
   async checkTransactionStatus(
-    apiKey: string,
+    clientId: string,
+    clientSecret: string,
     transactionId: string
   ): Promise<{ status: string }> {
+    const credentials = btoa(`${clientId}:${clientSecret}`);
     const response = await fetch(`https://api.pixup.com.br/v1/payment/pix/status/${transactionId}`, {
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        'Authorization': `Basic ${credentials}`,
       }
     });
 
