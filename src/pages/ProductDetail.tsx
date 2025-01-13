@@ -81,11 +81,11 @@ export default function ProductDetail() {
     : [product.image];
 
   return (
-    <div className="min-h-screen bg-gray-50 touch-none">
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
       <div className="container mx-auto px-4 pt-16 md:pt-24 pb-16">
         <div className="grid md:grid-cols-2 gap-6 md:gap-8">
-          <div className="w-full touch-none">
+          <div className="w-full">
             <ProductGallery images={productImages} />
           </div>
           <div className="space-y-4 md:space-y-6">
@@ -94,7 +94,7 @@ export default function ProductDetail() {
                 <h1 className="text-xl md:text-2xl font-bold text-gray-900">{product.title}</h1>
                 <p className="text-sm text-gray-500">Código: {product.id}</p>
               </div>
-              <Button variant="ghost" size="icon" className="touch-none">
+              <Button variant="ghost" size="icon">
                 <Heart className="h-6 w-6" />
               </Button>
             </div>
