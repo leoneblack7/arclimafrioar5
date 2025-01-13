@@ -10,6 +10,8 @@ export interface Product {
   isImagesActive?: boolean;
   isSpecificationsActive?: boolean;
   isAdditionalImagesActive?: boolean;
+  isRelatedProductsActive?: boolean;
+  relatedProductIds?: number[];
   specifications?: string;
   active: boolean;
   pixLink?: string;

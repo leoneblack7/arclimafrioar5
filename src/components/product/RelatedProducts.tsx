@@ -1,20 +1,49 @@
 import { useQuery } from "@tanstack/react-query";
 import { getFromLocalStorage } from "@/utils/localStorage";
 import { ProductCard } from "@/components/ProductCard";
+import { Product } from "@/types/product";
 
 interface RelatedProductsProps {
   currentProductId: number;
+  isActive?: boolean;
+  relatedProductIds?: number[];
 }
 
-export const RelatedProducts = ({ currentProductId }: RelatedProductsProps) => {
+export const RelatedProducts = ({ 
+  currentProductId, 
+  isActive = true,
+  relatedProductIds = []
+}: RelatedProductsProps) => {
   const { data: relatedProducts } = useQuery({
-    queryKey: ["featured-products"],
+    queryKey: ["featured-products", relatedProductIds],
     queryFn: async () => {
       const products = getFromLocalStorage('featured-products', []);
+      
+      // If specific products are selected, show those
+      if (relatedProductIds.length > 0) {
+        return products
+          .filter((product: Product) => 
+            product.active && 
+            relatedProductIds.includes(product.id)
+          )
+          .slice(0, 3)
+          .map((item: Product) => ({
+            id: Number(item.id),
+            title: item.title,
+            price: item.price,
+            image: item.image || '/placeholder.svg',
+            description: item.description,
+          }));
+      }
+
+      // Otherwise, show random featured products
       return products
-        .filter((product: any) => product.active && product.id !== currentProductId)
+        .filter((product: Product) => 
+          product.active && 
+          product.id !== currentProductId
+        )
         .slice(0, 3)
-        .map((item: any) => ({
+        .map((item: Product) => ({
           id: Number(item.id),
           title: item.title,
           price: item.price,
@@ -24,7 +53,7 @@ export const RelatedProducts = ({ currentProductId }: RelatedProductsProps) => {
     }
   });
 
-  if (!relatedProducts?.length) return null;
+  if (!isActive || !relatedProducts?.length) return null;
 
   return (
     <div className="border rounded-lg p-4 mb-6 w-full">

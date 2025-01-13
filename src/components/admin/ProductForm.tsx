@@ -7,6 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { ImageUploader } from "./product-form/ImageUploader";
 import { DescriptionEditor } from "./product-form/DescriptionEditor";
 import { SpecificationsEditor } from "./product-form/SpecificationsEditor";
+import { RelatedProductsEditor } from "./product-form/RelatedProductsEditor";
 
 interface ProductFormProps {
   product: Product;
@@ -23,6 +24,8 @@ export const ProductForm = ({ product, onSave, onCancel }: ProductFormProps) => 
     isImagesActive: product.isImagesActive ?? true,
     isSpecificationsActive: product.isSpecificationsActive ?? true,
     isAdditionalImagesActive: product.isAdditionalImagesActive ?? true,
+    isRelatedProductsActive: product.isRelatedProductsActive ?? true,
+    relatedProductIds: product.relatedProductIds || [],
     specifications: product.specifications || "",
   });
 
@@ -87,6 +90,17 @@ export const ProductForm = ({ product, onSave, onCancel }: ProductFormProps) => 
             }
             onActiveChange={(isSpecificationsActive) => 
               setFormData({ ...formData, isSpecificationsActive })
+            }
+          />
+
+          <RelatedProductsEditor
+            relatedProductIds={formData.relatedProductIds}
+            isActive={formData.isRelatedProductsActive}
+            onRelatedProductsChange={(relatedProductIds) => 
+              setFormData({ ...formData, relatedProductIds })
+            }
+            onActiveChange={(isRelatedProductsActive) => 
+              setFormData({ ...formData, isRelatedProductsActive })
             }
           />
 
