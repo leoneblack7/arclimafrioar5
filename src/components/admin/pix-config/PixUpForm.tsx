@@ -1,11 +1,11 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PixConfig } from "@/types/pix";
 import { toast } from "sonner";
 import { pixUpService } from "@/services/pixUpService";
 import { useState } from "react";
+import { PixUpApiKeys } from "./components/PixUpApiKeys";
+import { PixUpTestCpf } from "./components/PixUpTestCpf";
+import { PixUpActions } from "./components/PixUpActions";
 
 interface PixUpFormProps {
   config: PixConfig;
@@ -43,7 +43,6 @@ export const PixUpForm = ({ config, onConfigChange }: PixUpFormProps) => {
     try {
       toast.info("Gerando PIX de teste...");
       
-      // Primeiro autenticar
       const authResponse = await pixUpService.authenticate(
         config.pixUpClientId,
         config.pixUpClientSecret
@@ -54,7 +53,6 @@ export const PixUpForm = ({ config, onConfigChange }: PixUpFormProps) => {
         return;
       }
 
-      // Gerar QR Code PIX
       const qrCodeResponse = await pixUpService.createQrCode(
         authResponse.access_token,
         5000, // R$ 50,00 em centavos
@@ -101,64 +99,25 @@ export const PixUpForm = ({ config, onConfigChange }: PixUpFormProps) => {
     }
   };
 
-  const handleCpfChange = (value: string) => {
-    // Remove tudo que não for número
-    const cpfNumbers = value.replace(/\D/g, '');
-    // Limita a 11 dígitos
-    setTestCpf(cpfNumbers.slice(0, 11));
-  };
-
   return (
     <Card>
       <CardHeader>
         <CardTitle>Configurações do PixUp</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="pixup-client-id">Client ID</Label>
-          <Input
-            id="pixup-client-id"
-            value={config.pixUpClientId || ""}
-            onChange={(e) => handleClientIdChange(e.target.value)}
-            placeholder="Insira seu Client ID do PixUp"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="pixup-client-secret">Client Secret</Label>
-          <Input
-            id="pixup-client-secret"
-            type="password"
-            value={config.pixUpClientSecret || ""}
-            onChange={(e) => handleClientSecretChange(e.target.value)}
-            placeholder="Insira seu Client Secret do PixUp"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="test-cpf">CPF para Teste</Label>
-          <Input
-            id="test-cpf"
-            value={testCpf}
-            onChange={(e) => handleCpfChange(e.target.value)}
-            placeholder="Digite o CPF para teste (somente números)"
-            maxLength={11}
-          />
-        </div>
-        <div className="flex flex-col gap-2">
-          <Button 
-            variant="outline" 
-            onClick={testConnection}
-            className="w-full"
-          >
-            Testar Conexão
-          </Button>
-          <Button 
-            variant="default" 
-            onClick={generateTestPix}
-            className="w-full"
-          >
-            Gerar PIX de Teste (R$ 50,00)
-          </Button>
-        </div>
+        <PixUpApiKeys
+          config={config}
+          onClientIdChange={handleClientIdChange}
+          onClientSecretChange={handleClientSecretChange}
+        />
+        <PixUpTestCpf
+          testCpf={testCpf}
+          onCpfChange={setTestCpf}
+        />
+        <PixUpActions
+          onTestConnection={testConnection}
+          onGenerateTestPix={generateTestPix}
+        />
       </CardContent>
     </Card>
   );
