@@ -59,6 +59,25 @@ export default function Admin() {
     };
   }, [isAuthenticated]);
 
+  const renderActiveSection = () => {
+    const sections = {
+      "telegram-bot": <TelegramBotManager />,
+      "user-management": <UserManager />,
+      "dashboard": <Dashboard />,
+      "featured": <FeaturedProductManager />,
+      "logo": <LogoManager />,
+      "products": <ProductManager />,
+      "banners": <BannerManager />,
+      "orders": <PixPaymentManager />,
+      "pix-orders": <PixOrderManager />,
+      "credit-card-orders": <CreditCardOrderManager />,
+      "leone-whatsapp": <LeoneWhatsApp />,
+      "pix-config": <PixConfigManager />
+    };
+
+    return sections[activeSection as keyof typeof sections] || <Dashboard />;
+  };
+
   if (!isAuthenticated) {
     return (
       <div 
