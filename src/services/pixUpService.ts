@@ -61,5 +61,17 @@ export const pixUpService = {
     }
 
     return response.json();
+  },
+
+  async processWebhook(payload: any) {
+    // Validate webhook signature if provided by PixUp
+    // Process the webhook payload
+    const { requestBody } = payload;
+    
+    if (requestBody?.transactionType === "RECEIVEPIX" && requestBody?.transactionId) {
+      return await pixWebhookService.handleWebhook(payload);
+    }
+    
+    return { success: false, message: "Invalid webhook payload" };
   }
 };
