@@ -12,7 +12,7 @@ import { RelatedProducts } from '@/components/product/RelatedProducts';
 import { ProductGallery } from '@/components/product/ProductGallery';
 import { Footer } from '@/components/home/Footer';
 import { toast } from 'sonner';
-import { Link } from 'react-router-dom';
+import { Navbar } from '@/components/Navbar';
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -75,15 +75,9 @@ export default function ProductDetail() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <Navbar />
+      
       <div className="container mx-auto px-4 py-4 mb-4">
-        <Link to="/" className="block w-48 mb-6">
-          <img
-            src="/lovable-uploads/cac2472b-8231-4414-8fd3-13200a6cecc9.png"
-            alt="ArclimaFrio Logo"
-            className="w-full h-auto"
-          />
-        </Link>
-
         <ProductDetailHeader 
           title={product.title} 
           id={product.id} 
