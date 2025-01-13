@@ -15,14 +15,15 @@ interface Order {
   total_amount: number;
   payment_method: string;
   status: string;
+  transaction_id?: string;
 }
 
-const API_URL = 'http://localhost:3001/api'; // You'll need to create a backend service
+const API_URL = 'http://localhost/arclimafrio/api'; // Update this to match your XAMPP setup
 
 export const DatabaseService = {
   async getProducts(): Promise<Product[]> {
     try {
-      const response = await fetch(`${API_URL}/products`);
+      const response = await fetch(`${API_URL}/products/read.php`);
       if (!response.ok) throw new Error('Failed to fetch products');
       return response.json();
     } catch (error) {
@@ -34,7 +35,7 @@ export const DatabaseService = {
 
   async saveProduct(product: Product) {
     try {
-      const response = await fetch(`${API_URL}/products`, {
+      const response = await fetch(`${API_URL}/products/create.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -54,21 +55,9 @@ export const DatabaseService = {
     }
   },
 
-  async getOrders(): Promise<Order[]> {
-    try {
-      const response = await fetch(`${API_URL}/orders`);
-      if (!response.ok) throw new Error('Failed to fetch orders');
-      return response.json();
-    } catch (error) {
-      console.error('Error fetching orders:', error);
-      // Fallback to localStorage if API is not available
-      return JSON.parse(localStorage.getItem('orders') || '[]');
-    }
-  },
-
   async saveOrder(order: Order) {
     try {
-      const response = await fetch(`${API_URL}/orders`, {
+      const response = await fetch(`${API_URL}/orders/create.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
