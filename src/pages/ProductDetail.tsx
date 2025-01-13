@@ -9,6 +9,7 @@ import { ProductDetailPrice } from '@/components/product/ProductDetailPrice';
 import { ProductDetailActions } from '@/components/product/ProductDetailActions';
 import { ProductDetailShipping } from '@/components/product/ProductDetailShipping';
 import { RelatedProducts } from '@/components/product/RelatedProducts';
+import { ProductGallery } from '@/components/product/ProductGallery';
 import { toast } from 'sonner';
 
 export default function ProductDetail() {
@@ -78,10 +79,8 @@ export default function ProductDetail() {
       />
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
-        <ProductDetailImages 
-          title={product.title}
-          images={[product.image, ...(product.additionalImages || [])]}
-          isActive={product.isAdditionalImagesActive}
+        <ProductGallery 
+          images={[product.image, ...(product.images || [])]}
         />
         
         <div className="space-y-6">
@@ -97,6 +96,12 @@ export default function ProductDetail() {
           />
         </div>
       </div>
+
+      <ProductDetailImages 
+        title={product.title}
+        images={product.additionalImages || []}
+        isActive={product.isAdditionalImagesActive}
+      />
 
       <RelatedProducts 
         currentProductId={product.id}
