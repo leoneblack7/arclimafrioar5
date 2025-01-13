@@ -7,8 +7,11 @@ import { ProductsSection } from "@/components/home/ProductsSection";
 import { CTASection } from "@/components/home/CTASection";
 import { Footer } from "@/components/home/Footer";
 import { getFromLocalStorage } from "@/utils/localStorage";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Index = () => {
+  const isMobile = useIsMobile();
+
   const { data: products, isLoading } = useQuery({
     queryKey: ["featured-products"],
     queryFn: async () => {
@@ -27,30 +30,32 @@ const Index = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <Navbar />
       <div className="w-full">
         <Banner />
       </div>
-      <HeroSection onExploreClick={() => {
-        const productsSection = document.getElementById('products-section');
-        if (productsSection) {
-          productsSection.scrollIntoView({ behavior: 'smooth' });
-        }
-      }} />
-      <FeaturesSection />
-      {isLoading ? (
-        <div className="text-center py-16">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-gray-600">Carregando produtos...</p>
-        </div>
-      ) : (
-        <ProductsSection 
-          products={products || []} 
-          title="Produtos em Destaque"
-          description="Explore nossa seleção de produtos premium com tecnologia de ponta e eficiência energética"
-        />
-      )}
+      <div className={`${isMobile ? 'px-4' : 'container mx-auto'}`}>
+        <HeroSection onExploreClick={() => {
+          const productsSection = document.getElementById('products-section');
+          if (productsSection) {
+            productsSection.scrollIntoView({ behavior: 'smooth' });
+          }
+        }} />
+        <FeaturesSection />
+        {isLoading ? (
+          <div className="text-center py-16">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-4 text-gray-600">Carregando produtos...</p>
+          </div>
+        ) : (
+          <ProductsSection 
+            products={products || []} 
+            title="Produtos em Destaque"
+            description="Explore nossa seleção de produtos premium com tecnologia de ponta e eficiência energética"
+          />
+        )}
+      </div>
       <CTASection />
       <Footer />
     </div>

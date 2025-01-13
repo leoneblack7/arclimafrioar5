@@ -1,20 +1,27 @@
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface HeroSectionProps {
   onExploreClick: () => void;
 }
 
 export const HeroSection = ({ onExploreClick }: HeroSectionProps) => {
+  const isMobile = useIsMobile();
+
   return (
-    <section className="pb-12 px-4 bg-gradient-to-b from-white to-blue-50">
-      <div className="container mx-auto text-center pt-8">
-        <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500">
+    <section className="py-12 md:py-20">
+      <div className="text-center">
+        <h1 className={`${isMobile ? 'text-3xl' : 'text-4xl md:text-6xl'} font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500 animate-fade-in`}>
           Climatização Inteligente com ArclimaFrio
         </h1>
-        <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+        <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto animate-fade-in delay-100">
           Descubra nossa linha premium de ar condicionado com tecnologia de ponta e máxima eficiência
         </p>
-        <Button size="lg" className="animate-float" onClick={onExploreClick}>
+        <Button 
+          size={isMobile ? "default" : "lg"} 
+          className="animate-float bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 transform hover:scale-105 transition-all duration-300"
+          onClick={onExploreClick}
+        >
           Explorar Produtos
         </Button>
       </div>
