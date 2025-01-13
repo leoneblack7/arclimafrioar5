@@ -12,6 +12,7 @@ import { ProductDetailActions } from "@/components/product/ProductDetailActions"
 import { ProductDetailShipping } from "@/components/product/ProductDetailShipping";
 import { ProductDetailDescription } from "@/components/product/ProductDetailDescription";
 import { ProductDetailImages } from "@/components/product/ProductDetailImages";
+import { RelatedProducts } from "@/components/product/RelatedProducts";
 import { Footer } from "@/components/home/Footer";
 
 export default function ProductDetail() {
@@ -98,12 +99,16 @@ export default function ProductDetail() {
               specifications={product.specifications}
               isActive={product.isSpecificationsActive}
             />
-            <ProductDetailImages 
-              title="Imagens Adicionais"
-              images={product.additionalImages || []}
-              isActive={product.isAdditionalImagesActive}
-            />
           </div>
+        </div>
+        
+        <div className="mt-12">
+          <RelatedProducts currentProductId={Number(id)} />
+          <ProductDetailImages 
+            title="Produto de qualidade"
+            images={product.additionalImages || []}
+            isActive={product.isAdditionalImagesActive}
+          />
         </div>
       </div>
       <Footer />
