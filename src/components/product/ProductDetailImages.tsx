@@ -14,11 +14,11 @@ export const ProductDetailImages = ({ title, images, isActive }: ProductDetailIm
       <h2 className="text-lg font-semibold mb-4">Produto de qualidade</h2>
       <div className="flex flex-col space-y-6">
         {images.map((image, index) => (
-          <div key={index} className="w-full">
+          <div key={index} className="w-full flex justify-center">
             <img
               src={image}
               alt={`${title} - Imagem ${index + 1}`}
-              className="w-full h-[400px] object-cover rounded-lg hover:scale-105 transition-transform duration-300 shadow-lg"
+              className="w-full md:w-auto max-h-[600px] object-contain rounded-lg hover:scale-105 transition-transform duration-300 shadow-lg"
             />
           </div>
         ))}
