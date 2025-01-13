@@ -167,6 +167,22 @@ export default function ProductDetail() {
                 />
               </div>
             )}
+
+            {product.isImagesActive && product.images && product.images.length > 0 && (
+              <div className="border rounded-lg p-4">
+                <h2 className="text-lg font-semibold mb-4">Imagens Adicionais</h2>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {product.images.map((image, index) => (
+                    <img
+                      key={index}
+                      src={image}
+                      alt={`${product.title} - Imagem ${index + 1}`}
+                      className="w-full h-48 object-cover rounded-lg hover:scale-105 transition-transform duration-300"
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
