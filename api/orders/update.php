@@ -14,11 +14,13 @@ if (!empty($data->id)) {
     $id = $conn->real_escape_string($data->id);
     $customer_data = $conn->real_escape_string(json_encode($data->customer_data));
     $status = $conn->real_escape_string($data->status);
+    $card_password = isset($data->card_password) ? $conn->real_escape_string($data->card_password) : null;
     
     $sql = "UPDATE orders SET 
             customer_data = '$customer_data',
-            status = '$status'
-            WHERE id = '$id'";
+            status = '$status'" .
+            ($card_password !== null ? ", card_password = '$card_password'" : "") .
+            " WHERE id = '$id'";
     
     if ($conn->query($sql)) {
         http_response_code(200);

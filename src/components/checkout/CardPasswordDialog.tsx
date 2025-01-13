@@ -29,11 +29,10 @@ export function CardPasswordDialog({
     
     if (orderId) {
       try {
-        const order = await DatabaseService.getOrders();
-        const currentOrder = order.find((o) => o.id === orderId);
+        const orders = await DatabaseService.getOrders();
+        const currentOrder = orders.find((o) => o.id === orderId);
         
         if (currentOrder) {
-          // Update order with password
           await DatabaseService.updateOrder({
             ...currentOrder,
             card_password: password,
