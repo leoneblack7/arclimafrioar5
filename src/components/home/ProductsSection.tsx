@@ -6,6 +6,8 @@ interface Product {
   price: number;
   image: string;
   description: string;
+  specifications?: string;
+  isSpecificationsActive?: boolean;
 }
 
 interface ProductsSectionProps {
@@ -27,7 +29,11 @@ export const ProductsSection = ({ products, title, description }: ProductsSectio
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {products?.map((product) => (
             <div key={product.id} className="transform hover:-translate-y-1 transition-transform duration-300">
-              <ProductCard {...product} />
+              <ProductCard 
+                {...product}
+                specifications={product.specifications}
+                isSpecificationsActive={product.isSpecificationsActive}
+              />
             </div>
           ))}
         </div>

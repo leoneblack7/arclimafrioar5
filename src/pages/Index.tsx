@@ -16,33 +16,39 @@ const Index = () => {
   const { data: products, isLoading } = useQuery({
     queryKey: ["featured-products"],
     queryFn: async () => {
+      console.log("Fetching featured products");
       const storedProducts = getFromLocalStorage('featured-products', []);
+      console.log("Stored products:", storedProducts);
       return storedProducts
         .filter((item: any) => item.active)
         .map((item: any) => ({
           id: Number(item.id),
           title: item.title,
-          price: item.price,
+          price: Number(item.price),
           image: item.image || '/placeholder.svg',
           description: item.description,
-          active: item.active
+          active: item.active,
+          specifications: item.specifications,
+          isSpecificationsActive: item.isSpecificationsActive
         }));
     }
   });
 
+  const scrollToProducts = () => {
+    const productsSection = document.getElementById('products-section');
+    if (productsSection) {
+      productsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-gray-50 to-white">
       <Navbar />
       <div className="w-full">
         <Banner />
       </div>
-      <div className={`${isMobile ? 'px-4' : 'container mx-auto'}`}>
-        <HeroSection onExploreClick={() => {
-          const productsSection = document.getElementById('products-section');
-          if (productsSection) {
-            productsSection.scrollIntoView({ behavior: 'smooth' });
-          }
-        }} />
+      <div className={`flex-grow ${isMobile ? 'px-4' : 'container mx-auto'}`}>
+        <HeroSection onExploreClick={scrollToProducts} />
         <FeaturesSection />
         <div className="w-full my-8">
           <SecondaryBanner />
