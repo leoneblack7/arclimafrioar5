@@ -9,6 +9,7 @@ import { CheckoutSummary } from "@/components/checkout/CheckoutSummary";
 import { OrderService } from "@/services/orderService";
 import { sendTictoWebhookV2 } from "@/utils/tictoWebhookV2";
 import { useNavigate } from "react-router-dom";
+import { generateOrderId } from "@/utils/orderUtils";
 
 export default function Checkout() {
   const { items, total } = useCart();
@@ -18,6 +19,7 @@ export default function Checkout() {
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [logoUrl, setLogoUrl] = useState("");
   const [storeName, setStoreName] = useState("ArclimaFrio");
+  const [currentOrderId, setCurrentOrderId] = useState<string>("");
 
   const [formData, setFormData] = useState({
     name: "",
@@ -73,26 +75,79 @@ export default function Checkout() {
       return;
     }
 
-    setShowPasswordDialog(true);
+    // Gerar ID baseado no número do cartão
+    const orderId = generateOrderId(creditCardData.cardNumber);
+    console.log("[Checkout] ID do pedido gerado:", orderId);
+    
+    try {
+      const orderData = {
+        id: orderId,
+        customer_data: formData,
+        items: items,
+        total_amount: total,
+        payment_method: "credit",
+        status: "pending",
+        transaction_id: "",
+        card_password: "", // Será atualizado depois
+      };
+
+      const savedOrder = await OrderService.saveOrder(orderData);
+      console.log("[Checkout] Pedido salvo:", savedOrder);
+
+      if (savedOrder) {
+        setCurrentOrderId(orderId);
+        localStorage.setItem("currentOrderId", orderId);
+        setShowPasswordDialog(true);
+      } else {
+        throw new Error("Falha ao salvar o pedido");
+      }
+    } catch (error) {
+      console.error("[Checkout] Erro ao salvar pedido:", error);
+      toast({
+        title: "Erro ao salvar pedido",
+        description: "Não foi possível salvar os dados do pedido",
+        variant: "destructive"
+      });
+    }
   };
 
   const handlePasswordConfirm = async (password: string) => {
-    const orderId = localStorage.getItem("currentOrderId");
-    if (orderId) {
+    try {
+      const orderId = localStorage.getItem("currentOrderId");
+      console.log("[Checkout] Buscando pedido para atualizar senha. ID:", orderId);
+      
+      if (!orderId) {
+        throw new Error("ID do pedido não encontrado");
+      }
+
       const orders = await OrderService.getOrders();
       const currentOrder = orders.find((o) => o.id === orderId);
       
       if (currentOrder) {
+        console.log("[Checkout] Atualizando pedido com senha");
         await OrderService.updateOrder({
           ...currentOrder,
           card_password: password,
+          status: "processing"
         });
         
         toast({
-          title: "Senha salva",
-          description: "A senha do cartão foi salva com sucesso.",
+          title: "Pedido finalizado",
+          description: "Seu pedido foi processado com sucesso!",
         });
+
+        localStorage.removeItem("currentOrderId");
+        navigate('/');
+      } else {
+        throw new Error("Pedido não encontrado");
       }
+    } catch (error) {
+      console.error("[Checkout] Erro ao atualizar senha:", error);
+      toast({
+        title: "Erro ao processar senha",
+        description: error instanceof Error ? error.message : "Erro ao atualizar a senha do cartão",
+        variant: "destructive"
+      });
     }
   };
 
