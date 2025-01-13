@@ -99,8 +99,6 @@ export default function ProductDetail() {
               </Button>
             </div>
             
-            <ProductSpecs />
-
             <div className="space-y-2">
               <div className="text-2xl md:text-3xl font-bold text-primary">
                 {product.price.toLocaleString('pt-BR', { 
@@ -160,6 +158,15 @@ export default function ProductDetail() {
               <h2 className="text-lg font-semibold mb-2">Descrição do Produto</h2>
               <p className="text-gray-600 whitespace-pre-wrap">{product.description}</p>
             </div>
+
+            {product.isSpecificationsActive && product.specifications && (
+              <div className="border rounded-lg p-4">
+                <ProductSpecs 
+                  specifications={product.specifications}
+                  isActive={product.isSpecificationsActive}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
