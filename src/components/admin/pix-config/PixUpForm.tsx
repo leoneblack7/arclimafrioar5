@@ -34,16 +34,14 @@ export const PixUpForm = ({ config, onConfigChange }: PixUpFormProps) => {
     try {
       toast.info("Testando conexão com PixUp...");
       
-      // Use a proxy or backend endpoint instead of direct API call
-      const response = await fetch('/api/pixup/test-connection', {
+      const credentials = btoa(`${config.pixUpClientId}:${config.pixUpClientSecret}`);
+      const response = await fetch('https://api.pixup.com.br/authentication', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Authorization': `Basic ${credentials}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: JSON.stringify({
-          clientId: config.pixUpClientId,
-          clientSecret: config.pixUpClientSecret,
-        })
+        body: 'grant_type=client_credentials'
       });
 
       if (response.ok) {
