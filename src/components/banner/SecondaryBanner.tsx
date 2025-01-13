@@ -68,18 +68,28 @@ export const SecondaryBanner = () => {
     return null;
   }
 
+  const gradients = [
+    'bg-gradient-to-r from-[#9b87f5] to-[#8B5CF6] hover:from-[#8B5CF6] hover:to-[#9b87f5]',
+    'bg-gradient-to-r from-[#D946EF] to-[#F97316] hover:from-[#F97316] hover:to-[#D946EF]',
+    'bg-gradient-to-r from-[#0EA5E9] to-[#33C3F0] hover:from-[#33C3F0] hover:to-[#0EA5E9]'
+  ];
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      {banners.map((banner) => (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-4 md:px-0">
+      {banners.map((banner, index) => (
         <div 
           key={banner.id}
-          className="relative w-full overflow-hidden aspect-[21/9]"
+          className={`relative w-full overflow-hidden rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:-translate-y-1 ${gradients[index]}`}
         >
-          <img
-            src={banner.image_url}
-            alt="Secondary banner"
-            className="w-full h-full object-cover"
-          />
+          <div className="relative aspect-[21/9] group">
+            <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-all duration-300"></div>
+            <img
+              src={banner.image_url}
+              alt="Secondary banner"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          </div>
         </div>
       ))}
     </div>
