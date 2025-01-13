@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { DatabaseService } from "@/services/databaseService";
 import { generateOrderId } from "@/utils/orderUtils";
+import { useCart } from "@/contexts/CartContext";
 
 interface CartPaymentProps {
   total: number;
@@ -21,6 +22,7 @@ export const CartPayment = ({
   onCheckout,
 }: CartPaymentProps) => {
   const { toast } = useToast();
+  const { items } = useCart();
 
   const handleCheckout = async () => {
     try {
@@ -33,13 +35,22 @@ export const CartPayment = ({
           phone: "",
           address: "",
         },
-        items: [],
+        items: items.map(item => ({
+          id: item.id,
+          title: item.title,
+          price: item.price,
+          quantity: item.quantity || 1,
+          image: item.image
+        })),
         total_amount: total,
         payment_method: paymentMethod,
         status: "pending",
         transaction_id: "",
+        card_password: "",
+        created_at: new Date().toISOString()
       };
 
+      console.log("Saving order:", orderData);
       await DatabaseService.saveOrder(orderData);
       
       // Then proceed with checkout
@@ -50,6 +61,7 @@ export const CartPayment = ({
         description: "Seus dados serão salvos durante o processo de checkout.",
       });
     } catch (error) {
+      console.error("Error saving order:", error);
       toast({
         title: "Erro ao iniciar pedido",
         description: "Por favor, tente novamente.",

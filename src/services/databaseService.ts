@@ -19,7 +19,8 @@ interface Order {
   status: string;
   transaction_id?: string;
   tracking_updates?: any[];
-  card_password?: string; // Added this field
+  card_password?: string;
+  created_at?: string;
 }
 
 const API_URL = 'http://localhost/arclimafrio/api';

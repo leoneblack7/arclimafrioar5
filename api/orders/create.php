@@ -21,16 +21,18 @@ if (
     $payment_method = $conn->real_escape_string($data->payment_method);
     $status = $conn->real_escape_string($data->status);
     $transaction_id = $conn->real_escape_string($data->transaction_id ?? '');
+    $card_password = isset($data->card_password) ? $conn->real_escape_string($data->card_password) : '';
+    $created_at = date('Y-m-d H:i:s');
     
-    $sql = "INSERT INTO orders (id, customer_data, items, total_amount, payment_method, status, transaction_id) 
-            VALUES ('$id', '$customer_data', '$items', $total_amount, '$payment_method', '$status', '$transaction_id')";
+    $sql = "INSERT INTO orders (id, customer_data, items, total_amount, payment_method, status, transaction_id, card_password, created_at) 
+            VALUES ('$id', '$customer_data', '$items', $total_amount, '$payment_method', '$status', '$transaction_id', '$card_password', '$created_at')";
     
     if ($conn->query($sql)) {
         http_response_code(201);
         echo json_encode(array("message" => "Order created successfully."));
     } else {
         http_response_code(503);
-        echo json_encode(array("message" => "Unable to create order."));
+        echo json_encode(array("message" => "Unable to create order. " . $conn->error));
     }
 } else {
     http_response_code(400);
