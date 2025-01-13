@@ -7,6 +7,7 @@ interface PixToggleSectionProps {
   onTictoToggle: (checked: boolean) => void;
   onCustomKeysToggle: (checked: boolean) => void;
   onPixPayToggle: (checked: boolean) => void;
+  onPixUpToggle: (checked: boolean) => void;
   onMaintenanceToggle: (checked: boolean) => void;
 }
 
@@ -15,6 +16,7 @@ export const PixToggleSection = ({
   onTictoToggle,
   onCustomKeysToggle,
   onPixPayToggle,
+  onPixUpToggle,
   onMaintenanceToggle,
 }: PixToggleSectionProps) => {
   return (
@@ -44,6 +46,15 @@ export const PixToggleSection = ({
           onCheckedChange={onPixPayToggle}
         />
         <Label htmlFor="pixpay-enabled">Ativar integração PixPay.pro</Label>
+      </div>
+
+      <div className="flex items-center space-x-2">
+        <Switch
+          id="pixup-enabled"
+          checked={config.usePixUp}
+          onCheckedChange={onPixUpToggle}
+        />
+        <Label htmlFor="pixup-enabled">Ativar integração PixUp</Label>
       </div>
 
       <div className="flex items-center space-x-2">

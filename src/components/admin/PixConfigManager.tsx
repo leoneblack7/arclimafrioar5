@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { PixToggleSection } from "./pix-config/PixToggleSection";
 import { PixKeyForm } from "./pix-config/PixKeyForm";
 import { PixPayForm } from "./pix-config/PixPayForm";
+import { PixUpForm } from "./pix-config/PixUpForm";
 import { PixApiKeySection } from "./pix-config/PixApiKeySection";
 import { usePixConfig } from "./pix-config/usePixConfig";
 
@@ -15,6 +16,7 @@ export const PixConfigManager = () => {
     handleTictoToggle,
     handleCustomKeysToggle,
     handlePixPayToggle,
+    handlePixUpToggle,
     handleMaintenanceToggle,
     handleSave,
   } = usePixConfig();
@@ -30,6 +32,7 @@ export const PixConfigManager = () => {
           onTictoToggle={handleTictoToggle}
           onCustomKeysToggle={handleCustomKeysToggle}
           onPixPayToggle={handlePixPayToggle}
+          onPixUpToggle={handlePixUpToggle}
           onMaintenanceToggle={handleMaintenanceToggle}
         />
 
@@ -49,6 +52,13 @@ export const PixConfigManager = () => {
 
         {config.usePixPay && (
           <PixPayForm
+            config={config}
+            onConfigChange={setConfig}
+          />
+        )}
+
+        {config.usePixUp && (
+          <PixUpForm
             config={config}
             onConfigChange={setConfig}
           />

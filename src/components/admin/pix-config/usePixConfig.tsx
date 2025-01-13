@@ -7,11 +7,13 @@ const defaultConfig: PixConfig = {
   enabled: false,
   useCustomKeys: false,
   usePixPay: false,
+  usePixUp: false,
   pixKey: "",
   pixName: "",
   pixCity: "",
   pixPayClientId: "",
   pixPayClientSecret: "",
+  pixUpApiKey: "",
   maintenanceMode: true,
 };
 
@@ -42,6 +44,7 @@ export const usePixConfig = () => {
       enabled: checked,
       useCustomKeys: checked ? false : config.useCustomKeys,
       usePixPay: checked ? false : config.usePixPay,
+      usePixUp: checked ? false : config.usePixUp,
     });
   };
 
@@ -55,6 +58,7 @@ export const usePixConfig = () => {
       useCustomKeys: checked,
       enabled: checked ? false : config.enabled,
       usePixPay: checked ? false : config.usePixPay,
+      usePixUp: checked ? false : config.usePixUp,
     });
   };
 
@@ -68,6 +72,21 @@ export const usePixConfig = () => {
       usePixPay: checked,
       enabled: checked ? false : config.enabled,
       useCustomKeys: checked ? false : config.useCustomKeys,
+      usePixUp: checked ? false : config.usePixUp,
+    });
+  };
+
+  const handlePixUpToggle = (checked: boolean) => {
+    if (config.maintenanceMode && checked) {
+      toast.error("Desative o modo de manutenção primeiro");
+      return;
+    }
+    setConfig({
+      ...config,
+      usePixUp: checked,
+      enabled: checked ? false : config.enabled,
+      useCustomKeys: checked ? false : config.useCustomKeys,
+      usePixPay: checked ? false : config.usePixPay,
     });
   };
 
@@ -77,7 +96,8 @@ export const usePixConfig = () => {
       maintenanceMode: checked,
       enabled: checked ? false : config.enabled,
       useCustomKeys: checked ? false : config.useCustomKeys,
-      usePixPay: checked ? false : config.usePixPay
+      usePixPay: checked ? false : config.usePixPay,
+      usePixUp: checked ? false : config.usePixUp,
     });
   };
 
@@ -93,6 +113,8 @@ export const usePixConfig = () => {
       message = "Chaves PIX personalizadas estão ativadas";
     } else if (config.usePixPay) {
       message = "Integração PixPay.pro está ativada";
+    } else if (config.usePixUp) {
+      message = "Integração PixUp está ativada";
     } else {
       message = "Nenhuma integração PIX está ativada";
     }
@@ -110,6 +132,7 @@ export const usePixConfig = () => {
     handleTictoToggle,
     handleCustomKeysToggle,
     handlePixPayToggle,
+    handlePixUpToggle,
     handleMaintenanceToggle,
     handleSave,
   };
