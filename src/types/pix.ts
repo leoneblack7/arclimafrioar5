@@ -22,8 +22,8 @@ export interface PixUpTransaction {
 
 export interface PixWebhookPayload {
   requestBody: {
-    transactionType: string;
     transactionId: string;
+    transactionType: string;
     status: string;
     amount: number;
     external_id: string;
