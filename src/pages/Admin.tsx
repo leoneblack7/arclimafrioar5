@@ -30,11 +30,11 @@ export default function Admin() {
     const setViewportMeta = () => {
       const viewport = document.querySelector('meta[name=viewport]');
       if (viewport) {
-        viewport.setAttribute('content', 'width=device-width, initial-scale=0.5, maximum-scale=0.5, user-scalable=0');
+        viewport.setAttribute('content', 'width=device-width, initial-scale=0.3, maximum-scale=0.3, user-scalable=0');
       } else {
         const meta = document.createElement('meta');
         meta.name = 'viewport';
-        meta.content = 'width=device-width, initial-scale=0.5, maximum-scale=0.5, user-scalable=0';
+        meta.content = 'width=device-width, initial-scale=0.3, maximum-scale=0.3, user-scalable=0';
         document.head.appendChild(meta);
       }
     };
