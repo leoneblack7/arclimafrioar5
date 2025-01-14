@@ -1,18 +1,21 @@
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { getFromLocalStorage, saveToLocalStorage } from "@/utils/localStorage";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useCreditCardOrders = () => {
-  const [orders, setOrders] = useState<any[]>([]);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  const fetchOrders = () => {
-    const allOrders = getFromLocalStorage('orders', []);
-    const creditOrders = allOrders
-      .filter((order: any) => order.payment_method === 'credit')
-      .sort((a: any, b: any) => b.timestamp - a.timestamp); // Ordenar por timestamp decrescente
-    setOrders(creditOrders);
-  };
+  const { data: orders = [], isLoading } = useQuery({
+    queryKey: ["credit-card-orders"],
+    queryFn: async () => {
+      const response = await fetch('api/orders/read.php');
+      const allOrders = await response.json();
+      return allOrders
+        .filter((order: any) => order.payment_method === 'credit')
+        .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    }
+  });
 
   const handleCopyData = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -21,26 +24,37 @@ export const useCreditCardOrders = () => {
     });
   };
 
-  const handleDelete = (orderId: string) => {
-    const allOrders = getFromLocalStorage('orders', []);
-    const updatedOrders = allOrders.filter((order: any) => order.id !== orderId);
-    saveToLocalStorage('orders', updatedOrders);
-    
-    toast({
-      title: "Pedido deletado com sucesso!"
-    });
+  const handleDelete = async (orderId: string) => {
+    try {
+      const response = await fetch('api/orders/delete.php', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: orderId })
+      });
 
-    fetchOrders();
+      if (response.ok) {
+        toast({
+          title: "Pedido deletado com sucesso!"
+        });
+        queryClient.invalidateQueries({ queryKey: ["credit-card-orders"] });
+      } else {
+        throw new Error('Falha ao deletar pedido');
+      }
+    } catch (error) {
+      console.error('Error deleting order:', error);
+      toast({
+        title: "Erro ao deletar pedido",
+        variant: "destructive"
+      });
+    }
   };
-
-  useEffect(() => {
-    fetchOrders();
-  }, []);
 
   return {
     orders,
+    isLoading,
     handleCopyData,
-    handleDelete,
-    fetchOrders
+    handleDelete
   };
 };
