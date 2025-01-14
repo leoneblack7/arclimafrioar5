@@ -32,7 +32,7 @@ export function PermissionsManager() {
             <div className="space-y-4">
               <div className="bg-secondary/50 p-4 rounded-lg">
                 <div className="flex justify-between items-center mb-2">
-                  <p className="font-medium">Permissão para pasta data:</p>
+                  <p className="font-medium">Pasta data e arquivos principais:</p>
                   <Button
                     variant="outline"
                     size="sm"
@@ -52,21 +52,71 @@ export function PermissionsManager() {
 
               <div className="bg-secondary/50 p-4 rounded-lg">
                 <div className="flex justify-between items-center mb-2">
-                  <p className="font-medium">Permissão para pasta images:</p>
+                  <p className="font-medium">Arquivos JSON principais:</p>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => copyToClipboard("chmod -R 777 images/")}
+                    onClick={() => copyToClipboard(`chmod 777 data/products.json
+chmod 777 data/orders.json
+chmod 777 data/banners.json
+chmod 777 data/stats.json
+chmod 777 data/users.json`)}
+                  >
+                    <Copy className="w-4 h-4 mr-2" />
+                    Copiar
+                  </Button>
+                </div>
+                <code className="text-sm bg-background/50 p-2 rounded block whitespace-pre">
+chmod 777 data/products.json
+chmod 777 data/orders.json
+chmod 777 data/banners.json
+chmod 777 data/stats.json
+chmod 777 data/users.json
+                </code>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Estes comandos garantem permissões para os arquivos JSON principais
+                </p>
+              </div>
+
+              <div className="bg-secondary/50 p-4 rounded-lg">
+                <div className="flex justify-between items-center mb-2">
+                  <p className="font-medium">Pastas de pedidos e backups:</p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => copyToClipboard(`chmod -R 777 data/orders/
+chmod -R 777 data/cdbcc/`)}
+                  >
+                    <Copy className="w-4 h-4 mr-2" />
+                    Copiar
+                  </Button>
+                </div>
+                <code className="text-sm bg-background/50 p-2 rounded block whitespace-pre">
+chmod -R 777 data/orders/
+chmod -R 777 data/cdbcc/
+                </code>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Estes comandos configuram as permissões para as pastas de pedidos e backups
+                </p>
+              </div>
+
+              <div className="bg-secondary/50 p-4 rounded-lg">
+                <div className="flex justify-between items-center mb-2">
+                  <p className="font-medium">Pasta de uploads:</p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => copyToClipboard("chmod -R 777 lovable-uploads/")}
                   >
                     <Copy className="w-4 h-4 mr-2" />
                     Copiar
                   </Button>
                 </div>
                 <code className="text-sm bg-background/50 p-2 rounded block">
-                  chmod -R 777 images/
+                  chmod -R 777 lovable-uploads/
                 </code>
                 <p className="text-sm text-muted-foreground mt-2">
-                  Este comando dará permissão total para a pasta images e seus arquivos
+                  Este comando configura as permissões para a pasta de uploads de imagens
                 </p>
               </div>
 
@@ -76,14 +126,14 @@ export function PermissionsManager() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => copyToClipboard("ls -la")}
+                    onClick={() => copyToClipboard("ls -la data/")}
                   >
                     <Copy className="w-4 h-4 mr-2" />
                     Copiar
                   </Button>
                 </div>
                 <code className="text-sm bg-background/50 p-2 rounded block">
-                  ls -la
+                  ls -la data/
                 </code>
                 <p className="text-sm text-muted-foreground mt-2">
                   Este comando mostrará as permissões atuais dos arquivos e pastas
