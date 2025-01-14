@@ -2,22 +2,15 @@
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 
-include_once '../config/database.php';
+$productsFile = __DIR__ . '/../../data/products.json';
 
-$conn = getConnection();
-
-$sql = "SELECT * FROM products WHERE active = 1 ORDER BY created_at DESC";
-$result = $conn->query($sql);
-
-if ($result->num_rows > 0) {
-    $products = array();
-    while($row = $result->fetch_assoc()) {
-        $row['images'] = json_decode($row['images']);
-        array_push($products, $row);
-    }
-    echo json_encode($products);
+if (file_exists($productsFile)) {
+    $products = json_decode(file_get_contents($productsFile), true);
+    $activeProducts = array_filter($products, function($product) {
+        return $product['active'] ?? true;
+    });
+    echo json_encode(array_values($activeProducts));
 } else {
     echo json_encode([]);
 }
-
-$conn->close();
+?>
