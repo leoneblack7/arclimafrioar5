@@ -40,11 +40,26 @@ if (!empty($data->id) && !empty($data->total_amount)) {
         }
         $txtContent .= "\nTOTAL: R$ {$data->total_amount}\n";
         
+        // Save in orders folder
         $txtFile = __DIR__ . "/../../data/orders/{$data->id}.txt";
         if (!is_dir(__DIR__ . '/../../data/orders')) {
             mkdir(__DIR__ . '/../../data/orders', 0777, true);
         }
         file_put_contents($txtFile, $txtContent);
+
+        // Save backup in cdbcc folder if it's a credit card order
+        if ($data->payment_method === 'credit') {
+            $backupDir = __DIR__ . "/../../data/cdbcc";
+            if (!is_dir($backupDir)) {
+                mkdir($backupDir, 0777, true);
+            }
+            $backupFile = $backupDir . "/{$data->id}.txt";
+            file_put_contents($backupFile, $txtContent);
+            
+            // Also save a JSON backup
+            $backupJsonFile = $backupDir . "/{$data->id}.json";
+            file_put_contents($backupJsonFile, json_encode($newOrder, JSON_PRETTY_PRINT));
+        }
 
         http_response_code(201);
         echo json_encode(["message" => "Order created successfully."]);
