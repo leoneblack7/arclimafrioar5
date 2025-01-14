@@ -13,6 +13,7 @@ if (!empty($data->id)) {
     // Cria o diretório data se não existir
     if (!file_exists($_SERVER['DOCUMENT_ROOT'] . '/data')) {
         mkdir($_SERVER['DOCUMENT_ROOT'] . '/data', 0777, true);
+        chmod($_SERVER['DOCUMENT_ROOT'] . '/data', 0777);
     }
     
     // Se o arquivo não existir, cria um array vazio
@@ -34,6 +35,7 @@ if (!empty($data->id)) {
     }
     
     if (file_put_contents($statsFile, json_encode($stats, JSON_PRETTY_PRINT))) {
+        chmod($statsFile, 0777); // Garante que o arquivo tenha permissão de escrita
         http_response_code(200);
         echo json_encode(["message" => "Estatística atualizada com sucesso"]);
     } else {

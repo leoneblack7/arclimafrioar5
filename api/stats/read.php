@@ -7,6 +7,7 @@ $statsFile = $_SERVER['DOCUMENT_ROOT'] . '/data/stats.json';
 // Cria o diretório data se não existir
 if (!file_exists($_SERVER['DOCUMENT_ROOT'] . '/data')) {
     mkdir($_SERVER['DOCUMENT_ROOT'] . '/data', 0777, true);
+    chmod($_SERVER['DOCUMENT_ROOT'] . '/data', 0777);
 }
 
 // Se o arquivo não existir, cria um array vazio
