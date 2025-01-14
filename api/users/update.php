@@ -4,34 +4,42 @@ header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: PUT");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-include_once '../config/database.php';
-
-$conn = getConnection();
-
 $data = json_decode(file_get_contents("php://input"));
+$usersFile = __DIR__ . '/../../data/users.json';
 
 if (!empty($data->id)) {
-    $id = $conn->real_escape_string($data->id);
-    $username = $conn->real_escape_string($data->username);
-    $role = $conn->real_escape_string($data->role);
-    $active = $data->active ? 1 : 0;
+    $users = json_decode(file_get_contents($usersFile), true);
     
-    $sql = "UPDATE users SET 
-            username = '$username',
-            role = '$role',
-            active = $active
-            WHERE id = $id AND username != 'admin'";
+    $index = array_search($data->id, array_column($users, 'id'));
     
-    if ($conn->query($sql)) {
-        http_response_code(200);
-        echo json_encode(array("message" => "User updated successfully."));
+    if ($index !== false) {
+        // Don't update password if not provided
+        if (!empty($data->password)) {
+            $data->password = password_hash($data->password, PASSWORD_DEFAULT);
+        } else {
+            unset($data->password);
+        }
+        
+        // Protect admin user from being deactivated
+        if ($users[$index]['username'] === 'admin') {
+            $data->active = true;
+        }
+        
+        $users[$index] = array_merge($users[$index], (array)$data);
+        
+        if (file_put_contents($usersFile, json_encode($users, JSON_PRETTY_PRINT))) {
+            http_response_code(200);
+            echo json_encode(["message" => "User updated successfully."]);
+        } else {
+            http_response_code(503);
+            echo json_encode(["message" => "Unable to update user."]);
+        }
     } else {
-        http_response_code(503);
-        echo json_encode(array("message" => "Unable to update user."));
+        http_response_code(404);
+        echo json_encode(["message" => "User not found."]);
     }
 } else {
     http_response_code(400);
-    echo json_encode(array("message" => "Unable to update user. Data is incomplete."));
+    echo json_encode(["message" => "Unable to update user. No ID provided."]);
 }
-
-$conn->close();
+?>
