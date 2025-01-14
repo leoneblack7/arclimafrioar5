@@ -13,10 +13,13 @@ export const useProductManager = () => {
     queryKey: ["products"],
     queryFn: async () => {
       try {
+        console.log("Fetching products from API...");
         const response = await axios.get('/api/products/read.php');
+        console.log("API response:", response.data);
         return response.data || [];
       } catch (error) {
         console.error('Error fetching products:', error);
+        toast.error("Erro ao carregar produtos");
         return [];
       }
     }
@@ -46,9 +49,10 @@ export const useProductManager = () => {
         image: updatedProduct.images?.[0] || updatedProduct.image
       };
 
-      const response = await axios.post('/api/products/update.php', productToSave);
+      const endpoint = productToSave.id ? '/api/products/update.php' : '/api/products/create.php';
+      const response = await axios.post(endpoint, productToSave);
       
-      if (response.data.success) {
+      if (response.status === 200 || response.status === 201) {
         queryClient.invalidateQueries({ queryKey: ["products"] });
         setEditingProduct(null);
         setIsDialogOpen(false);
@@ -76,7 +80,7 @@ export const useProductManager = () => {
       
       const response = await axios.post('/api/products/create.php', newProduct);
       
-      if (response.data.success) {
+      if (response.status === 201) {
         queryClient.invalidateQueries({ queryKey: ["products"] });
         toast.success("Produto importado com sucesso!");
       } else {
@@ -92,7 +96,7 @@ export const useProductManager = () => {
     try {
       const response = await axios.post('/api/products/delete.php', { id: productId });
       
-      if (response.data.success) {
+      if (response.status === 200) {
         queryClient.invalidateQueries({ queryKey: ["products"] });
         toast.success("Produto removido com sucesso!");
       } else {
@@ -112,7 +116,7 @@ export const useProductManager = () => {
       const updatedProduct = { ...product, active: !product.active };
       const response = await axios.post('/api/products/update.php', updatedProduct);
       
-      if (response.data.success) {
+      if (response.status === 200) {
         queryClient.invalidateQueries({ queryKey: ["products"] });
         toast.success("Status do produto atualizado!");
       } else {
