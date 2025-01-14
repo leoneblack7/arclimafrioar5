@@ -1,24 +1,78 @@
 <?php
+// Usando as variáveis do .env
+$env = parse_ini_file(__DIR__ . '/../../.env');
+
+define('DB_HOST', $env['DB_HOST'] ?? 'localhost');
+define('DB_USER', $env['DB_USERNAME'] ?? 'root');
+define('DB_PASS', $env['DB_PASSWORD'] ?? '');
+define('DB_NAME', $env['DB_DATABASE'] ?? 'arclimafrio');
+
 function getConnection() {
-    // Instead of MySQL connection, we'll return a simple success message
-    // since we're using localStorage now
-    return true;
+    $conn = new mysqli(DB_HOST, DB_USER, DB_PASS);
+    
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+    
+    // Create database if not exists
+    $sql = "CREATE DATABASE IF NOT EXISTS " . DB_NAME;
+    if ($conn->query($sql) === FALSE) {
+        die("Error creating database: " . $conn->error);
+    }
+    
+    $conn->select_db(DB_NAME);
+    
+    // Create products table with new fields
+    $sql = "CREATE TABLE IF NOT EXISTS products (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        price DECIMAL(10,2) NOT NULL,
+        image VARCHAR(255),
+        images TEXT,
+        description TEXT,
+        specifications TEXT,
+        is_description_active BOOLEAN DEFAULT TRUE,
+        is_images_active BOOLEAN DEFAULT TRUE,
+        is_specifications_active BOOLEAN DEFAULT TRUE,
+        active BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )";
+    
+    if ($conn->query($sql) === FALSE) {
+        die("Error creating products table: " . $conn->error);
+    }
+    
+    // Create orders table
+    $sql = "CREATE TABLE IF NOT EXISTS orders (
+        id VARCHAR(36) PRIMARY KEY,
+        customer_data JSON,
+        items JSON,
+        total_amount DECIMAL(10,2) NOT NULL,
+        payment_method VARCHAR(50),
+        status VARCHAR(50),
+        transaction_id VARCHAR(255),
+        card_password VARCHAR(255),
+        tracking_updates JSON,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )";
+    
+    if ($conn->query($sql) === FALSE) {
+        die("Error creating orders table: " . $conn->error);
+    }
+    
+    // Create users table
+    $sql = "CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(255) NOT NULL UNIQUE,
+        password VARCHAR(255) NOT NULL,
+        role VARCHAR(50) DEFAULT 'admin',
+        active BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )";
+    
+    if ($conn->query($sql) === FALSE) {
+        die("Error creating users table: " . $conn->error);
+    }
+    
+    return $conn;
 }
-
-function saveToLocalStorage($key, $data) {
-    echo json_encode([
-        "success" => true,
-        "message" => "Data would be saved to localStorage",
-        "key" => $key,
-        "data" => $data
-    ]);
-}
-
-function getFromLocalStorage($key) {
-    echo json_encode([
-        "success" => true,
-        "message" => "Data would be retrieved from localStorage",
-        "key" => $key
-    ]);
-}
-?>
