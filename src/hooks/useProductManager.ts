@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Product } from "@/types/product";
-import { saveToLocalStorage, getFromLocalStorage } from "@/utils/localStorage";
+import { saveProduct, getProducts, deleteProduct } from "@/utils/databaseService";
 
 export const useProductManager = () => {
   const queryClient = useQueryClient();
@@ -12,16 +12,7 @@ export const useProductManager = () => {
   const { data: products = [], isLoading } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
-      const storedProducts = getFromLocalStorage('products', []);
-      return storedProducts.map((item: any) => ({
-        id: Number(item.id),
-        title: item.title,
-        price: Number(item.price),
-        image: item.image || '/placeholder.svg',
-        images: item.images || [item.image || '/placeholder.svg'],
-        description: item.description,
-        active: item.active || false
-      }));
+      return getProducts();
     }
   });
 
@@ -41,7 +32,6 @@ export const useProductManager = () => {
 
   const handleSaveProduct = async (updatedProduct: Product) => {
     try {
-      let updatedProducts;
       const productToSave = {
         ...updatedProduct,
         price: Number(updatedProduct.price),
@@ -50,20 +40,11 @@ export const useProductManager = () => {
         image: updatedProduct.images?.[0] || updatedProduct.image
       };
 
-      if (products.find(p => p.id === productToSave.id)) {
-        updatedProducts = products.map(p => 
-          p.id === productToSave.id ? productToSave : p
-        );
-        toast.success("Produto atualizado com sucesso!");
-      } else {
-        updatedProducts = [...products, productToSave];
-        toast.success("Produto adicionado com sucesso!");
-      }
-      
-      saveToLocalStorage('products', updatedProducts);
+      saveProduct(productToSave);
       queryClient.invalidateQueries({ queryKey: ["products"] });
       setEditingProduct(null);
       setIsDialogOpen(false);
+      toast.success("Produto salvo com sucesso!");
     } catch (error) {
       console.error('Error saving product:', error);
       toast.error("Erro ao salvar produto");
@@ -82,8 +63,7 @@ export const useProductManager = () => {
         active: true
       };
       
-      const updatedProducts = [...products, newProduct];
-      saveToLocalStorage('products', updatedProducts);
+      saveProduct(newProduct);
       queryClient.invalidateQueries({ queryKey: ["products"] });
       toast.success("Produto importado com sucesso!");
     } catch (error) {
@@ -94,8 +74,7 @@ export const useProductManager = () => {
 
   const handleDeleteProduct = async (productId: number) => {
     try {
-      const updatedProducts = products.filter(p => p.id !== productId);
-      saveToLocalStorage('products', updatedProducts);
+      deleteProduct(productId);
       queryClient.invalidateQueries({ queryKey: ["products"] });
       toast.success("Produto removido com sucesso!");
     } catch (error) {
@@ -109,10 +88,8 @@ export const useProductManager = () => {
     if (!product) return;
 
     try {
-      const updatedProducts = products.map(p => 
-        p.id === productId ? { ...p, active: !p.active } : p
-      );
-      saveToLocalStorage('products', updatedProducts);
+      const updatedProduct = { ...product, active: !product.active };
+      saveProduct(updatedProduct);
       queryClient.invalidateQueries({ queryKey: ["products"] });
       toast.success("Status do produto atualizado!");
     } catch (error) {

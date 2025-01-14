@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,29 +10,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { Badge } from "@/components/ui/badge";
+import { saveOrder, getOrders, deleteOrder } from "@/utils/databaseService";
 
 export function OrderManager() {
   const [orders, setOrders] = useState<any[]>([]);
   const [editingOrder, setEditingOrder] = useState<any>(null);
   const { toast } = useToast();
 
-  const fetchOrders = async () => {
-    const { data, error } = await supabase
-      .from('orders')
-      .select('*')
-      .eq('payment_method', 'pix')
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      toast({
-        title: "Erro ao carregar pedidos",
-        description: error.message,
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setOrders(data || []);
+  const fetchOrders = () => {
+    const allOrders = getOrders();
+    const pixOrders = allOrders.filter((order: any) => order.payment_method === 'pix');
+    setOrders(pixOrders);
   };
 
   useEffect(() => {
@@ -44,51 +31,37 @@ export function OrderManager() {
     setEditingOrder(order);
   };
 
-  const handleSave = async () => {
+  const handleSave = () => {
     if (!editingOrder) return;
 
-    const { error } = await supabase
-      .from('orders')
-      .update(editingOrder)
-      .eq('id', editingOrder.id);
-
-    if (error) {
+    try {
+      saveOrder(editingOrder);
+      toast({
+        title: "Alterações salvas com sucesso!"
+      });
+      setEditingOrder(null);
+      fetchOrders();
+    } catch (error) {
       toast({
         title: "Erro ao salvar alterações",
-        description: error.message,
         variant: "destructive"
       });
-      return;
     }
-
-    toast({
-      title: "Alterações salvas com sucesso!"
-    });
-
-    setEditingOrder(null);
-    fetchOrders();
   };
 
   const handleDelete = async (orderId: string) => {
-    const { error } = await supabase
-      .from('orders')
-      .delete()
-      .eq('id', orderId);
-
-    if (error) {
+    try {
+      deleteOrder(orderId);
+      toast({
+        title: "Pedido deletado com sucesso!"
+      });
+      fetchOrders();
+    } catch (error) {
       toast({
         title: "Erro ao deletar pedido",
-        description: error.message,
         variant: "destructive"
       });
-      return;
     }
-
-    toast({
-      title: "Pedido deletado com sucesso!"
-    });
-
-    fetchOrders();
   };
 
   const getStatusBadge = (status: string) => {
@@ -222,3 +195,4 @@ export function OrderManager() {
     </div>
   );
 }
+};
