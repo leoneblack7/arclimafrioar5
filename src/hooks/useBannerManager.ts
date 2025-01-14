@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import axios from "axios";
 
 interface Banner {
   id: string;
@@ -7,108 +8,42 @@ interface Banner {
   active: boolean;
 }
 
-const defaultBanners: Banner[] = [
-  {
-    id: 'default-banner-1',
-    image_url: '/lovable-uploads/be106df6-7f56-49b8-8767-4cf73aa20a7b.png',
-    active: true
-  },
-  {
-    id: 'default-banner-2',
-    image_url: '/lovable-uploads/3f83f27c-39bc-4118-9240-41e9d4d45fbf.png',
-    active: true
-  },
-  {
-    id: 'default-banner-3',
-    image_url: '/lovable-uploads/b628c938-51f7-44ca-9c86-ff0be454ec82.png',
-    active: true
-  },
-  {
-    id: 'default-banner-4',
-    image_url: '/lovable-uploads/cac2472b-8231-4414-8fd3-13200a6cecc9.png',
-    active: true
-  },
-  {
-    id: 'default-banner-5',
-    image_url: '/lovable-uploads/10041c18-fc73-405c-a630-853731dc5792.png',
-    active: true
-  },
-  {
-    id: 'default-banner-6',
-    image_url: '/lovable-uploads/14fcd544-00af-494f-b65d-d120a188f4af.png',
-    active: true
-  }
-];
-
-const defaultSecondaryBanners: Banner[] = [
-  {
-    id: 'secondary-banner-1',
-    image_url: '/lovable-uploads/be106df6-7f56-49b8-8767-4cf73aa20a7b.png',
-    active: true
-  },
-  {
-    id: 'secondary-banner-2',
-    image_url: '/lovable-uploads/3f83f27c-39bc-4118-9240-41e9d4d45fbf.png',
-    active: true
-  },
-  {
-    id: 'secondary-banner-3',
-    image_url: '/lovable-uploads/b628c938-51f7-44ca-9c86-ff0be454ec82.png',
-    active: true
-  }
-];
-
 export const useBannerManager = () => {
   const [banners, setBanners] = useState<Banner[]>([]);
   const [secondaryBanners, setSecondaryBanners] = useState<Banner[]>([]);
 
-  const loadBanners = () => {
+  const loadBanners = async () => {
     try {
-      console.log("BannerManager - Iniciando carregamento dos banners");
-      const storedBanners = localStorage.getItem('banners');
-      const storedSecondaryBanners = localStorage.getItem('secondary-banners');
-      
-      if (storedBanners) {
-        const parsedBanners = JSON.parse(storedBanners);
-        if (parsedBanners && Array.isArray(parsedBanners) && parsedBanners.length > 0) {
-          setBanners(parsedBanners);
-        } else {
-          setBanners(defaultBanners);
-        }
-      } else {
-        setBanners(defaultBanners);
-      }
-
-      if (storedSecondaryBanners) {
-        const parsedSecondaryBanners = JSON.parse(storedSecondaryBanners);
-        if (parsedSecondaryBanners && Array.isArray(parsedSecondaryBanners) && parsedSecondaryBanners.length > 0) {
-          setSecondaryBanners(parsedSecondaryBanners);
-        } else {
-          setSecondaryBanners(defaultSecondaryBanners);
-        }
-      } else {
-        setSecondaryBanners(defaultSecondaryBanners);
+      const response = await axios.get('/api/banners/read.php');
+      if (response.data) {
+        setBanners(response.data);
       }
     } catch (error) {
       console.error('Erro ao carregar banners:', error);
       toast.error('Erro ao carregar os banners');
-      setBanners(defaultBanners);
-      setSecondaryBanners(defaultSecondaryBanners);
     }
   };
 
-  const handleUploadSuccess = (base64String: string) => {
-    const newBanner = {
-      id: `banner-${Date.now()}`,
-      image_url: base64String,
-      active: true
-    };
+  const handleUploadSuccess = async (base64String: string) => {
+    try {
+      const response = await axios.post('/api/banners/save.php', {
+        image: base64String
+      });
 
-    const updatedBanners = [...banners, newBanner];
-    localStorage.setItem('banners', JSON.stringify(updatedBanners));
-    setBanners(updatedBanners);
-    window.dispatchEvent(new Event('bannersUpdated'));
-    toast.success("Banner adicionado e ativado com sucesso!");
+      if (response.data.image_url) {
+        const newBanner = {
+          id: `banner-${Date.now()}`,
+          image_url: response.data.image_url,
+          active: true
+        };
+
+        setBanners(prev => [...prev, newBanner]);
+        toast.success("Banner adicionado e ativado com sucesso!");
+      }
+    } catch (error) {
+      console.error('Erro ao salvar banner:', error);
+      toast.error('Erro ao salvar o banner');
+    }
   };
 
   const handleSecondaryUploadSuccess = (base64String: string) => {
