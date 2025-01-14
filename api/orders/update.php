@@ -4,30 +4,32 @@ header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: PUT");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
+include_once '../config/database.php';
+
+$conn = getConnection();
+
 $data = json_decode(file_get_contents("php://input"));
-$ordersFile = __DIR__ . '/../../data/orders.json';
 
 if (!empty($data->id)) {
-    $orders = json_decode(file_get_contents($ordersFile), true);
+    $id = $conn->real_escape_string($data->id);
+    $customer_data = $conn->real_escape_string(json_encode($data->customer_data));
+    $status = $conn->real_escape_string($data->status);
     
-    $index = array_search($data->id, array_column($orders, 'id'));
+    $sql = "UPDATE orders SET 
+            customer_data = '$customer_data',
+            status = '$status'
+            WHERE id = '$id'";
     
-    if ($index !== false) {
-        $orders[$index] = array_merge($orders[$index], (array)$data);
-        
-        if (file_put_contents($ordersFile, json_encode($orders, JSON_PRETTY_PRINT))) {
-            http_response_code(200);
-            echo json_encode(["message" => "Order updated successfully."]);
-        } else {
-            http_response_code(503);
-            echo json_encode(["message" => "Unable to update order."]);
-        }
+    if ($conn->query($sql)) {
+        http_response_code(200);
+        echo json_encode(array("message" => "Order updated successfully."));
     } else {
-        http_response_code(404);
-        echo json_encode(["message" => "Order not found."]);
+        http_response_code(503);
+        echo json_encode(array("message" => "Unable to update order."));
     }
 } else {
     http_response_code(400);
-    echo json_encode(["message" => "Unable to update order. No ID provided."]);
+    echo json_encode(array("message" => "Unable to update order. Data is incomplete."));
 }
-?>
+
+$conn->close();

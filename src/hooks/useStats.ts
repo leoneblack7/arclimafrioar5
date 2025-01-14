@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { BarChart3, CreditCard, Link, Search } from "lucide-react";
 import { useCardStats } from "./useCardStats";
-import axios from "axios";
 
 export const useStats = () => {
   const { toast } = useToast();
@@ -67,33 +66,6 @@ export const useStats = () => {
     }
   ]);
 
-  useEffect(() => {
-    const loadStats = async () => {
-      try {
-        const response = await axios.get('/api/stats/read.php');
-        if (response.data && Array.isArray(response.data)) {
-          setStats(prevStats => {
-            // Mescla os dados do servidor com os dados padrão
-            const updatedStats = [...prevStats];
-            response.data.forEach(serverStat => {
-              const index = updatedStats.findIndex(stat => stat.id === serverStat.id);
-              if (index !== -1) {
-                updatedStats[index] = {
-                  ...updatedStats[index],
-                  value: serverStat.value
-                };
-              }
-            });
-            return updatedStats;
-          });
-        }
-      } catch (error) {
-        console.error('Erro ao carregar estatísticas:', error);
-      }
-    };
-    loadStats();
-  }, []);
-
   const handleEdit = (id: string) => {
     const stat = stats.find(s => s.id === id);
     if (stat) {
@@ -102,7 +74,7 @@ export const useStats = () => {
     return "";
   };
 
-  const handleSave = async (id: string, value: string) => {
+  const handleSave = (id: string, value: string) => {
     if (!value.match(/^\d+$/)) {
       toast({
         title: "Erro",
@@ -112,53 +84,25 @@ export const useStats = () => {
       return;
     }
 
-    try {
-      await axios.post('/api/stats/update.php', {
-        id,
-        value
-      });
-
-      setStats(stats.map(stat => 
-        stat.id === id ? { ...stat, value } : stat
-      ));
-      
-      toast({
-        title: "Sucesso",
-        description: "Valor atualizado com sucesso"
-      });
-    } catch (error) {
-      console.error('Erro ao atualizar estatística:', error);
-      toast({
-        title: "Erro",
-        description: "Erro ao atualizar valor",
-        variant: "destructive"
-      });
-    }
+    setStats(stats.map(stat => 
+      stat.id === id ? { ...stat, value } : stat
+    ));
+    
+    toast({
+      title: "Sucesso",
+      description: "Valor atualizado com sucesso"
+    });
   };
 
-  const handleReset = async (id: string) => {
-    try {
-      await axios.post('/api/stats/update.php', {
-        id,
-        value: "0"
-      });
-
-      setStats(stats.map(stat => 
-        stat.id === id ? { ...stat, value: "0" } : stat
-      ));
-      
-      toast({
-        title: "Sucesso",
-        description: "Valor zerado com sucesso"
-      });
-    } catch (error) {
-      console.error('Erro ao zerar estatística:', error);
-      toast({
-        title: "Erro",
-        description: "Erro ao zerar valor",
-        variant: "destructive"
-      });
-    }
+  const handleReset = (id: string) => {
+    setStats(stats.map(stat => 
+      stat.id === id ? { ...stat, value: "0" } : stat
+    ));
+    
+    toast({
+      title: "Sucesso",
+      description: "Valor zerado com sucesso"
+    });
   };
 
   return {

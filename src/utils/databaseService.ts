@@ -48,6 +48,30 @@ export const deleteOrder = (orderId: string) => {
   saveToLocalStorage('orders', updatedOrders);
 };
 
+// Users
+export const saveUser = (user: any) => {
+  const users = getFromLocalStorage('users', []);
+  const existingIndex = users.findIndex((u: any) => u.username === user.username);
+  
+  if (existingIndex >= 0) {
+    users[existingIndex] = user;
+  } else {
+    users.push(user);
+  }
+  
+  saveToLocalStorage('users', users);
+};
+
+export const getUsers = () => {
+  return getFromLocalStorage('users', []);
+};
+
+export const deleteUser = (username: string) => {
+  const users = getFromLocalStorage('users', []);
+  const updatedUsers = users.filter((u: any) => u.username !== username);
+  saveToLocalStorage('users', updatedUsers);
+};
+
 // Store Configuration
 export const saveStoreConfig = (config: any) => {
   saveToLocalStorage('store_config', config);

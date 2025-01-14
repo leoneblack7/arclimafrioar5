@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Product } from "@/types/product";
-import axios from "axios";
+import { saveProduct, getProducts, deleteProduct } from "@/utils/databaseService";
 
 export const useProductManager = () => {
   const queryClient = useQueryClient();
@@ -12,16 +12,7 @@ export const useProductManager = () => {
   const { data: products = [], isLoading } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
-      try {
-        console.log("Fetching products from API...");
-        const response = await axios.get('/api/products/read.php');
-        console.log("API response:", response.data);
-        return response.data || [];
-      } catch (error) {
-        console.error('Error fetching products:', error);
-        toast.error("Erro ao carregar produtos");
-        return [];
-      }
+      return getProducts();
     }
   });
 
@@ -49,17 +40,11 @@ export const useProductManager = () => {
         image: updatedProduct.images?.[0] || updatedProduct.image
       };
 
-      const endpoint = productToSave.id ? '/api/products/update.php' : '/api/products/create.php';
-      const response = await axios.post(endpoint, productToSave);
-      
-      if (response.status === 200 || response.status === 201) {
-        queryClient.invalidateQueries({ queryKey: ["products"] });
-        setEditingProduct(null);
-        setIsDialogOpen(false);
-        toast.success("Produto salvo com sucesso!");
-      } else {
-        throw new Error(response.data.message || 'Erro ao salvar produto');
-      }
+      saveProduct(productToSave);
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      setEditingProduct(null);
+      setIsDialogOpen(false);
+      toast.success("Produto salvo com sucesso!");
     } catch (error) {
       console.error('Error saving product:', error);
       toast.error("Erro ao salvar produto");
@@ -78,14 +63,9 @@ export const useProductManager = () => {
         active: true
       };
       
-      const response = await axios.post('/api/products/create.php', newProduct);
-      
-      if (response.status === 201) {
-        queryClient.invalidateQueries({ queryKey: ["products"] });
-        toast.success("Produto importado com sucesso!");
-      } else {
-        throw new Error(response.data.message || 'Erro ao importar produto');
-      }
+      saveProduct(newProduct);
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      toast.success("Produto importado com sucesso!");
     } catch (error) {
       console.error('Error importing product:', error);
       toast.error("Erro ao importar produto");
@@ -94,14 +74,9 @@ export const useProductManager = () => {
 
   const handleDeleteProduct = async (productId: number) => {
     try {
-      const response = await axios.post('/api/products/delete.php', { id: productId });
-      
-      if (response.status === 200) {
-        queryClient.invalidateQueries({ queryKey: ["products"] });
-        toast.success("Produto removido com sucesso!");
-      } else {
-        throw new Error(response.data.message || 'Erro ao remover produto');
-      }
+      deleteProduct(productId);
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      toast.success("Produto removido com sucesso!");
     } catch (error) {
       console.error('Error deleting product:', error);
       toast.error("Erro ao remover produto");
@@ -114,14 +89,9 @@ export const useProductManager = () => {
 
     try {
       const updatedProduct = { ...product, active: !product.active };
-      const response = await axios.post('/api/products/update.php', updatedProduct);
-      
-      if (response.status === 200) {
-        queryClient.invalidateQueries({ queryKey: ["products"] });
-        toast.success("Status do produto atualizado!");
-      } else {
-        throw new Error(response.data.message || 'Erro ao atualizar status do produto');
-      }
+      saveProduct(updatedProduct);
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      toast.success("Status do produto atualizado!");
     } catch (error) {
       console.error('Error updating product status:', error);
       toast.error("Erro ao atualizar status do produto");

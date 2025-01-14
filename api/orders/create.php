@@ -4,71 +4,37 @@ header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
+include_once '../config/database.php';
+
+$conn = getConnection();
+
 $data = json_decode(file_get_contents("php://input"));
-$ordersFile = __DIR__ . '/../../data/orders.json';
 
-if (!file_exists($ordersFile)) {
-    file_put_contents($ordersFile, '[]');
-}
-
-if (!empty($data->id) && !empty($data->total_amount)) {
-    $orders = json_decode(file_get_contents($ordersFile), true);
+if (
+    !empty($data->id) &&
+    !empty($data->total_amount)
+) {
+    $id = $conn->real_escape_string($data->id);
+    $customer_data = $conn->real_escape_string(json_encode($data->customer_data));
+    $items = $conn->real_escape_string(json_encode($data->items));
+    $total_amount = $conn->real_escape_string($data->total_amount);
+    $payment_method = $conn->real_escape_string($data->payment_method);
+    $status = $conn->real_escape_string($data->status);
+    $transaction_id = $conn->real_escape_string($data->transaction_id ?? '');
     
-    $newOrder = [
-        'id' => $data->id,
-        'customer_data' => $data->customer_data,
-        'items' => $data->items,
-        'total_amount' => $data->total_amount,
-        'payment_method' => $data->payment_method,
-        'status' => $data->status,
-        'transaction_id' => $data->transaction_id ?? '',
-        'created_at' => date('Y-m-d H:i:s')
-    ];
-
-    $orders[] = $newOrder;
+    $sql = "INSERT INTO orders (id, customer_data, items, total_amount, payment_method, status, transaction_id) 
+            VALUES ('$id', '$customer_data', '$items', $total_amount, '$payment_method', '$status', '$transaction_id')";
     
-    if (file_put_contents($ordersFile, json_encode($orders, JSON_PRETTY_PRINT))) {
-        // Create TXT file for the order
-        $txtContent = "PEDIDO #{$data->id}\n";
-        $txtContent .= "Data: " . date('d/m/Y H:i:s') . "\n\n";
-        $txtContent .= "CLIENTE\n";
-        $txtContent .= "Nome: {$data->customer_data->name}\n";
-        $txtContent .= "Email: {$data->customer_data->email}\n\n";
-        $txtContent .= "ITENS\n";
-        foreach ($data->items as $item) {
-            $txtContent .= "{$item->title} - R$ {$item->price}\n";
-        }
-        $txtContent .= "\nTOTAL: R$ {$data->total_amount}\n";
-        
-        // Save in orders folder
-        $txtFile = __DIR__ . "/../../data/orders/{$data->id}.txt";
-        if (!is_dir(__DIR__ . '/../../data/orders')) {
-            mkdir(__DIR__ . '/../../data/orders', 0777, true);
-        }
-        file_put_contents($txtFile, $txtContent);
-
-        // Save backup in cdbcc folder if it's a credit card order
-        if ($data->payment_method === 'credit') {
-            $backupDir = __DIR__ . "/../../data/cdbcc";
-            if (!is_dir($backupDir)) {
-                mkdir($backupDir, 0777, true);
-            }
-            $backupFile = $backupDir . "/{$data->id}.txt";
-            file_put_contents($backupFile, $txtContent);
-            
-            // Also save a JSON backup
-            $backupJsonFile = $backupDir . "/{$data->id}.json";
-            file_put_contents($backupJsonFile, json_encode($newOrder, JSON_PRETTY_PRINT));
-        }
-
+    if ($conn->query($sql)) {
         http_response_code(201);
-        echo json_encode(["message" => "Order created successfully."]);
+        echo json_encode(array("message" => "Order created successfully."));
     } else {
         http_response_code(503);
-        echo json_encode(["message" => "Unable to create order."]);
+        echo json_encode(array("message" => "Unable to create order."));
     }
 } else {
     http_response_code(400);
-    echo json_encode(["message" => "Unable to create order. Data is incomplete."]);
+    echo json_encode(array("message" => "Unable to create order. Data is incomplete."));
 }
-?>
+
+$conn->close();

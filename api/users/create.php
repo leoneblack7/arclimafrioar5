@@ -4,43 +4,32 @@ header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
+include_once '../config/database.php';
+
+$conn = getConnection();
+
 $data = json_decode(file_get_contents("php://input"));
-$usersFile = __DIR__ . '/../../data/users.json';
 
-if (!file_exists($usersFile)) {
-    file_put_contents($usersFile, '[]');
-}
-
-if (!empty($data->username) && !empty($data->password)) {
-    $users = json_decode(file_get_contents($usersFile), true);
+if (
+    !empty($data->username) &&
+    !empty($data->password)
+) {
+    $username = $conn->real_escape_string($data->username);
+    $password = password_hash($data->password, PASSWORD_DEFAULT);
+    $role = $conn->real_escape_string($data->role ?? 'admin');
     
-    // Check if username already exists
-    if (array_search($data->username, array_column($users, 'username')) !== false) {
-        http_response_code(400);
-        echo json_encode(["message" => "Username already exists."]);
-        exit;
-    }
-
-    $newUser = [
-        'id' => time(),
-        'username' => $data->username,
-        'password' => password_hash($data->password, PASSWORD_DEFAULT),
-        'role' => $data->role ?? 'admin',
-        'active' => true,
-        'created_at' => date('Y-m-d H:i:s')
-    ];
-
-    $users[] = $newUser;
+    $sql = "INSERT INTO users (username, password, role) VALUES ('$username', '$password', '$role')";
     
-    if (file_put_contents($usersFile, json_encode($users, JSON_PRETTY_PRINT))) {
+    if ($conn->query($sql)) {
         http_response_code(201);
-        echo json_encode(["message" => "User created successfully."]);
+        echo json_encode(array("message" => "User created successfully."));
     } else {
         http_response_code(503);
-        echo json_encode(["message" => "Unable to create user."]);
+        echo json_encode(array("message" => "Unable to create user."));
     }
 } else {
     http_response_code(400);
-    echo json_encode(["message" => "Unable to create user. Data is incomplete."]);
+    echo json_encode(array("message" => "Unable to create user. Data is incomplete."));
 }
-?>
+
+$conn->close();

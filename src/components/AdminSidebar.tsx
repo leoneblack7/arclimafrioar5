@@ -14,7 +14,6 @@ import {
   MessageCircle,
   Settings,
   User,
-  Shield,
 } from "lucide-react";
 
 interface AdminSidebarProps {
@@ -38,7 +37,6 @@ export const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarPro
     { id: "pix-config", label: "Configurações PIX", icon: Settings },
     { id: "telegram-bot", label: "Telegram Bot", icon: MessageCircle },
     { id: "user-management", label: "Gerenciar Usuário", icon: User },
-    { id: "permissions", label: "Permissão", icon: Shield },
   ];
 
   return (

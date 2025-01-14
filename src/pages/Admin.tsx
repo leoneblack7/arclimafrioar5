@@ -14,7 +14,6 @@ import { LeoneWhatsApp } from "@/components/LeoneWhatsApp";
 import { PixConfigManager } from "@/components/admin/PixConfigManager";
 import { TelegramBotManager } from "@/components/admin/TelegramBotManager";
 import { UserManager } from "@/components/admin/UserManager";
-import { PermissionsManager } from "@/components/admin/PermissionsManager";
 
 export default function Admin() {
   const { isAuthenticated, login } = useAuth();
@@ -94,7 +93,6 @@ export default function Admin() {
     const sections = {
       "telegram-bot": <TelegramBotManager />,
       "user-management": <UserManager />,
-      "permissions": <PermissionsManager />,
       "dashboard": <Dashboard />,
       "featured": <FeaturedProductManager />,
       "logo": <LogoManager />,
