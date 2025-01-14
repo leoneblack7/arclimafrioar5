@@ -1,95 +1,56 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { toast } from "sonner";
+import React, { createContext, useContext, useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
 
-interface CartItem {
+interface Product {
   id: number;
   title: string;
   price: number;
-  quantity: number;
   image: string;
+  quantity?: number;
+  pixLink?: string;
 }
 
 interface CartContextType {
-  items: CartItem[];
-  addItem: (item: CartItem) => void;
-  removeItem: (itemId: number) => void;
+  items: Product[];
+  addItem: (product: Product) => void;
+  removeItem: (productId: number) => void;
+  updateQuantity: (productId: number, quantity: number) => void;
   clearCart: () => void;
-  updateQuantity: (itemId: number, quantity: number) => void;
   total: number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [items, setItems] = useState<CartItem[]>([]);
+export function CartProvider({ children }: { children: React.ReactNode }) {
+  const [items, setItems] = useState<Product[]>([]);
+  const { toast } = useToast();
 
-  useEffect(() => {
-    loadCartFromDatabase();
-  }, []);
-
-  useEffect(() => {
-    if (items.length > 0) {
-      saveCartToDatabase();
-    }
-  }, [items]);
-
-  const loadCartFromDatabase = async () => {
-    try {
-      const response = await fetch('api/store-config/get-cart.php');
-      if (response.ok) {
-        const data = await response.json();
-        if (data.cart_data) {
-          setItems(JSON.parse(data.cart_data));
-        }
-      }
-    } catch (error) {
-      console.error('Error loading cart:', error);
-    }
-  };
-
-  const saveCartToDatabase = async () => {
-    try {
-      await fetch('api/store-config/save-cart.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          cart_data: items
-        })
-      });
-    } catch (error) {
-      console.error('Error saving cart:', error);
-    }
-  };
-
-  const addItem = (item: CartItem) => {
-    setItems(currentItems => {
-      const existingItem = currentItems.find(i => i.id === item.id);
+  const addItem = (product: Product) => {
+    setItems((currentItems) => {
+      const existingItem = currentItems.find((item) => item.id === product.id);
       if (existingItem) {
-        return currentItems.map(i =>
-          i.id === item.id
-            ? { ...i, quantity: i.quantity + 1 }
-            : i
+        return currentItems.map((item) =>
+          item.id === product.id
+            ? { ...item, quantity: (item.quantity || 1) + 1 }
+            : item
         );
       }
-      return [...currentItems, { ...item, quantity: 1 }];
+      toast({
+        title: "Produto adicionado",
+        description: `${product.title} foi adicionado ao carrinho`,
+      });
+      return [...currentItems, { ...product, quantity: 1 }];
     });
-    toast.success("Produto adicionado ao carrinho!");
   };
 
-  const removeItem = (itemId: number) => {
-    setItems(currentItems => currentItems.filter(item => item.id !== itemId));
-    toast.success("Produto removido do carrinho!");
+  const removeItem = (productId: number) => {
+    setItems((currentItems) => currentItems.filter((item) => item.id !== productId));
   };
 
-  const updateQuantity = (itemId: number, quantity: number) => {
-    if (quantity < 1) return;
-    setItems(currentItems =>
-      currentItems.map(item =>
-        item.id === itemId
-          ? { ...item, quantity }
-          : item
+  const updateQuantity = (productId: number, quantity: number) => {
+    setItems((currentItems) =>
+      currentItems.map((item) =>
+        item.id === productId ? { ...item, quantity } : item
       )
     );
   };
@@ -98,26 +59,24 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setItems([]);
   };
 
-  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const total = items.reduce(
+    (sum, item) => sum + item.price * (item.quantity || 1),
+    0
+  );
 
   return (
-    <CartContext.Provider value={{
-      items,
-      addItem,
-      removeItem,
-      clearCart,
-      updateQuantity,
-      total
-    }}>
+    <CartContext.Provider
+      value={{ items, addItem, removeItem, updateQuantity, clearCart, total }}
+    >
       {children}
     </CartContext.Provider>
   );
-};
+}
 
-export const useCart = () => {
+export function useCart() {
   const context = useContext(CartContext);
   if (context === undefined) {
-    throw new Error('useCart must be used within a CartProvider');
+    throw new Error("useCart must be used within a CartProvider");
   }
   return context;
-};
+}
