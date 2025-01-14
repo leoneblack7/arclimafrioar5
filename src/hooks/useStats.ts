@@ -71,8 +71,21 @@ export const useStats = () => {
     const loadStats = async () => {
       try {
         const response = await axios.get('/api/stats/read.php');
-        if (response.data) {
-          setStats(response.data);
+        if (response.data && Array.isArray(response.data)) {
+          setStats(prevStats => {
+            // Mescla os dados do servidor com os dados padrão
+            const updatedStats = [...prevStats];
+            response.data.forEach(serverStat => {
+              const index = updatedStats.findIndex(stat => stat.id === serverStat.id);
+              if (index !== -1) {
+                updatedStats[index] = {
+                  ...updatedStats[index],
+                  value: serverStat.value
+                };
+              }
+            });
+            return updatedStats;
+          });
         }
       } catch (error) {
         console.error('Erro ao carregar estatísticas:', error);

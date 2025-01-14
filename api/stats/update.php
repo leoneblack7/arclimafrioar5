@@ -10,27 +10,35 @@ $data = json_decode(file_get_contents("php://input"));
 if (!empty($data->id)) {
     $statsFile = $_SERVER['DOCUMENT_ROOT'] . '/data/stats.json';
     
-    if (file_exists($statsFile)) {
-        $stats = json_decode(file_get_contents($statsFile), true) ?? [];
-        
-        // Atualiza a estatística com o ID especificado
-        $stats = array_map(function($stat) use ($data) {
-            if ($stat['id'] === $data->id) {
-                $stat['value'] = $data->value;
-            }
-            return $stat;
-        }, $stats);
-        
-        if (file_put_contents($statsFile, json_encode($stats, JSON_PRETTY_PRINT))) {
-            http_response_code(200);
-            echo json_encode(["message" => "Estatística atualizada com sucesso"]);
-        } else {
-            http_response_code(503);
-            echo json_encode(["message" => "Não foi possível atualizar a estatística"]);
+    // Cria o diretório data se não existir
+    if (!file_exists($_SERVER['DOCUMENT_ROOT'] . '/data')) {
+        mkdir($_SERVER['DOCUMENT_ROOT'] . '/data', 0777, true);
+    }
+    
+    // Se o arquivo não existir, cria um array vazio
+    if (!file_exists($statsFile)) {
+        file_put_contents($statsFile, json_encode([]));
+        chmod($statsFile, 0777);
+    }
+    
+    $stats = json_decode(file_get_contents($statsFile), true) ?? [];
+    
+    // Procura a estatística com o ID especificado
+    $found = false;
+    foreach ($stats as &$stat) {
+        if ($stat['id'] === $data->id) {
+            $stat['value'] = $data->value;
+            $found = true;
+            break;
         }
+    }
+    
+    if (file_put_contents($statsFile, json_encode($stats, JSON_PRETTY_PRINT))) {
+        http_response_code(200);
+        echo json_encode(["message" => "Estatística atualizada com sucesso"]);
     } else {
-        http_response_code(404);
-        echo json_encode(["message" => "Arquivo de estatísticas não encontrado"]);
+        http_response_code(503);
+        echo json_encode(["message" => "Não foi possível atualizar a estatística"]);
     }
 } else {
     http_response_code(400);
