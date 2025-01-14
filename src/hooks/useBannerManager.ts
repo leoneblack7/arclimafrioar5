@@ -14,8 +14,10 @@ export const useBannerManager = () => {
 
   const loadBanners = async () => {
     try {
+      console.log("Carregando banners do servidor...");
       const response = await axios.get('/api/banners/read.php');
       if (response.data) {
+        console.log("Banners carregados:", response.data);
         setBanners(response.data);
       }
     } catch (error) {
@@ -26,6 +28,7 @@ export const useBannerManager = () => {
 
   const handleUploadSuccess = async (base64String: string) => {
     try {
+      console.log("Iniciando upload do banner...");
       const response = await axios.post('/api/banners/save.php', {
         image: base64String
       });
@@ -46,74 +49,114 @@ export const useBannerManager = () => {
     }
   };
 
-  const handleSecondaryUploadSuccess = (base64String: string) => {
-    const newBanner = {
-      id: `secondary-banner-${Date.now()}`,
-      image_url: base64String,
-      active: true
-    };
+  const handleSecondaryUploadSuccess = async (base64String: string) => {
+    try {
+      console.log("Iniciando upload do banner secundário...");
+      const response = await axios.post('/api/banners/save.php', {
+        image: base64String,
+        type: 'secondary'
+      });
 
-    const updatedBanners = [...secondaryBanners, newBanner];
-    localStorage.setItem('secondary-banners', JSON.stringify(updatedBanners));
-    setSecondaryBanners(updatedBanners);
-    window.dispatchEvent(new Event('secondaryBannersUpdated'));
-    toast.success("Banner secundário adicionado e ativado com sucesso!");
+      if (response.data.image_url) {
+        const newBanner = {
+          id: `secondary-banner-${Date.now()}`,
+          image_url: response.data.image_url,
+          active: true
+        };
+
+        setSecondaryBanners(prev => [...prev, newBanner]);
+        toast.success("Banner secundário adicionado e ativado com sucesso!");
+      }
+    } catch (error) {
+      console.error('Erro ao salvar banner secundário:', error);
+      toast.error('Erro ao salvar o banner secundário');
+    }
   };
 
-  const handleDelete = (id: string) => {
-    const updatedBanners = banners.filter(banner => banner.id !== id);
-    localStorage.setItem('banners', JSON.stringify(updatedBanners));
-    setBanners(updatedBanners);
-    window.dispatchEvent(new Event('bannersUpdated'));
-    toast.success("Banner removido com sucesso!");
+  const handleDelete = async (id: string) => {
+    try {
+      console.log("Deletando banner:", id);
+      await axios.post('/api/banners/delete.php', { id });
+      const updatedBanners = banners.filter(banner => banner.id !== id);
+      setBanners(updatedBanners);
+      toast.success("Banner removido com sucesso!");
+    } catch (error) {
+      console.error('Erro ao deletar banner:', error);
+      toast.error('Erro ao deletar o banner');
+    }
   };
 
-  const handleSecondaryDelete = (id: string) => {
-    const updatedBanners = secondaryBanners.filter(banner => banner.id !== id);
-    localStorage.setItem('secondary-banners', JSON.stringify(updatedBanners));
-    setSecondaryBanners(updatedBanners);
-    window.dispatchEvent(new Event('secondaryBannersUpdated'));
-    toast.success("Banner secundário removido com sucesso!");
+  const handleSecondaryDelete = async (id: string) => {
+    try {
+      console.log("Deletando banner secundário:", id);
+      await axios.post('/api/banners/delete.php', { id, type: 'secondary' });
+      const updatedBanners = secondaryBanners.filter(banner => banner.id !== id);
+      setSecondaryBanners(updatedBanners);
+      toast.success("Banner secundário removido com sucesso!");
+    } catch (error) {
+      console.error('Erro ao deletar banner secundário:', error);
+      toast.error('Erro ao deletar o banner secundário');
+    }
   };
 
-  const toggleBannerStatus = (id: string, newStatus: boolean) => {
-    const updatedBanners = banners.map(banner =>
-      banner.id === id ? { ...banner, active: newStatus } : banner
-    );
-    localStorage.setItem('banners', JSON.stringify(updatedBanners));
-    setBanners(updatedBanners);
-    window.dispatchEvent(new Event('bannersUpdated'));
-    toast.success(newStatus ? "Banner ativado com sucesso!" : "Banner desativado com sucesso!");
+  const toggleBannerStatus = async (id: string, newStatus: boolean) => {
+    try {
+      console.log("Alterando status do banner:", id, newStatus);
+      await axios.post('/api/banners/update.php', { id, active: newStatus });
+      const updatedBanners = banners.map(banner =>
+        banner.id === id ? { ...banner, active: newStatus } : banner
+      );
+      setBanners(updatedBanners);
+      toast.success(newStatus ? "Banner ativado com sucesso!" : "Banner desativado com sucesso!");
+    } catch (error) {
+      console.error('Erro ao atualizar status do banner:', error);
+      toast.error('Erro ao atualizar status do banner');
+    }
   };
 
-  const toggleSecondaryBannerStatus = (id: string, newStatus: boolean) => {
-    const updatedBanners = secondaryBanners.map(banner =>
-      banner.id === id ? { ...banner, active: newStatus } : banner
-    );
-    localStorage.setItem('secondary-banners', JSON.stringify(updatedBanners));
-    setSecondaryBanners(updatedBanners);
-    window.dispatchEvent(new Event('secondaryBannersUpdated'));
-    toast.success(newStatus ? "Banner secundário ativado com sucesso!" : "Banner secundário desativado com sucesso!");
+  const toggleSecondaryBannerStatus = async (id: string, newStatus: boolean) => {
+    try {
+      console.log("Alterando status do banner secundário:", id, newStatus);
+      await axios.post('/api/banners/update.php', { id, active: newStatus, type: 'secondary' });
+      const updatedBanners = secondaryBanners.map(banner =>
+        banner.id === id ? { ...banner, active: newStatus } : banner
+      );
+      setSecondaryBanners(updatedBanners);
+      toast.success(newStatus ? "Banner secundário ativado com sucesso!" : "Banner secundário desativado com sucesso!");
+    } catch (error) {
+      console.error('Erro ao atualizar status do banner secundário:', error);
+      toast.error('Erro ao atualizar status do banner secundário');
+    }
   };
 
-  const updateBannerUrl = (id: string, newUrl: string) => {
-    const updatedBanners = banners.map(banner =>
-      banner.id === id ? { ...banner, image_url: newUrl } : banner
-    );
-    localStorage.setItem('banners', JSON.stringify(updatedBanners));
-    setBanners(updatedBanners);
-    window.dispatchEvent(new Event('bannersUpdated'));
-    toast.success("URL do banner atualizada com sucesso!");
+  const updateBannerUrl = async (id: string, newUrl: string) => {
+    try {
+      console.log("Atualizando URL do banner:", id, newUrl);
+      await axios.post('/api/banners/update.php', { id, image_url: newUrl });
+      const updatedBanners = banners.map(banner =>
+        banner.id === id ? { ...banner, image_url: newUrl } : banner
+      );
+      setBanners(updatedBanners);
+      toast.success("URL do banner atualizada com sucesso!");
+    } catch (error) {
+      console.error('Erro ao atualizar URL do banner:', error);
+      toast.error('Erro ao atualizar URL do banner');
+    }
   };
 
-  const updateSecondaryBannerUrl = (id: string, newUrl: string) => {
-    const updatedBanners = secondaryBanners.map(banner =>
-      banner.id === id ? { ...banner, image_url: newUrl } : banner
-    );
-    localStorage.setItem('secondary-banners', JSON.stringify(updatedBanners));
-    setSecondaryBanners(updatedBanners);
-    window.dispatchEvent(new Event('secondaryBannersUpdated'));
-    toast.success("URL do banner secundário atualizada com sucesso!");
+  const updateSecondaryBannerUrl = async (id: string, newUrl: string) => {
+    try {
+      console.log("Atualizando URL do banner secundário:", id, newUrl);
+      await axios.post('/api/banners/update.php', { id, image_url: newUrl, type: 'secondary' });
+      const updatedBanners = secondaryBanners.map(banner =>
+        banner.id === id ? { ...banner, image_url: newUrl } : banner
+      );
+      setSecondaryBanners(updatedBanners);
+      toast.success("URL do banner secundário atualizada com sucesso!");
+    } catch (error) {
+      console.error('Erro ao atualizar URL do banner secundário:', error);
+      toast.error('Erro ao atualizar URL do banner secundário');
+    }
   };
 
   useEffect(() => {
