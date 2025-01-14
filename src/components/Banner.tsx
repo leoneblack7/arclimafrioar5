@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { BannerNavigation } from './banner/BannerNavigation';
 import { BannerSlide } from './banner/BannerSlide';
 import { BannerIndicators } from './banner/BannerIndicators';
+import axios from 'axios';
 
 interface Banner {
   id: string;
@@ -9,85 +10,42 @@ interface Banner {
   active: boolean;
 }
 
-const defaultBanners: Banner[] = [
-  {
-    id: 'default-banner-1',
-    image_url: '/lovable-uploads/be106df6-7f56-49b8-8767-4cf73aa20a7b.png',
-    active: true
-  },
-  {
-    id: 'default-banner-2',
-    image_url: '/lovable-uploads/3f83f27c-39bc-4118-9240-41e9d4d45fbf.png',
-    active: true
-  },
-  {
-    id: 'default-banner-3',
-    image_url: '/lovable-uploads/b628c938-51f7-44ca-9c86-ff0be454ec82.png',
-    active: true
-  },
-  {
-    id: 'default-banner-4',
-    image_url: '/lovable-uploads/cac2472b-8231-4414-8fd3-13200a6cecc9.png',
-    active: true
-  },
-  {
-    id: 'default-banner-5',
-    image_url: '/lovable-uploads/10041c18-fc73-405c-a630-853731dc5792.png',
-    active: true
-  },
-  {
-    id: 'default-banner-6',
-    image_url: '/lovable-uploads/14fcd544-00af-494f-b65d-d120a188f4af.png',
-    active: true
-  }
-];
-
 export const Banner = () => {
-  const [banners, setBanners] = useState<Banner[]>(defaultBanners);
+  const [banners, setBanners] = useState<Banner[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right');
 
-  const loadBanners = () => {
+  const loadBanners = async () => {
     try {
       console.log("Banner - Iniciando carregamento dos banners");
-      const storedBanners = localStorage.getItem('banners');
-      console.log("Banner - Dados do localStorage:", storedBanners);
+      const response = await axios.get('/api/banners/read.php');
+      console.log("Banner - Resposta da API:", response.data);
       
-      if (storedBanners) {
-        const parsedBanners = JSON.parse(storedBanners);
-        console.log("Banner - Banners parseados:", parsedBanners);
+      if (response.data && Array.isArray(response.data)) {
+        // Filtra apenas os banners ativos
+        const activeBanners = response.data.filter((banner: Banner) => banner.active);
         
-        if (parsedBanners && Array.isArray(parsedBanners) && parsedBanners.length > 0) {
-          // Filtra apenas os banners ativos
-          const activeBanners = parsedBanners.filter((banner: Banner) => banner.active);
-          
-          if (activeBanners.length > 0) {
-            console.log("Banner - Usando banners do localStorage");
-            setBanners(activeBanners);
-            return;
-          }
+        if (activeBanners.length > 0) {
+          console.log("Banner - Banners ativos carregados:", activeBanners);
+          setBanners(activeBanners);
+          return;
         }
       }
       
-      console.log("Banner - Usando banners padrão");
-      setBanners(defaultBanners);
+      console.error("Banner - Nenhum banner ativo encontrado");
     } catch (error) {
       console.error('Erro ao carregar banners:', error);
-      setBanners(defaultBanners);
     }
   };
 
   useEffect(() => {
     loadBanners();
-    window.addEventListener('bannersUpdated', loadBanners);
-    return () => {
-      window.removeEventListener('bannersUpdated', loadBanners);
-    };
+    
+    // Recarrega os banners a cada 30 segundos
+    const interval = setInterval(loadBanners, 30000);
+    
+    return () => clearInterval(interval);
   }, []);
-
-  useEffect(() => {
-    console.log("Banner - Estado atual dos banners:", banners);
-  }, [banners]);
 
   const nextSlide = () => {
     setSlideDirection('right');
