@@ -129,7 +129,9 @@ class DatabaseServiceClass {
           id: order.id,
           user_id: order.user_id,
           status: order.status,
-          total_amount: order.total_amount
+          total_amount: order.total_amount,
+          customer_data: order.customer_data,
+          payment_method: order.payment_method
         })
         .select()
         .single();

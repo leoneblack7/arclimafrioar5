@@ -33,7 +33,14 @@ export interface Order {
     state?: string;
     zipCode?: string;
   };
-  items: any[];
+  items: {
+    id: string;
+    order_id: string;
+    product_id: string;
+    quantity: number;
+    price: number;
+    created_at?: string;
+  }[];
   payment_method?: string;
   transaction_id?: string;
   tracking_updates?: any[];
