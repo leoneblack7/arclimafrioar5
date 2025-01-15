@@ -78,7 +78,9 @@ export type Database = {
       orders: {
         Row: {
           created_at: string | null
+          customer_data: Json | null
           id: string
+          payment_method: string | null
           status: string
           total_amount: number
           updated_at: string | null
@@ -86,7 +88,9 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          customer_data?: Json | null
           id?: string
+          payment_method?: string | null
           status: string
           total_amount: number
           updated_at?: string | null
@@ -94,7 +98,9 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          customer_data?: Json | null
           id?: string
+          payment_method?: string | null
           status?: string
           total_amount?: number
           updated_at?: string | null
