@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getFromLocalStorage } from '@/utils/localStorage';
 import { Product } from '@/types/product';
@@ -14,7 +14,6 @@ import { Footer } from '@/components/home/Footer';
 import { toast } from 'sonner';
 import { Navbar } from '@/components/Navbar';
 import { useCart } from '@/contexts/CartContext';
-import { useNavigate } from 'react-router-dom';
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
