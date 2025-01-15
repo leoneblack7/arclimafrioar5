@@ -45,7 +45,7 @@ export const ProductManager = () => {
         onEdit={(product) => {
           setEditingProduct({
             ...product,
-            images: product.images || [product.image]
+            images: product.images || [product.image_url]
           });
           setIsDialogOpen(true);
         }}

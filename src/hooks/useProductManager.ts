@@ -18,10 +18,10 @@ export const useProductManager = () => {
 
   const handleNewProduct = () => {
     const newProduct: Product = {
-      id: Date.now(),
+      id: String(Date.now()),
       title: "Novo Produto",
       price: 0,
-      image: "/placeholder.svg",
+      image_url: "/placeholder.svg",
       images: ["/placeholder.svg"],
       description: "Descrição do novo produto",
       active: true
@@ -35,9 +35,9 @@ export const useProductManager = () => {
       const productToSave = {
         ...updatedProduct,
         price: Number(updatedProduct.price),
-        id: updatedProduct.id || Date.now(),
-        images: updatedProduct.images || [updatedProduct.image],
-        image: updatedProduct.images?.[0] || updatedProduct.image
+        id: updatedProduct.id || String(Date.now()),
+        images: updatedProduct.images || [updatedProduct.image_url],
+        image_url: updatedProduct.images?.[0] || updatedProduct.image_url
       };
 
       saveProduct(productToSave);
@@ -54,10 +54,10 @@ export const useProductManager = () => {
   const handleImportProduct = async (scrapedProduct: any) => {
     try {
       const newProduct: Product = {
-        id: Date.now(),
+        id: String(Date.now()),
         title: scrapedProduct.title,
         price: Number(scrapedProduct.price),
-        image: scrapedProduct.images[0] || '/placeholder.svg',
+        image_url: scrapedProduct.images[0] || '/placeholder.svg',
         images: scrapedProduct.images || [scrapedProduct.images[0] || '/placeholder.svg'],
         description: scrapedProduct.description,
         active: true
@@ -72,7 +72,7 @@ export const useProductManager = () => {
     }
   };
 
-  const handleDeleteProduct = async (productId: number) => {
+  const handleDeleteProduct = async (productId: string) => {
     try {
       deleteProduct(productId);
       queryClient.invalidateQueries({ queryKey: ["products"] });
@@ -83,7 +83,7 @@ export const useProductManager = () => {
     }
   };
 
-  const handleToggleActive = async (productId: number) => {
+  const handleToggleActive = async (productId: string) => {
     const product = products.find(p => p.id === productId);
     if (!product) return;
 

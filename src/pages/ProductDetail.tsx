@@ -25,7 +25,7 @@ export default function ProductDetail() {
     queryKey: ['product', id],
     queryFn: async () => {
       const products = getFromLocalStorage('products', []) as Product[];
-      const foundProduct = products.find((p) => p.id === Number(id));
+      const foundProduct = products.find((p) => p.id === id);
       
       if (!foundProduct) {
         throw new Error('Produto não encontrado');
@@ -35,7 +35,7 @@ export default function ProductDetail() {
         id: foundProduct.id,
         title: foundProduct.title || '',
         price: foundProduct.price || 0,
-        image: foundProduct.image || '',
+        image_url: foundProduct.image_url || '',
         images: foundProduct.images || [],
         description: foundProduct.description || '',
         isDescriptionActive: foundProduct.isDescriptionActive ?? true,
@@ -58,7 +58,7 @@ export default function ProductDetail() {
         id: product.id,
         title: product.title,
         price: product.price,
-        image: product.image,
+        image_url: product.image_url,
         quantity: 1
       });
       toast.success('Produto adicionado ao carrinho!');
@@ -71,7 +71,7 @@ export default function ProductDetail() {
         id: product.id,
         title: product.title,
         price: product.price,
-        image: product.image,
+        image_url: product.image_url,
         quantity: 1
       });
       navigate('/checkout');
@@ -107,7 +107,7 @@ export default function ProductDetail() {
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
           <ProductGallery 
-            images={[product.image, ...(product.images || [])]}
+            images={[product.image_url, ...(product.images || [])]}
           />
           
           <div className="space-y-6">

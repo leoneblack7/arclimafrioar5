@@ -4,9 +4,9 @@ import { ProductCard } from "@/components/ProductCard";
 import { Product } from "@/types/product";
 
 interface RelatedProductsProps {
-  currentProductId: number;
+  currentProductId: string;
   isActive?: boolean;
-  relatedProductIds?: number[];
+  relatedProductIds?: string[];
 }
 
 export const RelatedProducts = ({ 
@@ -28,10 +28,10 @@ export const RelatedProducts = ({
           )
           .slice(0, 3)
           .map((item: Product) => ({
-            id: Number(item.id),
+            id: item.id,
             title: item.title,
             price: item.price,
-            image: item.image || '/placeholder.svg',
+            image_url: item.image_url || '/placeholder.svg',
             description: item.description,
           }));
       }
@@ -44,10 +44,10 @@ export const RelatedProducts = ({
         )
         .slice(0, 3)
         .map((item: Product) => ({
-          id: Number(item.id),
+          id: item.id,
           title: item.title,
           price: item.price,
-          image: item.image || '/placeholder.svg',
+          image_url: item.image_url || '/placeholder.svg',
           description: item.description,
         }));
     }

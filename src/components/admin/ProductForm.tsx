@@ -18,7 +18,7 @@ interface ProductFormProps {
 export const ProductForm = ({ product, onSave, onCancel }: ProductFormProps) => {
   const [formData, setFormData] = useState<Product>({
     ...product,
-    images: product.images || [product.image],
+    images: product.images || [product.image_url],
     additionalImages: product.additionalImages || [],
     isDescriptionActive: product.isDescriptionActive ?? true,
     isImagesActive: product.isImagesActive ?? true,
@@ -33,6 +33,7 @@ export const ProductForm = ({ product, onSave, onCancel }: ProductFormProps) => 
     e.preventDefault();
     onSave({
       ...formData,
+      image_url: formData.images[0] || '/placeholder.svg',
       images: formData.images.filter(Boolean),
       additionalImages: formData.additionalImages.filter(Boolean)
     });
@@ -76,8 +77,8 @@ export const ProductForm = ({ product, onSave, onCancel }: ProductFormProps) => 
             isActive={formData.isImagesActive}
             onImagesChange={(images) => setFormData({
               ...formData,
-              image: images[0],
-              images
+              images,
+              image_url: images[0] || '/placeholder.svg'
             })}
             onActiveChange={(isImagesActive) => setFormData({ ...formData, isImagesActive })}
           />
@@ -94,7 +95,7 @@ export const ProductForm = ({ product, onSave, onCancel }: ProductFormProps) => 
           />
 
           <RelatedProductsEditor
-            relatedProductIds={formData.relatedProductIds}
+            relatedProductIds={formData.relatedProductIds || []}
             isActive={formData.isRelatedProductsActive}
             onRelatedProductsChange={(relatedProductIds) => 
               setFormData({ ...formData, relatedProductIds })
@@ -106,7 +107,7 @@ export const ProductForm = ({ product, onSave, onCancel }: ProductFormProps) => 
 
           <ImageUploader
             title="Imagens Adicionais"
-            images={formData.additionalImages}
+            images={formData.additionalImages || []}
             isActive={formData.isAdditionalImagesActive}
             onImagesChange={(additionalImages) => setFormData({
               ...formData,
