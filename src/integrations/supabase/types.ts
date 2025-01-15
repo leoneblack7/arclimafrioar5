@@ -153,6 +153,30 @@ export type Database = {
         }
         Relationships: []
       }
+      supabase_connections: {
+        Row: {
+          anon_key: string
+          created_at: string
+          id: string
+          project_url: string
+          updated_at: string
+        }
+        Insert: {
+          anon_key: string
+          created_at?: string
+          id?: string
+          project_url: string
+          updated_at?: string
+        }
+        Update: {
+          anon_key?: string
+          created_at?: string
+          id?: string
+          project_url?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

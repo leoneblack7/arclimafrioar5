@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { User, UserPlus, UserMinus } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { getFromLocalStorage, saveToLocalStorage } from "@/utils/localStorage";
+import { SupabaseConnectionManager } from "./SupabaseConnectionManager";
 
 interface UserData {
   username: string;
@@ -85,8 +86,9 @@ export function UserManager() {
   };
 
   return (
-    <Card>
-      <CardContent className="pt-6">
+    <div className="space-y-6">
+      <Card>
+        <CardContent className="pt-6">
         <h2 className="text-2xl font-bold mb-4">Gerenciar Usuários</h2>
         <p className="text-muted-foreground mb-6">Usuário atual: {currentUsername}</p>
 
@@ -153,7 +155,10 @@ export function UserManager() {
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+
+      <SupabaseConnectionManager />
+    </div>
   );
 }

@@ -1,3 +1,4 @@
+import { supabase } from "@/integrations/supabase/client";
 import { saveToLocalStorage, getFromLocalStorage } from '@/utils/localStorage';
 
 interface Product {
@@ -21,18 +22,19 @@ interface Order {
   tracking_updates?: any[];
 }
 
-const API_URL = 'http://localhost/arclimafrio/api';
-
 class DatabaseServiceClass {
   async getProducts(): Promise<Product[]> {
     try {
-      const response = await fetch(`${API_URL}/products/read.php`);
-      if (!response.ok) throw new Error('Failed to fetch products');
-      const products = await response.json();
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
       
       // Save to localStorage as backup
-      saveToLocalStorage('products', products);
-      return products;
+      saveToLocalStorage('products', data);
+      return data;
     } catch (error) {
       console.error('Error fetching products:', error);
       return getFromLocalStorage('products', []);
@@ -41,31 +43,31 @@ class DatabaseServiceClass {
 
   async saveProduct(product: Product) {
     try {
-      const method = product.id ? 'PUT' : 'POST';
-      const endpoint = product.id ? 'update.php' : 'create.php';
-      
-      const response = await fetch(`${API_URL}/products/${endpoint}`, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(product),
-      });
-      
-      if (!response.ok) throw new Error('Failed to save product');
-      const savedProduct = await response.json();
+      const { data, error } = await supabase
+        .from('products')
+        .upsert({
+          id: product.id,
+          title: product.title,
+          price: product.price,
+          image_url: product.image,
+          description: product.description
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
       
       // Update localStorage
       const products = getFromLocalStorage('products', []);
       const index = products.findIndex((p: Product) => p.id === product.id);
       if (index !== -1) {
-        products[index] = savedProduct;
+        products[index] = data;
       } else {
-        products.push(savedProduct);
+        products.push(data);
       }
       saveToLocalStorage('products', products);
       
-      return savedProduct;
+      return data;
     } catch (error) {
       console.error('Error saving product:', error);
       return this.saveProductToLocalStorage(product);
@@ -85,59 +87,21 @@ class DatabaseServiceClass {
     return newProduct;
   }
 
-  async saveOrder(order: Order) {
-    try {
-      const response = await fetch(`${API_URL}/orders/create.php`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(order),
-      });
-      
-      if (!response.ok) throw new Error('Failed to save order');
-      const savedOrder = await response.json();
-      
-      // Update localStorage
-      const orders = getFromLocalStorage('orders', []);
-      const index = orders.findIndex((o: Order) => o.id === order.id);
-      if (index !== -1) {
-        orders[index] = savedOrder;
-      } else {
-        orders.push(savedOrder);
-      }
-      saveToLocalStorage('orders', orders);
-      
-      return savedOrder;
-    } catch (error) {
-      console.error('Error saving order:', error);
-      return this.saveOrderToLocalStorage(order);
-    }
-  }
-
-  private saveOrderToLocalStorage(order: Order) {
-    const orders = getFromLocalStorage('orders', []);
-    const index = orders.findIndex((o: Order) => o.id === order.id);
-    if (index !== -1) {
-      orders[index] = order;
-    } else {
-      orders.push(order);
-    }
-    saveToLocalStorage('orders', orders);
-    return order;
-  }
-
   async deleteProduct(productId: number) {
     try {
-      const response = await fetch(`${API_URL}/products/delete.php`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ id: productId }),
-      });
-      if (!response.ok) throw new Error('Failed to delete product');
-      return response.json();
+      const { error } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', productId);
+
+      if (error) throw error;
+
+      // Update localStorage
+      const products = getFromLocalStorage('products', []);
+      const filteredProducts = products.filter((p: Product) => p.id !== productId);
+      saveToLocalStorage('products', filteredProducts);
+      
+      return { message: 'Product deleted successfully' };
     } catch (error) {
       console.error('Error deleting product:', error);
       const products = getFromLocalStorage('products', []);
@@ -149,47 +113,67 @@ class DatabaseServiceClass {
 
   async getOrders(): Promise<Order[]> {
     try {
-      const response = await fetch(`${API_URL}/orders/read.php`);
-      if (!response.ok) throw new Error('Failed to fetch orders');
-      return response.json();
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*');
+
+      if (error) throw error;
+      return data;
     } catch (error) {
       console.error('Error fetching orders:', error);
       return getFromLocalStorage('orders', []);
     }
   }
 
-  async updateOrder(order: Order) {
+  async saveOrder(order: Order) {
     try {
-      const response = await fetch(`${API_URL}/orders/update.php`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(order),
-      });
-      if (!response.ok) throw new Error('Failed to update order');
-      return response.json();
-    } catch (error) {
-      console.error('Error updating order:', error);
+      const { data, error } = await supabase
+        .from('orders')
+        .upsert(order)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Update localStorage
       const orders = getFromLocalStorage('orders', []);
       const index = orders.findIndex((o: Order) => o.id === order.id);
-      if (index !== -1) orders[index] = order;
+      if (index !== -1) {
+        orders[index] = data;
+      } else {
+        orders.push(data);
+      }
       saveToLocalStorage('orders', orders);
-      return order;
+      
+      return data;
+    } catch (error) {
+      console.error('Error saving order:', error);
+      return this.saveOrderToLocalStorage(order);
     }
+  }
+
+  private saveOrderToLocalStorage(order: Order) {
+    const orders = getFromLocalStorage('orders', []);
+    const newOrder = { ...order, id: order.id || Date.now().toString() };
+    if (order.id) {
+      const index = orders.findIndex((o: Order) => o.id === order.id);
+      if (index !== -1) orders[index] = newOrder;
+    } else {
+      orders.push(newOrder);
+    }
+    saveToLocalStorage('orders', orders);
+    return newOrder;
   }
 
   async deleteOrder(orderId: string) {
     try {
-      const response = await fetch(`${API_URL}/orders/delete.php`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ id: orderId }),
-      });
-      if (!response.ok) throw new Error('Failed to delete order');
-      return response.json();
+      const { error } = await supabase
+        .from('orders')
+        .delete()
+        .eq('id', orderId);
+
+      if (error) throw error;
+      return { message: 'Order deleted successfully' };
     } catch (error) {
       console.error('Error deleting order:', error);
       const orders = getFromLocalStorage('orders', []);
