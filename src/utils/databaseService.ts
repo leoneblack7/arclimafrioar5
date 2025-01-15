@@ -48,3 +48,12 @@ export const deleteOrder = (orderId: string) => {
   const updatedOrders = orders.filter((o: Order) => o.id !== orderId);
   saveToLocalStorage('orders', updatedOrders);
 };
+
+// Cart
+export const saveCart = (cartData: any[]) => {
+  saveToLocalStorage('cart', cartData);
+};
+
+export const getCart = () => {
+  return getFromLocalStorage('cart', []);
+};

@@ -20,12 +20,11 @@ export const PixPaymentManager = () => {
   const featuredProducts = getFromLocalStorage('featured-products', []) as Product[];
   const pixLinksEnabled = getFromLocalStorage('pix-links-enabled', false);
 
-  // Combine and remove duplicates based on product ID
   const allProducts = [...products, ...featuredProducts].filter((product, index, self) =>
     index === self.findIndex((p) => p.id === product.id)
   );
 
-  const handleSetPixLink = async (productId: number, pixLink: string) => {
+  const handleSetPixLink = async (productId: string, pixLink: string) => {
     const product = allProducts.find((p) => p.id === productId);
     if (!product) return;
 
@@ -45,7 +44,6 @@ export const PixPaymentManager = () => {
     saveToLocalStorage('pix-links-enabled', newState);
     
     if (newState) {
-      // Disable all PIX configurations when enabling PIX Links
       const pixConfig = getFromLocalStorage('PIX_CONFIG', {});
       saveToLocalStorage('PIX_CONFIG', {
         ...pixConfig,
@@ -60,7 +58,6 @@ export const PixPaymentManager = () => {
       toast.success("Links PIX desativados");
     }
     
-    // Force page reload to update all components
     window.location.reload();
   };
 
