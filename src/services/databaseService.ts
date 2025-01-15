@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { saveToLocalStorage, getFromLocalStorage } from '@/utils/localStorage';
-import { Product, Order } from '@/types/product';
+import { Product, Order, OrderItem } from '@/types/product';
 
 class DatabaseServiceClass {
   async getProducts(): Promise<Product[]> {
@@ -12,7 +12,6 @@ class DatabaseServiceClass {
 
       if (error) throw error;
       
-      // Save to localStorage as backup
       saveToLocalStorage('products', data);
       return data as Product[];
     } catch (error) {
@@ -37,7 +36,6 @@ class DatabaseServiceClass {
 
       if (error) throw error;
       
-      // Update localStorage
       const products = getFromLocalStorage('products', []);
       const index = products.findIndex((p: Product) => p.id === product.id);
       if (index !== -1) {
@@ -79,7 +77,6 @@ class DatabaseServiceClass {
 
       if (error) throw error;
 
-      // Update localStorage
       const products = getFromLocalStorage('products', []);
       const filteredProducts = products.filter((p: Product) => p.id !== productId);
       saveToLocalStorage('products', filteredProducts);
@@ -105,7 +102,6 @@ class DatabaseServiceClass {
 
       if (error) throw error;
 
-      // Transform the data to match the Order interface
       const transformedOrders = data.map(order => ({
         ...order,
         items: order.order_items || [],
@@ -122,7 +118,6 @@ class DatabaseServiceClass {
 
   async saveOrder(order: Order) {
     try {
-      // First save the order
       const { data: orderData, error: orderError } = await supabase
         .from('orders')
         .upsert({
@@ -138,7 +133,6 @@ class DatabaseServiceClass {
 
       if (orderError) throw orderError;
 
-      // Then save the order items
       if (order.items && order.items.length > 0) {
         const { error: itemsError } = await supabase
           .from('order_items')
@@ -179,13 +173,11 @@ class DatabaseServiceClass {
 
   async deleteOrder(orderId: string) {
     try {
-      // First delete the order items
       await supabase
         .from('order_items')
         .delete()
         .eq('order_id', orderId);
 
-      // Then delete the order
       const { error } = await supabase
         .from('orders')
         .delete()
