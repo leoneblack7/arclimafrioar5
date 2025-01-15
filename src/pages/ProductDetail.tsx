@@ -9,7 +9,6 @@ import { ProductDetailActions } from '@/components/product/ProductDetailActions'
 import { ProductDetailDescription } from '@/components/product/ProductDetailDescription';
 import { ProductDetailShipping } from '@/components/product/ProductDetailShipping';
 import { Footer } from '@/components/home/Footer';
-import { toast } from 'sonner';
 import { Navbar } from '@/components/Navbar';
 import { useCart } from '@/contexts/CartContext';
 
@@ -61,11 +60,11 @@ export default function ProductDetail() {
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="container mx-auto px-4 py-8">
-        <ProductDetailHeader title={product.title} />
+        <ProductDetailHeader title={product.title} id={product.id} />
         <div className="grid md:grid-cols-2 gap-8 mt-8">
           <ProductDetailImages
-            mainImage={product.image_url}
-            additionalImages={product.additionalImages || []}
+            title={product.title}
+            images={[product.image_url, ...(product.images || [])]}
             isActive={product.isImagesActive}
           />
           <div className="space-y-6">
@@ -79,9 +78,7 @@ export default function ProductDetail() {
         </div>
         <ProductDetailDescription
           description={product.description}
-          specifications={product.specifications}
-          isDescriptionActive={product.isDescriptionActive}
-          isSpecificationsActive={product.isSpecificationsActive}
+          isActive={product.isDescriptionActive}
         />
       </div>
       <Footer />
