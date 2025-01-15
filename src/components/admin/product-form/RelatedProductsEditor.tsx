@@ -5,9 +5,9 @@ import { Plus, X } from "lucide-react";
 import { useState } from "react";
 
 interface RelatedProductsEditorProps {
-  relatedProductIds?: number[];
+  relatedProductIds?: string[];
   isActive?: boolean;
-  onRelatedProductsChange: (relatedProductIds: number[]) => void;
+  onRelatedProductsChange: (relatedProductIds: string[]) => void;
   onActiveChange: (isActive: boolean) => void;
 }
 
@@ -20,14 +20,14 @@ export const RelatedProductsEditor = ({
   const [newProductId, setNewProductId] = useState("");
 
   const handleAddProduct = () => {
-    if (newProductId && !isNaN(Number(newProductId))) {
-      const updatedIds = [...relatedProductIds, Number(newProductId)];
+    if (newProductId) {
+      const updatedIds = [...relatedProductIds, newProductId];
       onRelatedProductsChange(updatedIds);
       setNewProductId("");
     }
   };
 
-  const handleRemoveProduct = (idToRemove: number) => {
+  const handleRemoveProduct = (idToRemove: string) => {
     const updatedIds = relatedProductIds.filter(id => id !== idToRemove);
     onRelatedProductsChange(updatedIds);
   };
@@ -51,7 +51,6 @@ export const RelatedProductsEditor = ({
               placeholder="Digite o código do produto"
               value={newProductId}
               onChange={(e) => setNewProductId(e.target.value)}
-              type="number"
             />
             <Button
               type="button"

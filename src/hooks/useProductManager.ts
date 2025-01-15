@@ -24,7 +24,8 @@ export const useProductManager = () => {
       image_url: "/placeholder.svg",
       images: ["/placeholder.svg"],
       description: "Descrição do novo produto",
-      active: true
+      active: true,
+      relatedProductIds: []
     };
     setEditingProduct(newProduct);
     setIsDialogOpen(true);
@@ -60,7 +61,8 @@ export const useProductManager = () => {
         image_url: scrapedProduct.images[0] || '/placeholder.svg',
         images: scrapedProduct.images || [scrapedProduct.images[0] || '/placeholder.svg'],
         description: scrapedProduct.description,
-        active: true
+        active: true,
+        relatedProductIds: []
       };
       
       saveProduct(newProduct);

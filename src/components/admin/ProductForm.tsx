@@ -95,7 +95,7 @@ export const ProductForm = ({ product, onSave, onCancel }: ProductFormProps) => 
           />
 
           <RelatedProductsEditor
-            relatedProductIds={formData.relatedProductIds || []}
+            relatedProductIds={formData.relatedProductIds}
             isActive={formData.isRelatedProductsActive}
             onRelatedProductsChange={(relatedProductIds) => 
               setFormData({ ...formData, relatedProductIds })
