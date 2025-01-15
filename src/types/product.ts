@@ -11,7 +11,7 @@ export interface Product {
   isSpecificationsActive?: boolean;
   isAdditionalImagesActive?: boolean;
   isRelatedProductsActive?: boolean;
-  relatedProductIds?: string[];  // Changed from number[] to string[]
+  relatedProductIds?: string[];
   specifications?: string;
   active?: boolean;
   pixLink?: string;
