@@ -11,7 +11,7 @@ export interface Product {
   isSpecificationsActive?: boolean;
   isAdditionalImagesActive?: boolean;
   isRelatedProductsActive?: boolean;
-  relatedProductIds?: string[];
+  relatedProductIds?: string[];  // Changed from number[] to string[]
   specifications?: string;
   active?: boolean;
   pixLink?: string;
@@ -24,7 +24,15 @@ export interface Order {
   user_id?: string;
   status: string;
   total_amount: number;
-  customer_data?: any;
+  customer_data?: {
+    name: string;
+    email: string;
+    phone?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+  };
   items: any[];
   payment_method?: string;
   transaction_id?: string;

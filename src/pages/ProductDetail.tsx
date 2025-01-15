@@ -32,22 +32,14 @@ export default function ProductDetail() {
       }
 
       return {
-        id: foundProduct.id,
-        title: foundProduct.title || '',
-        price: foundProduct.price || 0,
-        image_url: foundProduct.image_url || '',
-        images: foundProduct.images || [],
-        description: foundProduct.description || '',
+        ...foundProduct,
+        images: foundProduct.images || [foundProduct.image_url],
         isDescriptionActive: foundProduct.isDescriptionActive ?? true,
         isImagesActive: foundProduct.isImagesActive ?? true,
         isSpecificationsActive: foundProduct.isSpecificationsActive ?? true,
         isAdditionalImagesActive: foundProduct.isAdditionalImagesActive ?? true,
         isRelatedProductsActive: foundProduct.isRelatedProductsActive ?? true,
         relatedProductIds: foundProduct.relatedProductIds || [],
-        specifications: foundProduct.specifications || '',
-        active: foundProduct.active ?? true,
-        additionalImages: foundProduct.additionalImages || [],
-        pixLink: foundProduct.pixLink || ''
       } as Product;
     }
   });
