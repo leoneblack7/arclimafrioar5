@@ -4,11 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export const SupabaseConnectionManager = () => {
   const [projectUrl, setProjectUrl] = useState("");
   const [anonKey, setAnonKey] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isTestingConnection, setIsTestingConnection] = useState(false);
 
   const handleSaveConnection = async () => {
     try {
@@ -33,6 +35,25 @@ export const SupabaseConnectionManager = () => {
     }
   };
 
+  const handleTestConnection = async () => {
+    try {
+      setIsTestingConnection(true);
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .limit(1);
+
+      if (error) throw error;
+
+      toast.success("Conexão com Supabase estabelecida com sucesso!");
+    } catch (error) {
+      console.error('Error testing Supabase connection:', error);
+      toast.error("Erro ao testar conexão com Supabase");
+    } finally {
+      setIsTestingConnection(false);
+    }
+  };
+
   const handleImportData = async () => {
     try {
       setIsLoading(true);
@@ -50,7 +71,7 @@ export const SupabaseConnectionManager = () => {
           .upsert(products.map((p: any) => ({
             title: p.title,
             price: p.price,
-            image_url: p.image,
+            image_url: p.image_url || p.image,
             description: p.description
           })));
         if (productsError) throw productsError;
@@ -63,7 +84,9 @@ export const SupabaseConnectionManager = () => {
           .upsert(orders.map((o: any) => ({
             status: o.status,
             total_amount: o.total_amount,
-            user_id: o.user_id
+            user_id: o.user_id,
+            customer_data: o.customer_data,
+            payment_method: o.payment_method
           })));
         if (ordersError) throw ordersError;
       }
@@ -101,37 +124,56 @@ export const SupabaseConnectionManager = () => {
       <CardHeader>
         <CardTitle>Gerenciar Conexão Supabase</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Input
-            placeholder="URL do Projeto Supabase"
-            value={projectUrl}
-            onChange={(e) => setProjectUrl(e.target.value)}
-          />
-          <Input
-            placeholder="Chave Anônima"
-            value={anonKey}
-            onChange={(e) => setAnonKey(e.target.value)}
-            type="password"
-          />
-          <Button 
-            onClick={handleSaveConnection}
-            disabled={isLoading}
-            className="w-full"
-          >
-            {isLoading ? "Salvando..." : "Salvar Conexão"}
-          </Button>
-        </div>
+      <CardContent className="space-y-6">
+        <Alert>
+          <AlertDescription>
+            <p className="mb-2">Exemplo de dados para conexão:</p>
+            <p><strong>URL do Projeto:</strong> https://[seu-projeto].supabase.co</p>
+            <p><strong>Chave Anônima:</strong> eyJhbGciOiJIUzI1NiIs... (encontrada em Project Settings {'>'} API)</p>
+          </AlertDescription>
+        </Alert>
 
-        <div className="pt-4 border-t">
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Input
+              placeholder="URL do Projeto Supabase"
+              value={projectUrl}
+              onChange={(e) => setProjectUrl(e.target.value)}
+            />
+            <Input
+              placeholder="Chave Anônima"
+              value={anonKey}
+              onChange={(e) => setAnonKey(e.target.value)}
+              type="password"
+            />
+            <Button 
+              onClick={handleSaveConnection}
+              disabled={isLoading}
+              className="w-full"
+            >
+              {isLoading ? "Salvando..." : "Salvar Conexão"}
+            </Button>
+          </div>
+
           <Button
-            onClick={handleImportData}
-            disabled={isLoading}
-            variant="secondary"
+            onClick={handleTestConnection}
+            disabled={isTestingConnection}
+            variant="outline"
             className="w-full"
           >
-            {isLoading ? "Importando..." : "Importar Dados do LocalStorage"}
+            {isTestingConnection ? "Testando..." : "Testar Conexão"}
           </Button>
+
+          <div className="pt-4 border-t">
+            <Button
+              onClick={handleImportData}
+              disabled={isLoading}
+              variant="secondary"
+              className="w-full"
+            >
+              {isLoading ? "Importando..." : "Importar Dados do LocalStorage"}
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>
