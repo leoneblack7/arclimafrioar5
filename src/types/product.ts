@@ -1,9 +1,9 @@
 export interface Product {
-  id: number;
+  id: string;
   title: string;
   price: number;
-  image: string;
-  images: string[];
+  image_url: string;
+  images?: string[];
   additionalImages?: string[];
   description: string;
   isDescriptionActive?: boolean;
@@ -11,8 +11,10 @@ export interface Product {
   isSpecificationsActive?: boolean;
   isAdditionalImagesActive?: boolean;
   isRelatedProductsActive?: boolean;
-  relatedProductIds?: number[];
+  relatedProductIds?: string[];
   specifications?: string;
-  active: boolean;
+  active?: boolean;
   pixLink?: string;
+  created_at?: string;
+  updated_at?: string;
 }
