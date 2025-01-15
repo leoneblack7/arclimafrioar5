@@ -8,20 +8,20 @@ import { Product } from "@/types/product";
 interface ProductsTableProps {
   products: Product[];
   onEdit: (product: Product) => void;
-  onDelete: (productId: number) => void;
-  onToggleActive: (productId: number) => void;
+  onDelete: (productId: string) => void;
+  onToggleActive: (productId: string) => void;
 }
 
 export const ProductsTable = ({ products, onEdit, onDelete, onToggleActive }: ProductsTableProps) => {
-  const handleDelete = (productId: number) => {
+  const handleDelete = (productId: string) => {
     if (window.confirm("Tem certeza que deseja excluir este produto?")) {
       onDelete(productId);
       toast.success("Produto removido com sucesso!");
     }
   };
 
-  const formatProductCode = (id: number) => {
-    return String(id).padStart(5, '0');
+  const formatProductCode = (id: string) => {
+    return id.padStart(5, '0');
   };
 
   return (
@@ -45,7 +45,7 @@ export const ProductsTable = ({ products, onEdit, onDelete, onToggleActive }: Pr
               <TableCell className="text-foreground dark:text-foreground">
                 <div className="flex items-center gap-4">
                   <img
-                    src={product.image}
+                    src={product.image_url}
                     alt={product.title}
                     className="w-12 h-12 object-cover rounded"
                   />

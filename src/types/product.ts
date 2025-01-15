@@ -18,3 +18,25 @@ export interface Product {
   created_at?: string;
   updated_at?: string;
 }
+
+export interface Order {
+  id: string;
+  user_id?: string;
+  status: string;
+  total_amount: number;
+  customer_data?: any;
+  items: any[];
+  payment_method?: string;
+  transaction_id?: string;
+  tracking_updates?: any[];
+  created_at?: string;
+  updated_at?: string;
+  order_items?: {
+    id: string;
+    order_id: string;
+    product_id: string;
+    quantity: number;
+    price: number;
+    created_at?: string;
+  }[];
+}
