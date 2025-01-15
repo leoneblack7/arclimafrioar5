@@ -18,7 +18,7 @@ export const useProductManager = () => {
 
   const handleNewProduct = () => {
     const newProduct: Product = {
-      id: String(Date.now()),
+      id: crypto.randomUUID(),
       title: "Novo Produto",
       price: 0,
       image_url: "/placeholder.svg",
@@ -36,7 +36,7 @@ export const useProductManager = () => {
       const productToSave = {
         ...updatedProduct,
         price: Number(updatedProduct.price),
-        id: updatedProduct.id || String(Date.now()),
+        id: updatedProduct.id || crypto.randomUUID(),
         images: updatedProduct.images || [updatedProduct.image_url],
         image_url: updatedProduct.images?.[0] || updatedProduct.image_url
       };
@@ -55,7 +55,7 @@ export const useProductManager = () => {
   const handleImportProduct = async (scrapedProduct: any) => {
     try {
       const newProduct: Product = {
-        id: String(Date.now()),
+        id: crypto.randomUUID(),
         title: scrapedProduct.title,
         price: Number(scrapedProduct.price),
         image_url: scrapedProduct.images[0] || '/placeholder.svg',
