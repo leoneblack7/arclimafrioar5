@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { toast } from "sonner";
-import { saveCart, getCart } from '@/utils/databaseService';
 
 interface CartItem {
   id: number;
@@ -25,19 +24,38 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [items, setItems] = useState<CartItem[]>([]);
 
   useEffect(() => {
-    loadCartFromStorage();
+    loadCartFromServer();
   }, []);
 
   useEffect(() => {
     if (items.length > 0) {
-      saveCart(items);
+      saveCartToServer(items);
     }
   }, [items]);
 
-  const loadCartFromStorage = () => {
-    const savedCart = getCart();
-    if (savedCart && Array.isArray(savedCart)) {
-      setItems(savedCart);
+  const loadCartFromServer = async () => {
+    try {
+      const response = await fetch('/api/store-config/get-cart.php');
+      const data = await response.json();
+      if (data.cart_data) {
+        setItems(JSON.parse(data.cart_data));
+      }
+    } catch (error) {
+      console.error('Error loading cart:', error);
+    }
+  };
+
+  const saveCartToServer = async (cartItems: CartItem[]) => {
+    try {
+      await fetch('/api/store-config/save-cart.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ cart_data: cartItems }),
+      });
+    } catch (error) {
+      console.error('Error saving cart:', error);
     }
   };
 
@@ -74,7 +92,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const clearCart = () => {
     setItems([]);
-    saveCart([]);
+    saveCartToServer([]);
   };
 
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);

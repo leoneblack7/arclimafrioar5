@@ -12,9 +12,7 @@ export const BannerManager = () => {
     handleDelete, 
     handleSecondaryDelete,
     toggleBannerStatus, 
-    toggleSecondaryBannerStatus,
-    updateBannerUrl,
-    updateSecondaryBannerUrl
+    toggleSecondaryBannerStatus
   } = useBannerManager();
 
   return (
@@ -37,7 +35,6 @@ export const BannerManager = () => {
                 active={banner.active}
                 onToggleStatus={toggleBannerStatus}
                 onDelete={handleDelete}
-                onUpdateUrl={updateBannerUrl}
               />
             ))}
           </div>
@@ -54,7 +51,6 @@ export const BannerManager = () => {
                 active={banner.active}
                 onToggleStatus={toggleSecondaryBannerStatus}
                 onDelete={handleSecondaryDelete}
-                onUpdateUrl={updateSecondaryBannerUrl}
               />
             ))}
           </div>
