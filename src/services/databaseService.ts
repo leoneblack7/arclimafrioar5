@@ -105,7 +105,7 @@ class DatabaseServiceClass {
       const transformedOrders = data.map(order => ({
         ...order,
         items: order.order_items || [],
-        customer_data: order.customer_data || {},
+        customer_data: this.parseCustomerData(order.customer_data),
         payment_method: order.payment_method || 'unknown'
       })) as Order[];
 
@@ -114,6 +114,36 @@ class DatabaseServiceClass {
       console.error('Error fetching orders:', error);
       return getFromLocalStorage('orders', []);
     }
+  }
+
+  private parseCustomerData(customerData: any): Order['customer_data'] {
+    if (!customerData) {
+      return {
+        name: '',
+        email: '',
+      };
+    }
+
+    // If it's a string, try to parse it
+    if (typeof customerData === 'string') {
+      try {
+        customerData = JSON.parse(customerData);
+      } catch (e) {
+        console.error('Error parsing customer data:', e);
+        return { name: '', email: '' };
+      }
+    }
+
+    // Ensure the object has the required properties
+    return {
+      name: customerData.name || '',
+      email: customerData.email || '',
+      phone: customerData.phone || '',
+      address: customerData.address || '',
+      city: customerData.city || '',
+      state: customerData.state || '',
+      zipCode: customerData.zipCode || '',
+    };
   }
 
   async saveOrder(order: Order) {
