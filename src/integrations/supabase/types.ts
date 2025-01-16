@@ -13,6 +13,7 @@ export type Database = {
         Row: {
           active: boolean | null
           created_at: string | null
+          file_path: string | null
           id: string
           image_url: string
           updated_at: string | null
@@ -20,6 +21,7 @@ export type Database = {
         Insert: {
           active?: boolean | null
           created_at?: string | null
+          file_path?: string | null
           id?: string
           image_url: string
           updated_at?: string | null
@@ -27,8 +29,33 @@ export type Database = {
         Update: {
           active?: boolean | null
           created_at?: string | null
+          file_path?: string | null
           id?: string
           image_url?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      file_storage: {
+        Row: {
+          created_at: string | null
+          file_path: string
+          file_type: string
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          file_path: string
+          file_type: string
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          file_path?: string
+          file_type?: string
+          id?: string
           updated_at?: string | null
         }
         Relationships: []
@@ -79,6 +106,7 @@ export type Database = {
         Row: {
           created_at: string | null
           customer_data: Json | null
+          file_path: string | null
           id: string
           payment_method: string | null
           status: string
@@ -89,6 +117,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           customer_data?: Json | null
+          file_path?: string | null
           id?: string
           payment_method?: string | null
           status: string
@@ -99,6 +128,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           customer_data?: Json | null
+          file_path?: string | null
           id?: string
           payment_method?: string | null
           status?: string
@@ -112,6 +142,7 @@ export type Database = {
         Row: {
           created_at: string | null
           description: string
+          file_path: string | null
           id: string
           image_url: string
           price: number
@@ -121,6 +152,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           description: string
+          file_path?: string | null
           id?: string
           image_url: string
           price: number
@@ -130,6 +162,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           description?: string
+          file_path?: string | null
           id?: string
           image_url?: string
           price?: number

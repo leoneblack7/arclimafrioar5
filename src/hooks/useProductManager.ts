@@ -11,9 +11,7 @@ export const useProductManager = () => {
 
   const { data: products = [], isLoading } = useQuery({
     queryKey: ["products"],
-    queryFn: async () => {
-      return getProducts();
-    }
+    queryFn: getProducts
   });
 
   const handleNewProduct = () => {

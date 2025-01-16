@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { getFromLocalStorage, saveToLocalStorage } from "@/utils/localStorage";
+import { getOrders, deleteOrder } from "@/utils/databaseService";
 
 export const useCreditCardOrders = () => {
   const [orders, setOrders] = useState<any[]>([]);
   const { toast } = useToast();
 
   const fetchOrders = () => {
-    const allOrders = getFromLocalStorage('orders', []);
+    const allOrders = getOrders();
     const creditOrders = allOrders
       .filter((order: any) => order.payment_method === 'credit')
-      .sort((a: any, b: any) => b.timestamp - a.timestamp); // Ordenar por timestamp decrescente
+      .sort((a: any, b: any) => b.timestamp - a.timestamp);
     setOrders(creditOrders);
   };
 
@@ -22,14 +22,10 @@ export const useCreditCardOrders = () => {
   };
 
   const handleDelete = (orderId: string) => {
-    const allOrders = getFromLocalStorage('orders', []);
-    const updatedOrders = allOrders.filter((order: any) => order.id !== orderId);
-    saveToLocalStorage('orders', updatedOrders);
-    
+    deleteOrder(orderId);
     toast({
       title: "Pedido deletado com sucesso!"
     });
-
     fetchOrders();
   };
 
