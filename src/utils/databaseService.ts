@@ -1,4 +1,4 @@
-import { Product, Order, Banner } from "@/types/product";
+import { Product, Order, Banner, StoreConfig } from "@/types/storage";
 import { readData, writeData } from './localFileStorage';
 
 // Products
@@ -77,23 +77,23 @@ export const deleteBanner = async (id: string): Promise<boolean> => {
 };
 
 // Store Settings
-export const getStoreConfig = async () => {
+export const getStoreSettings = async (): Promise<StoreConfig> => {
   const config = await readData('store-config.json') || {};
   return config;
 };
 
-export const saveStoreConfig = async (config: any): Promise<boolean> => {
+export const saveStoreSettings = async (config: StoreConfig): Promise<boolean> => {
   return writeData('store-config.json', config);
 };
 
 // Cart
 export const getCart = async () => {
-  const config = await getStoreConfig();
+  const config = await getStoreSettings();
   return config.cart_data || [];
 };
 
 export const saveCart = async (cartData: any): Promise<boolean> => {
-  const config = await getStoreConfig();
+  const config = await getStoreSettings();
   config.cart_data = cartData;
-  return saveStoreConfig(config);
+  return saveStoreSettings(config);
 };
