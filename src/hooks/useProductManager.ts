@@ -11,7 +11,8 @@ export const useProductManager = () => {
 
   const { data: products = [], isLoading } = useQuery({
     queryKey: ["products"],
-    queryFn: getProducts
+    queryFn: getProducts,
+    initialData: []
   });
 
   const handleNewProduct = () => {
@@ -22,8 +23,7 @@ export const useProductManager = () => {
       image_url: "/placeholder.svg",
       images: ["/placeholder.svg"],
       description: "Descrição do novo produto",
-      active: true,
-      relatedProductIds: []
+      active: true
     };
     setEditingProduct(newProduct);
     setIsDialogOpen(true);
@@ -31,15 +31,7 @@ export const useProductManager = () => {
 
   const handleSaveProduct = async (updatedProduct: Product) => {
     try {
-      const productToSave = {
-        ...updatedProduct,
-        price: Number(updatedProduct.price),
-        id: updatedProduct.id || crypto.randomUUID(),
-        images: updatedProduct.images || [updatedProduct.image_url],
-        image_url: updatedProduct.images?.[0] || updatedProduct.image_url
-      };
-
-      saveProduct(productToSave);
+      await saveProduct(updatedProduct);
       queryClient.invalidateQueries({ queryKey: ["products"] });
       setEditingProduct(null);
       setIsDialogOpen(false);
@@ -59,11 +51,10 @@ export const useProductManager = () => {
         image_url: scrapedProduct.images[0] || '/placeholder.svg',
         images: scrapedProduct.images || [scrapedProduct.images[0] || '/placeholder.svg'],
         description: scrapedProduct.description,
-        active: true,
-        relatedProductIds: []
+        active: true
       };
       
-      saveProduct(newProduct);
+      await saveProduct(newProduct);
       queryClient.invalidateQueries({ queryKey: ["products"] });
       toast.success("Produto importado com sucesso!");
     } catch (error) {
@@ -74,7 +65,7 @@ export const useProductManager = () => {
 
   const handleDeleteProduct = async (productId: string) => {
     try {
-      deleteProduct(productId);
+      await deleteProduct(productId);
       queryClient.invalidateQueries({ queryKey: ["products"] });
       toast.success("Produto removido com sucesso!");
     } catch (error) {
@@ -89,7 +80,7 @@ export const useProductManager = () => {
 
     try {
       const updatedProduct = { ...product, active: !product.active };
-      saveProduct(updatedProduct);
+      await saveProduct(updatedProduct);
       queryClient.invalidateQueries({ queryKey: ["products"] });
       toast.success("Status do produto atualizado!");
     } catch (error) {

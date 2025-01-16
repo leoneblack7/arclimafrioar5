@@ -1,46 +1,99 @@
-import {
-  getProducts,
-  saveProduct,
-  deleteProduct,
-  getOrders,
-  saveOrder,
-  deleteOrder,
-  getStoreConfig,
-  saveStoreConfig,
-  getBanners,
-  saveBanner,
-  deleteBanner,
-  getFeaturedProducts,
-  saveFeaturedProduct,
-  deleteFeaturedProduct,
-  getCart,
-  saveCart
-} from './localFileStorage';
+import { Product, Order, Banner } from "@/types/product";
+import { readData, writeData } from './localFileStorage';
 
 // Products
-export const getProductsFromDb = async () => getProducts();
-export const saveProductToDb = async (product: any) => saveProduct(product);
-export const deleteProductFromDb = async (id: string) => deleteProduct(id);
+export const getProducts = async (): Promise<Product[]> => {
+  const products = await readData('products.json') || [];
+  return products;
+};
+
+export const saveProduct = async (product: Product): Promise<boolean> => {
+  const products = await getProducts();
+  const index = products.findIndex(p => p.id === product.id);
+  
+  if (index >= 0) {
+    products[index] = { ...products[index], ...product };
+  } else {
+    products.push({ ...product, id: crypto.randomUUID() });
+  }
+  
+  return writeData('products.json', products);
+};
+
+export const deleteProduct = async (id: string): Promise<boolean> => {
+  const products = await getProducts();
+  const filtered = products.filter(p => p.id !== id);
+  return writeData('products.json', filtered);
+};
 
 // Orders
-export const getOrdersFromDb = async () => getOrders();
-export const saveOrderToDb = async (order: any) => saveOrder(order);
-export const deleteOrderFromDb = async (id: string) => deleteOrder(id);
+export const getOrders = async (): Promise<Order[]> => {
+  const orders = await readData('orders.json') || [];
+  return orders;
+};
 
-// Store Settings
-export const getStoreSettings = async () => getStoreConfig();
-export const saveStoreSettings = async (settings: any) => saveStoreConfig(settings);
+export const saveOrder = async (order: Order): Promise<boolean> => {
+  const orders = await getOrders();
+  const index = orders.findIndex(o => o.id === order.id);
+  
+  if (index >= 0) {
+    orders[index] = { ...orders[index], ...order };
+  } else {
+    orders.push({ ...order, id: crypto.randomUUID() });
+  }
+  
+  return writeData('orders.json', orders);
+};
+
+export const deleteOrder = async (id: string): Promise<boolean> => {
+  const orders = await getOrders();
+  const filtered = orders.filter(o => o.id !== id);
+  return writeData('orders.json', filtered);
+};
 
 // Banners
-export const getBannersFromDb = async () => getBanners();
-export const saveBannerToDb = async (banner: any) => saveBanner(banner);
-export const deleteBannerFromDb = async (id: string) => deleteBanner(id);
+export const getBanners = async (): Promise<Banner[]> => {
+  const banners = await readData('banners.json') || [];
+  return banners;
+};
 
-// Featured Products
-export const getFeaturedProductsFromDb = async () => getFeaturedProducts();
-export const saveFeaturedProductToDb = async (product: any) => saveFeaturedProduct(product);
-export const deleteFeaturedProductFromDb = async (id: string) => deleteFeaturedProduct(id);
+export const saveBanner = async (banner: Banner): Promise<boolean> => {
+  const banners = await getBanners();
+  const index = banners.findIndex(b => b.id === banner.id);
+  
+  if (index >= 0) {
+    banners[index] = { ...banners[index], ...banner };
+  } else {
+    banners.push({ ...banner, id: crypto.randomUUID() });
+  }
+  
+  return writeData('banners.json', banners);
+};
+
+export const deleteBanner = async (id: string): Promise<boolean> => {
+  const banners = await getBanners();
+  const filtered = banners.filter(b => b.id !== id);
+  return writeData('banners.json', filtered);
+};
+
+// Store Settings
+export const getStoreConfig = async () => {
+  const config = await readData('store-config.json') || {};
+  return config;
+};
+
+export const saveStoreConfig = async (config: any): Promise<boolean> => {
+  return writeData('store-config.json', config);
+};
 
 // Cart
-export const getCartFromDb = async () => getCart();
-export const saveCartToDb = async (cartData: any) => saveCart(cartData);
+export const getCart = async () => {
+  const config = await getStoreConfig();
+  return config.cart_data || [];
+};
+
+export const saveCart = async (cartData: any): Promise<boolean> => {
+  const config = await getStoreConfig();
+  config.cart_data = cartData;
+  return saveStoreConfig(config);
+};
