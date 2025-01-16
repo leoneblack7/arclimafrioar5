@@ -13,7 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getFromLocalStorage, saveToLocalStorage } from "@/utils/localStorage";
-import { Product } from "@/types/product";
+import { Product } from "@/types/storage";
 
 export const PixPaymentManager = () => {
   const { products, handleSaveProduct } = useProductManager();

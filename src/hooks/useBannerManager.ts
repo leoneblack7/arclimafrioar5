@@ -1,12 +1,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { saveBanner, getBanners, deleteBanner } from "@/utils/databaseService";
-
-interface Banner {
-  id: string;
-  image_url: string;
-  active: boolean;
-}
+import { Banner } from "@/types/storage";
 
 export const useBannerManager = () => {
   const [banners, setBanners] = useState<Banner[]>([]);
@@ -101,5 +96,3 @@ export const useBannerManager = () => {
     toggleSecondaryBannerStatus
   };
 };
-
-export type { Banner };
