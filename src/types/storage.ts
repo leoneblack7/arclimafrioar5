@@ -35,6 +35,7 @@ export interface Banner {
   active: boolean;  // Made required
   created_at?: string;
   updated_at?: string;
+  file_path?: string;  // Added file_path property
 }
 
 export interface StoreConfig {
