@@ -3,6 +3,7 @@ import { ProductDialog } from "./admin/ProductDialog";
 import { ProductImportForm } from "./admin/ProductImportForm";
 import { ProductsTable } from "./admin/ProductsTable";
 import { useProductManager } from "@/hooks/useProductManager";
+import { Product } from "@/types/storage";
 
 export const ProductManager = () => {
   const {
@@ -41,7 +42,7 @@ export const ProductManager = () => {
       />
 
       <ProductsTable
-        products={products}
+        products={products as Product[]}
         onEdit={(product) => {
           setEditingProduct({
             ...product,

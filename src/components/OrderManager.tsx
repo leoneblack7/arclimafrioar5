@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getOrders } from "@/utils/databaseService";
-import { Order } from "@/types/product";
+import { Order } from "@/types/storage";
 import { toast } from "sonner";
 
 export const OrderManager = () => {
@@ -39,7 +39,7 @@ export const OrderManager = () => {
           {orders.map((order) => (
             <li key={order.id} className="border-b py-2">
               <p>ID do Pedido: {order.id}</p>
-              <p>Data: {new Date(order.created_at).toLocaleString()}</p>
+              <p>Data: {new Date(order.created_at || '').toLocaleString()}</p>
               <p>Total: {order.total_amount.toFixed(2)} BRL</p>
               <p>Método de Pagamento: {order.payment_method}</p>
               <p>Status: {order.status}</p>

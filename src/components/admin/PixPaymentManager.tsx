@@ -1,9 +1,8 @@
+import { useState } from "react";
 import { useProductManager } from "@/hooks/useProductManager";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -17,63 +16,53 @@ import { Product } from "@/types/storage";
 
 export const PixPaymentManager = () => {
   const { products, handleSaveProduct } = useProductManager();
-  const featuredProducts = getFromLocalStorage('featured-products', []) as Product[];
-  const pixLinksEnabled = getFromLocalStorage('pix-links-enabled', false);
+  const [pixLink, setPixLink] = useState("");
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  const allProducts = [...products, ...featuredProducts].filter((product, index, self) =>
-    index === self.findIndex((p) => p.id === product.id)
-  );
+  const handleSavePixLink = async () => {
+    if (!selectedProduct) {
+      toast.error("Selecione um produto primeiro");
+      return;
+    }
 
-  const handleSetPixLink = async (productId: string, pixLink: string) => {
-    const product = allProducts.find((p) => p.id === productId);
-    if (!product) return;
+    if (!pixLink) {
+      toast.error("Insira o link do PIX");
+      return;
+    }
 
     try {
-      await handleSaveProduct({
-        ...product,
-        pixLink: pixLink || "https://payment.ticto.app/O368AB06D"
-      });
-      toast.success("Link PIX atualizado com sucesso!");
+      const updatedProduct = {
+        ...selectedProduct,
+        pixLink: pixLink
+      };
+
+      await handleSaveProduct(updatedProduct);
+      setPixLink("");
+      setSelectedProduct(null);
+      toast.success("Link PIX salvo com sucesso!");
     } catch (error) {
-      toast.error("Erro ao atualizar link PIX");
+      console.error('Error saving PIX link:', error);
+      toast.error("Erro ao salvar link PIX");
     }
   };
 
-  const togglePixLinks = () => {
-    const newState = !pixLinksEnabled;
-    saveToLocalStorage('pix-links-enabled', newState);
-    
-    if (newState) {
-      const pixConfig = getFromLocalStorage('PIX_CONFIG', {});
-      saveToLocalStorage('PIX_CONFIG', {
-        ...pixConfig,
-        enabled: false,
-        useCustomKeys: false,
-        usePixPay: false,
-        usePixUp: false,
-        maintenance: false
-      });
-      toast.success("Links PIX ativados e configurações PIX desativadas");
-    } else {
-      toast.success("Links PIX desativados");
-    }
-    
-    window.location.reload();
+  const handleSelectProduct = (product: Product) => {
+    setSelectedProduct(product);
+    setPixLink(product.pixLink || "");
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">Gerenciar Links PIX</h2>
-        <div className="flex items-center space-x-2">
-          <Switch
-            id="pix-links-enabled"
-            checked={pixLinksEnabled}
-            onCheckedChange={togglePixLinks}
+      <div className="space-y-4">
+        <h2 className="text-2xl font-bold">Gerenciar Links PIX</h2>
+        
+        <div className="flex gap-4">
+          <Input
+            placeholder="Cole o link do PIX aqui"
+            value={pixLink}
+            onChange={(e) => setPixLink(e.target.value)}
           />
-          <Label htmlFor="pix-links-enabled">
-            {pixLinksEnabled ? "Ativo" : "Inativo"}
-          </Label>
+          <Button onClick={handleSavePixLink}>Salvar Link</Button>
         </div>
       </div>
 
@@ -81,39 +70,23 @@ export const PixPaymentManager = () => {
         <TableHeader>
           <TableRow>
             <TableHead>Produto</TableHead>
-            <TableHead>Tipo</TableHead>
             <TableHead>Preço</TableHead>
             <TableHead>Link PIX</TableHead>
             <TableHead>Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {allProducts.map((product) => (
+          {products.map((product) => (
             <TableRow key={product.id}>
               <TableCell>{product.title}</TableCell>
-              <TableCell>
-                {featuredProducts.some(p => p.id === product.id) ? 'Destaque' : 'Regular'}
-              </TableCell>
-              <TableCell>
-                {product.price.toLocaleString("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                })}
-              </TableCell>
-              <TableCell>
-                <Input
-                  defaultValue={product.pixLink || "https://payment.ticto.app/O368AB06D"}
-                  onChange={(e) => handleSetPixLink(product.id, e.target.value)}
-                  disabled={!pixLinksEnabled}
-                />
-              </TableCell>
+              <TableCell>R$ {product.price.toFixed(2)}</TableCell>
+              <TableCell>{product.pixLink || "Não configurado"}</TableCell>
               <TableCell>
                 <Button
                   variant="outline"
-                  onClick={() => handleSetPixLink(product.id, "")}
-                  disabled={!pixLinksEnabled}
+                  onClick={() => handleSelectProduct(product)}
                 >
-                  Definir Link Padrão
+                  Selecionar
                 </Button>
               </TableCell>
             </TableRow>

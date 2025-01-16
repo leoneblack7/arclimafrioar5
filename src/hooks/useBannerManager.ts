@@ -7,83 +7,109 @@ export const useBannerManager = () => {
   const [banners, setBanners] = useState<Banner[]>([]);
   const [secondaryBanners, setSecondaryBanners] = useState<Banner[]>([]);
 
-  const loadBanners = async () => {
-    try {
-      const storedBanners = await getBanners();
-      if (storedBanners && storedBanners.length > 0) {
-        const mainBanners = storedBanners.filter(b => !b.id.startsWith('secondary-'));
-        const secBanners = storedBanners.filter(b => b.id.startsWith('secondary-'));
-        setBanners(mainBanners);
-        setSecondaryBanners(secBanners);
-      } else {
-        setBanners([]);
-        setSecondaryBanners([]);
-      }
-    } catch (error) {
-      console.error('Error loading banners:', error);
-      toast.error('Erro ao carregar os banners');
-      setBanners([]);
-      setSecondaryBanners([]);
-    }
-  };
-
-  const handleUploadSuccess = (base64String: string) => {
-    const newBanner = {
-      id: `banner-${Date.now()}`,
-      image_url: base64String,
-      active: true
-    };
-
-    saveBanner(newBanner);
-    setBanners([...banners, newBanner]);
-    toast.success("Banner adicionado e ativado com sucesso!");
-  };
-
-  const handleSecondaryUploadSuccess = (base64String: string) => {
-    const newBanner = {
-      id: `secondary-banner-${Date.now()}`,
-      image_url: base64String,
-      active: true
-    };
-
-    saveBanner(newBanner);
-    setSecondaryBanners([...secondaryBanners, newBanner]);
-    toast.success("Banner secundário adicionado e ativado com sucesso!");
-  };
-
-  const handleDelete = (id: string) => {
-    deleteBanner(id);
-    setBanners(banners.filter(banner => banner.id !== id));
-    toast.success("Banner removido com sucesso!");
-  };
-
-  const handleSecondaryDelete = (id: string) => {
-    deleteBanner(id);
-    setSecondaryBanners(secondaryBanners.filter(banner => banner.id !== id));
-    toast.success("Banner secundário removido com sucesso!");
-  };
-
-  const toggleBannerStatus = (id: string, newStatus: boolean) => {
-    const updatedBanners = banners.map(banner =>
-      banner.id === id ? { ...banner, active: newStatus } : banner
-    );
-    setBanners(updatedBanners);
-    saveBanner(updatedBanners.find(b => b.id === id));
-    toast.success(newStatus ? "Banner ativado com sucesso!" : "Banner desativado com sucesso!");
-  };
-
-  const toggleSecondaryBannerStatus = (id: string, newStatus: boolean) => {
-    const updatedBanners = secondaryBanners.map(banner =>
-      banner.id === id ? { ...banner, active: newStatus } : banner
-    );
-    setSecondaryBanners(updatedBanners);
-    saveBanner(updatedBanners.find(b => b.id === id));
-    toast.success(newStatus ? "Banner secundário ativado com sucesso!" : "Banner secundário desativado com sucesso!");
-  };
-
   useEffect(() => {
     loadBanners();
   }, []);
+
+  const loadBanners = async () => {
+    try {
+      const fetchedBanners = await getBanners();
+      if (Array.isArray(fetchedBanners)) {
+        const mainBanners = fetchedBanners.filter(banner => !banner.file_path?.includes('secondary'));
+        const secondary = fetchedBanners.filter(banner => banner.file_path?.includes('secondary'));
+        setBanners(mainBanners);
+        setSecondaryBanners(secondary);
+      }
+    } catch (error) {
+      console.error('Error loading banners:', error);
+      toast.error("Erro ao carregar banners");
+    }
+  };
+
+  const handleUploadSuccess = async (imageUrl: string) => {
+    try {
+      const newBanner: Banner = {
+        id: crypto.randomUUID(),
+        image_url: imageUrl,
+        active: true
+      };
+      await saveBanner(newBanner);
+      loadBanners();
+      toast.success("Banner adicionado com sucesso!");
+    } catch (error) {
+      console.error('Error saving banner:', error);
+      toast.error("Erro ao salvar banner");
+    }
+  };
+
+  const handleSecondaryUploadSuccess = async (imageUrl: string) => {
+    try {
+      const newBanner: Banner = {
+        id: crypto.randomUUID(),
+        image_url: imageUrl,
+        active: true,
+        file_path: 'secondary'
+      };
+      await saveBanner(newBanner);
+      loadBanners();
+      toast.success("Banner secundário adicionado com sucesso!");
+    } catch (error) {
+      console.error('Error saving secondary banner:', error);
+      toast.error("Erro ao salvar banner secundário");
+    }
+  };
+
+  const handleDelete = async (bannerId: string) => {
+    try {
+      await deleteBanner(bannerId);
+      loadBanners();
+      toast.success("Banner removido com sucesso!");
+    } catch (error) {
+      console.error('Error deleting banner:', error);
+      toast.error("Erro ao remover banner");
+    }
+  };
+
+  const handleSecondaryDelete = async (bannerId: string) => {
+    try {
+      await deleteBanner(bannerId);
+      loadBanners();
+      toast.success("Banner secundário removido com sucesso!");
+    } catch (error) {
+      console.error('Error deleting secondary banner:', error);
+      toast.error("Erro ao remover banner secundário");
+    }
+  };
+
+  const toggleBannerStatus = async (bannerId: string) => {
+    const banner = banners.find(b => b.id === bannerId);
+    if (banner) {
+      try {
+        const updatedBanner = { ...banner, active: !banner.active };
+        await saveBanner(updatedBanner);
+        loadBanners();
+        toast.success("Status do banner atualizado!");
+      } catch (error) {
+        console.error('Error updating banner status:', error);
+        toast.error("Erro ao atualizar status do banner");
+      }
+    }
+  };
+
+  const toggleSecondaryBannerStatus = async (bannerId: string) => {
+    const banner = secondaryBanners.find(b => b.id === bannerId);
+    if (banner) {
+      try {
+        const updatedBanner = { ...banner, active: !banner.active };
+        await saveBanner(updatedBanner);
+        loadBanners();
+        toast.success("Status do banner secundário atualizado!");
+      } catch (error) {
+        console.error('Error updating secondary banner status:', error);
+        toast.error("Erro ao atualizar status do banner secundário");
+      }
+    }
+  };
 
   return {
     banners,
