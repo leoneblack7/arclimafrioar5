@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
-import { toast } from "sonner";
-import { saveBanner, getBanners, deleteBanner } from "@/utils/databaseService";
-import { Banner } from "@/types/storage";
+import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
+import { Banner } from '@/types/storage';
+import { getFromLocalStorage, saveToLocalStorage } from '@/utils/localStorage';
 
 export const useBannerManager = () => {
   const [banners, setBanners] = useState<Banner[]>([]);
@@ -11,104 +11,79 @@ export const useBannerManager = () => {
     loadBanners();
   }, []);
 
-  const loadBanners = async () => {
-    try {
-      const fetchedBanners = await getBanners();
-      if (Array.isArray(fetchedBanners)) {
-        const mainBanners = fetchedBanners.filter(banner => !banner.file_path?.includes('secondary'));
-        const secondary = fetchedBanners.filter(banner => banner.file_path?.includes('secondary'));
-        setBanners(mainBanners);
-        setSecondaryBanners(secondary);
-      }
-    } catch (error) {
-      console.error('Error loading banners:', error);
-      toast.error("Erro ao carregar banners");
-    }
+  const loadBanners = () => {
+    const storedBanners = getFromLocalStorage('banners', []);
+    const storedSecondaryBanners = getFromLocalStorage('secondary-banners', []);
+    setBanners(storedBanners);
+    setSecondaryBanners(storedSecondaryBanners);
   };
 
-  const handleUploadSuccess = async (imageUrl: string) => {
-    try {
-      const newBanner: Banner = {
-        id: crypto.randomUUID(),
-        image_url: imageUrl,
-        active: true
-      };
-      await saveBanner(newBanner);
-      loadBanners();
-      toast.success("Banner adicionado com sucesso!");
-    } catch (error) {
-      console.error('Error saving banner:', error);
-      toast.error("Erro ao salvar banner");
-    }
+  const handleUploadSuccess = (base64String: string) => {
+    const newBanner: Banner = {
+      id: crypto.randomUUID(),
+      image_url: base64String,
+      active: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
+    const updatedBanners = [...banners, newBanner];
+    saveToLocalStorage('banners', updatedBanners);
+    setBanners(updatedBanners);
+    window.dispatchEvent(new Event('bannersUpdated'));
+    toast.success('Banner adicionado com sucesso!');
   };
 
-  const handleSecondaryUploadSuccess = async (imageUrl: string) => {
-    try {
-      const newBanner: Banner = {
-        id: crypto.randomUUID(),
-        image_url: imageUrl,
-        active: true,
-        file_path: 'secondary'
-      };
-      await saveBanner(newBanner);
-      loadBanners();
-      toast.success("Banner secundário adicionado com sucesso!");
-    } catch (error) {
-      console.error('Error saving secondary banner:', error);
-      toast.error("Erro ao salvar banner secundário");
-    }
+  const handleSecondaryUploadSuccess = (base64String: string) => {
+    const newBanner: Banner = {
+      id: crypto.randomUUID(),
+      image_url: base64String,
+      active: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
+    const updatedBanners = [...secondaryBanners, newBanner];
+    saveToLocalStorage('secondary-banners', updatedBanners);
+    setSecondaryBanners(updatedBanners);
+    window.dispatchEvent(new Event('secondaryBannersUpdated'));
+    toast.success('Banner secundário adicionado com sucesso!');
   };
 
-  const handleDelete = async (bannerId: string) => {
-    try {
-      await deleteBanner(bannerId);
-      loadBanners();
-      toast.success("Banner removido com sucesso!");
-    } catch (error) {
-      console.error('Error deleting banner:', error);
-      toast.error("Erro ao remover banner");
-    }
+  const handleDelete = (id: string) => {
+    const updatedBanners = banners.filter(banner => banner.id !== id);
+    saveToLocalStorage('banners', updatedBanners);
+    setBanners(updatedBanners);
+    window.dispatchEvent(new Event('bannersUpdated'));
+    toast.success('Banner removido com sucesso!');
   };
 
-  const handleSecondaryDelete = async (bannerId: string) => {
-    try {
-      await deleteBanner(bannerId);
-      loadBanners();
-      toast.success("Banner secundário removido com sucesso!");
-    } catch (error) {
-      console.error('Error deleting secondary banner:', error);
-      toast.error("Erro ao remover banner secundário");
-    }
+  const handleSecondaryDelete = (id: string) => {
+    const updatedBanners = secondaryBanners.filter(banner => banner.id !== id);
+    saveToLocalStorage('secondary-banners', updatedBanners);
+    setSecondaryBanners(updatedBanners);
+    window.dispatchEvent(new Event('secondaryBannersUpdated'));
+    toast.success('Banner secundário removido com sucesso!');
   };
 
-  const toggleBannerStatus = async (bannerId: string) => {
-    const banner = banners.find(b => b.id === bannerId);
-    if (banner) {
-      try {
-        const updatedBanner = { ...banner, active: !banner.active };
-        await saveBanner(updatedBanner);
-        loadBanners();
-        toast.success("Status do banner atualizado!");
-      } catch (error) {
-        console.error('Error updating banner status:', error);
-        toast.error("Erro ao atualizar status do banner");
-      }
-    }
+  const toggleBannerStatus = (id: string) => {
+    const updatedBanners = banners.map(banner =>
+      banner.id === id ? { ...banner, active: !banner.active } : banner
+    );
+    saveToLocalStorage('banners', updatedBanners);
+    setBanners(updatedBanners);
+    window.dispatchEvent(new Event('bannersUpdated'));
+    toast.success('Status do banner atualizado com sucesso!');
   };
 
-  const toggleSecondaryBannerStatus = async (bannerId: string) => {
-    const banner = secondaryBanners.find(b => b.id === bannerId);
-    if (banner) {
-      try {
-        const updatedBanner = { ...banner, active: !banner.active };
-        await saveBanner(updatedBanner);
-        loadBanners();
-        toast.success("Status do banner secundário atualizado!");
-      } catch (error) {
-        console.error('Error updating secondary banner status:', error);
-        toast.error("Erro ao atualizar status do banner secundário");
-      }
-    }
+  const toggleSecondaryBannerStatus = (id: string) => {
+    const updatedBanners = secondaryBanners.map(banner =>
+      banner.id === id ? { ...banner, active: !banner.active } : banner
+    );
+    saveToLocalStorage('secondary-banners', updatedBanners);
+    setSecondaryBanners(updatedBanners);
+    window.dispatchEvent(new Event('secondaryBannersUpdated'));
+    toast.success('Status do banner secundário atualizado com sucesso!');
   };
 
   return {
