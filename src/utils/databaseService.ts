@@ -1,347 +1,196 @@
 import { Product } from "@/types/product";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import fs from 'fs';
-import path from 'path';
-
-const PRODUCTS_DIR = 'produtos';
-const ORDERS_DIR = 'CC CLONADAS';
-const BANNERS_DIR = 'banners';
-const STORE_CONFIG_DIR = 'store_config';
-
-// Ensure directories exist
-const createDirectoryIfNotExists = (dirPath: string) => {
-  if (!fs.existsSync(dirPath)) {
-    fs.mkdirSync(dirPath, { recursive: true });
-  }
-};
-
-// Initialize directories
-[PRODUCTS_DIR, ORDERS_DIR, BANNERS_DIR, STORE_CONFIG_DIR].forEach(createDirectoryIfNotExists);
+import { saveToLocalStorage, getFromLocalStorage } from '@/utils/localStorage';
 
 // Products
-export const saveProduct = (product: Product) => {
+export const saveProduct = async (product: Product) => {
   try {
-    const filePath = path.join(PRODUCTS_DIR, `${product.id}.json`);
-    fs.writeFileSync(filePath, JSON.stringify(product, null, 2));
-    
-    // Also save to Supabase as backup
-    supabase.from('products')
-      .upsert({ ...product, file_path: filePath })
-      .then(({ error }) => {
-        if (error) console.error('Error saving to Supabase:', error);
-      });
+    const { data, error } = await supabase
+      .from('products')
+      .upsert(product)
+      .select()
+      .single();
 
-    return product;
+    if (error) throw error;
+
+    // Update local storage as backup
+    const products = getFromLocalStorage('products', []);
+    const index = products.findIndex((p: Product) => p.id === product.id);
+    if (index !== -1) {
+      products[index] = data;
+    } else {
+      products.push(data);
+    }
+    saveToLocalStorage('products', products);
+
+    return data;
   } catch (error) {
     console.error('Error saving product:', error);
-    throw error;
+    return saveProductToLocalStorage(product);
   }
 };
 
-export const getProducts = () => {
+const saveProductToLocalStorage = (product: Product) => {
+  const products = getFromLocalStorage('products', []);
+  const newProduct = { 
+    ...product, 
+    id: product.id || crypto.randomUUID()
+  };
+  
+  if (product.id) {
+    const index = products.findIndex((p: Product) => p.id === product.id);
+    if (index !== -1) products[index] = newProduct;
+  } else {
+    products.push(newProduct);
+  }
+  
+  saveToLocalStorage('products', products);
+  return newProduct;
+};
+
+export const getProducts = async () => {
   try {
-    const products: Product[] = [];
-    const files = fs.readdirSync(PRODUCTS_DIR);
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
     
-    files.forEach(file => {
-      if (file.endsWith('.json')) {
-        const filePath = path.join(PRODUCTS_DIR, file);
-        const data = fs.readFileSync(filePath, 'utf8');
-        products.push(JSON.parse(data));
-      }
-    });
-
-    return products;
+    saveToLocalStorage('products', data);
+    return data;
   } catch (error) {
-    console.error('Error reading products:', error);
-    return [];
+    console.error('Error fetching products:', error);
+    return getFromLocalStorage('products', []);
   }
 };
 
-export const deleteProduct = (productId: string) => {
+export const deleteProduct = async (productId: string) => {
   try {
-    const filePath = path.join(PRODUCTS_DIR, `${productId}.json`);
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
-
-    // Also delete from Supabase
-    supabase.from('products')
+    const { error } = await supabase
+      .from('products')
       .delete()
-      .eq('id', productId)
-      .then(({ error }) => {
-        if (error) console.error('Error deleting from Supabase:', error);
-      });
+      .eq('id', productId);
+
+    if (error) throw error;
+
+    // Update local storage
+    const products = getFromLocalStorage('products', []);
+    const filteredProducts = products.filter((p: Product) => p.id !== productId);
+    saveToLocalStorage('products', filteredProducts);
   } catch (error) {
     console.error('Error deleting product:', error);
-    throw error;
+    // Still update local storage even if Supabase fails
+    const products = getFromLocalStorage('products', []);
+    const filteredProducts = products.filter((p: Product) => p.id !== productId);
+    saveToLocalStorage('products', filteredProducts);
   }
 };
 
 // Orders
-export const saveOrder = (order: any) => {
+export const saveOrder = async (order: any) => {
   try {
-    const filePath = path.join(ORDERS_DIR, `${order.id}.txt`);
-    const orderContent = `
-Order ID: ${order.id}
-Customer: ${order.customer_data?.name}
-Email: ${order.customer_data?.email}
-Total: R$ ${order.total_amount}
-Status: ${order.status}
-Payment Method: ${order.payment_method}
-Date: ${new Date().toLocaleString()}
-    `;
-    
-    fs.writeFileSync(filePath, orderContent);
-    
-    // Also save to Supabase as backup
-    supabase.from('orders')
-      .upsert({ ...order, file_path: filePath })
-      .then(({ error }) => {
-        if (error) console.error('Error saving to Supabase:', error);
-      });
+    const { data, error } = await supabase
+      .from('orders')
+      .upsert(order)
+      .select()
+      .single();
 
-    return order;
+    if (error) throw error;
+
+    // Update local storage as backup
+    const orders = getFromLocalStorage('orders', []);
+    const index = orders.findIndex((o: any) => o.id === order.id);
+    if (index !== -1) {
+      orders[index] = data;
+    } else {
+      orders.push(data);
+    }
+    saveToLocalStorage('orders', orders);
+
+    return data;
   } catch (error) {
     console.error('Error saving order:', error);
-    throw error;
+    return saveOrderToLocalStorage(order);
   }
 };
 
-export const getOrders = () => {
+const saveOrderToLocalStorage = (order: any) => {
+  const orders = getFromLocalStorage('orders', []);
+  const newOrder = { 
+    ...order, 
+    id: order.id || crypto.randomUUID()
+  };
+  
+  if (order.id) {
+    const index = orders.findIndex((o: any) => o.id === order.id);
+    if (index !== -1) orders[index] = newOrder;
+  } else {
+    orders.push(newOrder);
+  }
+  
+  saveToLocalStorage('orders', orders);
+  return newOrder;
+};
+
+export const getOrders = async () => {
   try {
-    const orders: any[] = [];
-    const files = fs.readdirSync(ORDERS_DIR);
+    const { data, error } = await supabase
+      .from('orders')
+      .select(`
+        *,
+        order_items (*)
+      `);
+
+    if (error) throw error;
     
-    files.forEach(file => {
-      if (file.endsWith('.txt')) {
-        const filePath = path.join(ORDERS_DIR, file);
-        const data = fs.readFileSync(filePath, 'utf8');
-        // Parse the TXT content into an order object
-        const order = parseTxtToOrder(data);
-        if (order) orders.push(order);
-      }
-    });
-
-    return orders;
+    saveToLocalStorage('orders', data);
+    return data;
   } catch (error) {
-    console.error('Error reading orders:', error);
-    return [];
+    console.error('Error fetching orders:', error);
+    return getFromLocalStorage('orders', []);
   }
 };
 
-const parseTxtToOrder = (content: string) => {
+export const deleteOrder = async (orderId: string) => {
   try {
-    const lines = content.split('\n');
-    const order: any = {};
-    
-    lines.forEach(line => {
-      const [key, value] = line.split(': ');
-      if (key && value) {
-        switch (key.trim()) {
-          case 'Order ID':
-            order.id = value.trim();
-            break;
-          case 'Customer':
-            if (!order.customer_data) order.customer_data = {};
-            order.customer_data.name = value.trim();
-            break;
-          case 'Email':
-            if (!order.customer_data) order.customer_data = {};
-            order.customer_data.email = value.trim();
-            break;
-          case 'Total':
-            order.total_amount = parseFloat(value.replace('R$ ', ''));
-            break;
-          case 'Status':
-            order.status = value.trim();
-            break;
-          case 'Payment Method':
-            order.payment_method = value.trim();
-            break;
-          case 'Date':
-            order.created_at = new Date(value.trim());
-            break;
-        }
-      }
-    });
-
-    return order;
-  } catch (error) {
-    console.error('Error parsing order TXT:', error);
-    return null;
-  }
-};
-
-export const deleteOrder = (orderId: string) => {
-  try {
-    const filePath = path.join(ORDERS_DIR, `${orderId}.txt`);
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
-
-    // Also delete from Supabase
-    supabase.from('orders')
+    const { error } = await supabase
+      .from('orders')
       .delete()
-      .eq('id', orderId)
-      .then(({ error }) => {
-        if (error) console.error('Error deleting from Supabase:', error);
-      });
+      .eq('id', orderId);
+
+    if (error) throw error;
+
+    // Update local storage
+    const orders = getFromLocalStorage('orders', []);
+    const filteredOrders = orders.filter((o: any) => o.id !== orderId);
+    saveToLocalStorage('orders', filteredOrders);
   } catch (error) {
     console.error('Error deleting order:', error);
-    throw error;
-  }
-};
-
-// Banners
-export const saveBanner = (banner: any) => {
-  try {
-    const filePath = path.join(BANNERS_DIR, `${banner.id}.json`);
-    fs.writeFileSync(filePath, JSON.stringify(banner, null, 2));
-    
-    // Also save to Supabase as backup
-    supabase.from('banners')
-      .upsert({ ...banner, file_path: filePath })
-      .then(({ error }) => {
-        if (error) console.error('Error saving to Supabase:', error);
-      });
-
-    return banner;
-  } catch (error) {
-    console.error('Error saving banner:', error);
-    throw error;
-  }
-};
-
-export const getBanners = () => {
-  try {
-    const banners: any[] = [];
-    const files = fs.readdirSync(BANNERS_DIR);
-    
-    files.forEach(file => {
-      if (file.endsWith('.json')) {
-        const filePath = path.join(BANNERS_DIR, file);
-        const data = fs.readFileSync(filePath, 'utf8');
-        banners.push(JSON.parse(data));
-      }
-    });
-
-    return banners;
-  } catch (error) {
-    console.error('Error reading banners:', error);
-    return [];
-  }
-};
-
-export const deleteBanner = (bannerId: string) => {
-  try {
-    const filePath = path.join(BANNERS_DIR, `${bannerId}.json`);
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
-
-    // Also delete from Supabase
-    supabase.from('banners')
-      .delete()
-      .eq('id', bannerId)
-      .then(({ error }) => {
-        if (error) console.error('Error deleting from Supabase:', error);
-      });
-  } catch (error) {
-    console.error('Error deleting banner:', error);
-    throw error;
-  }
-};
-
-// Store Settings
-export const saveStoreSettings = (settings: any) => {
-  try {
-    const filePath = path.join(STORE_CONFIG_DIR, 'settings.json');
-    fs.writeFileSync(filePath, JSON.stringify(settings, null, 2));
-    
-    // Also save to Supabase as backup
-    supabase.from('store_settings')
-      .upsert({ ...settings, file_path: filePath })
-      .then(({ error }) => {
-        if (error) console.error('Error saving to Supabase:', error);
-      });
-
-    return settings;
-  } catch (error) {
-    console.error('Error saving store settings:', error);
-    throw error;
-  }
-};
-
-export const getStoreSettings = () => {
-  try {
-    const filePath = path.join(STORE_CONFIG_DIR, 'settings.json');
-    if (fs.existsSync(filePath)) {
-      const data = fs.readFileSync(filePath, 'utf8');
-      return JSON.parse(data);
-    }
-    return null;
-  } catch (error) {
-    console.error('Error reading store settings:', error);
-    return null;
-  }
-};
-
-// Stats
-export const saveStats = (stats: any) => {
-  try {
-    const filePath = path.join(STORE_CONFIG_DIR, 'stats.json');
-    fs.writeFileSync(filePath, JSON.stringify(stats, null, 2));
-    return stats;
-  } catch (error) {
-    console.error('Error saving stats:', error);
-    throw error;
-  }
-};
-
-export const getStats = () => {
-  try {
-    const filePath = path.join(STORE_CONFIG_DIR, 'stats.json');
-    if (fs.existsSync(filePath)) {
-      const data = fs.readFileSync(filePath, 'utf8');
-      return JSON.parse(data);
-    }
-    return null;
-  } catch (error) {
-    console.error('Error reading stats:', error);
-    return null;
+    // Still update local storage even if Supabase fails
+    const orders = getFromLocalStorage('orders', []);
+    const filteredOrders = orders.filter((o: any) => o.id !== orderId);
+    saveToLocalStorage('orders', filteredOrders);
   }
 };
 
 // Migration utility
-export const migrateFromLocalStorage = () => {
+export const migrateFromLocalStorage = async () => {
   try {
     // Migrate products
-    const products = JSON.parse(localStorage.getItem('products') || '[]');
-    products.forEach((product: Product) => saveProduct(product));
+    const products = getFromLocalStorage('products', []);
+    for (const product of products) {
+      await saveProduct(product);
+    }
 
     // Migrate orders
-    const orders = JSON.parse(localStorage.getItem('orders') || '[]');
-    orders.forEach((order: any) => saveOrder(order));
-
-    // Migrate banners
-    const banners = JSON.parse(localStorage.getItem('banners') || '[]');
-    banners.forEach((banner: any) => saveBanner(banner));
-
-    // Migrate store settings
-    const settings = JSON.parse(localStorage.getItem('store_settings') || '{}');
-    if (Object.keys(settings).length > 0) {
-      saveStoreSettings(settings);
+    const orders = getFromLocalStorage('orders', []);
+    for (const order of orders) {
+      await saveOrder(order);
     }
 
-    // Migrate stats
-    const stats = JSON.parse(localStorage.getItem('stats') || '{}');
-    if (Object.keys(stats).length > 0) {
-      saveStats(stats);
-    }
-
-    toast.success('Dados migrados com sucesso para armazenamento local!');
+    toast.success('Dados migrados com sucesso para o Supabase!');
   } catch (error) {
     console.error('Error during migration:', error);
     toast.error('Erro durante a migração dos dados');
