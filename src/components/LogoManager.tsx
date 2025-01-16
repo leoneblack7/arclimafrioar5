@@ -16,7 +16,7 @@ export const LogoManager = () => {
 
   const fetchStoreConfig = async () => {
     try {
-      const config = getStoreSettings();
+      const config = await getStoreSettings();
       if (config) {
         if (config.logo_url) setLogoUrl(config.logo_url);
         if (config.store_name) setStoreName(config.store_name);
@@ -34,7 +34,7 @@ export const LogoManager = () => {
     }
 
     try {
-      saveStoreSettings({
+      await saveStoreSettings({
         logo_url: logoUrl,
         store_name: storeName
       });

@@ -8,44 +8,26 @@ interface Banner {
   active: boolean;
 }
 
-const defaultBanners: Banner[] = [
-  {
-    id: 'default-banner-1',
-    image_url: '/lovable-uploads/be106df6-7f56-49b8-8767-4cf73aa20a7b.png',
-    active: true
-  },
-  {
-    id: 'default-banner-2',
-    image_url: '/lovable-uploads/3f83f27c-39bc-4118-9240-41e9d4d45fbf.png',
-    active: true
-  },
-  {
-    id: 'default-banner-3',
-    image_url: '/lovable-uploads/b628c938-51f7-44ca-9c86-ff0be454ec82.png',
-    active: true
-  }
-];
-
 export const useBannerManager = () => {
   const [banners, setBanners] = useState<Banner[]>([]);
   const [secondaryBanners, setSecondaryBanners] = useState<Banner[]>([]);
 
-  const loadBanners = () => {
+  const loadBanners = async () => {
     try {
-      const storedBanners = getBanners();
+      const storedBanners = await getBanners();
       if (storedBanners && storedBanners.length > 0) {
         const mainBanners = storedBanners.filter(b => !b.id.startsWith('secondary-'));
         const secBanners = storedBanners.filter(b => b.id.startsWith('secondary-'));
         setBanners(mainBanners);
         setSecondaryBanners(secBanners);
       } else {
-        setBanners(defaultBanners);
+        setBanners([]);
         setSecondaryBanners([]);
       }
     } catch (error) {
       console.error('Error loading banners:', error);
       toast.error('Erro ao carregar os banners');
-      setBanners(defaultBanners);
+      setBanners([]);
       setSecondaryBanners([]);
     }
   };
