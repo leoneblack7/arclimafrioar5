@@ -16,13 +16,8 @@ export default function Products() {
 
   const loadProducts = async () => {
     const loadedProducts = await getFromStorage<Product[]>('products', []);
-    const productsWithImage = loadedProducts.map(product => ({
-      ...product,
-      id: Number(product.id),
-      image: product.image_url || product.image || '/placeholder.svg'
-    }));
-    setProducts(productsWithImage);
-    setFilteredProducts(productsWithImage);
+    setProducts(loadedProducts);
+    setFilteredProducts(loadedProducts);
   };
 
   const handleSearch = (term: string) => {
@@ -54,7 +49,7 @@ export default function Products() {
                 id: Number(product.id),
                 title: product.title,
                 price: product.price,
-                image: product.image_url || product.image || '/placeholder.svg',
+                image: product.image_url || '/placeholder.svg',
                 description: product.description,
                 specifications: product.specifications,
                 isSpecificationsActive: product.is_specifications_active
