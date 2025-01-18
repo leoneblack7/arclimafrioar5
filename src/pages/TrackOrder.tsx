@@ -2,10 +2,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Package, CheckCircle2, Truck, Box, AlertCircle, XCircle, Clock } from "lucide-react";
+import { Package, CheckCircle2, Truck, Box, AlertCircle } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { useToast } from "@/hooks/use-toast";
-import { getFromLocalStorage } from "@/utils/localStorage";
+import { getFromStorage } from "@/utils/storage";
+import { Order } from "@/types/storage";
 
 interface TrackingStatus {
   status: string;
@@ -22,10 +23,10 @@ export default function TrackOrder() {
   const [isTracking, setIsTracking] = useState(false);
   const [initialTrackDate, setInitialTrackDate] = useState<Date | null>(null);
 
-  const validatePixOrder = (cpf: string) => {
-    const orders = getFromLocalStorage('orders', []);
-    return orders.find((order: any) => 
-      order.customer?.document === cpf && 
+  const validatePixOrder = async (cpf: string) => {
+    const orders = await getFromStorage<Order[]>('orders', []);
+    return orders.find((order: Order) => 
+      order.customer_data?.document === cpf && 
       order.payment_method === 'pix' && 
       order.status === 'paid'
     );
@@ -87,20 +88,20 @@ export default function TrackOrder() {
     return history;
   };
 
-  const handleTrack = (e: React.FormEvent) => {
+  const handleTrack = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsTracking(true);
     
     const cleanCpf = cpf.replace(/\D/g, '');
     if (cleanCpf.length === 11) {
-      const order = validatePixOrder(cleanCpf);
+      const order = await validatePixOrder(cleanCpf);
       
       if (order) {
         if (!initialTrackDate) {
-          setInitialTrackDate(new Date(order.timestamp));
+          setInitialTrackDate(new Date(order.created_at || Date.now()));
         }
         
-        const history = generateTrackingHistory(new Date(order.timestamp));
+        const history = generateTrackingHistory(new Date(order.created_at || Date.now()));
         setTrackingHistory(history);
       } else {
         toast({

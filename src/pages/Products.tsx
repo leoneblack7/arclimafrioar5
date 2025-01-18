@@ -1,121 +1,57 @@
-import { useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { ProductsSection } from "@/components/home/ProductsSection";
-import { Footer } from "@/components/home/Footer";
-import { getFromStorage, saveToStorage } from "@/utils/storage";
+import { useEffect, useState } from "react";
+import { ProductCard } from "@/components/ProductCard";
+import { SearchBar } from "@/components/SearchBar";
 import { Navbar } from "@/components/Navbar";
+import { getFromStorage } from "@/utils/storage";
+import { Product } from "@/types/storage";
 
-const initialProducts = [
-  {
-    id: 1,
-    title: "Ar Condicionado Split Inverter 12000 BTUs",
-    price: 2499.99,
-    image: "/placeholder.svg",
-    description: "Split Inverter com tecnologia de última geração, economia de energia e controle via WiFi. Ideal para ambientes de até 20m².",
-    active: true
-  },
-  {
-    id: 2,
-    title: "Ar Condicionado Portátil 9000 BTUs",
-    price: 1899.99,
-    image: "/placeholder.svg",
-    description: "Solução portátil ideal para ambientes sem instalação fixa. Perfeito para quartos e escritórios até 15m².",
-    active: true
-  },
-  {
-    id: 3,
-    title: "Split Hi-Wall Premium 18000 BTUs",
-    price: 3299.99,
-    image: "/placeholder.svg",
-    description: "Sistema avançado de filtragem, operação silenciosa e máxima eficiência energética. Recomendado para salas até 30m².",
-    active: true
-  },
-  {
-    id: 4,
-    title: "Multi Split Inverter 24000 BTUs",
-    price: 4599.99,
-    image: "/placeholder.svg",
-    description: "Sistema multi split para até 3 ambientes, com tecnologia inverter e controle individual. Ideal para apartamentos.",
-    active: true
-  },
-  {
-    id: 5,
-    title: "Ar Condicionado Cassete 36000 BTUs",
-    price: 5999.99,
-    image: "/placeholder.svg",
-    description: "Ideal para ambientes comerciais, com distribuição uniforme do ar e instalação no teto. Perfeito para lojas e escritórios.",
-    active: true
-  },
-  {
-    id: 6,
-    title: "Split Piso Teto 48000 BTUs",
-    price: 7299.99,
-    image: "/placeholder.svg",
-    description: "Versátil e potente, perfeito para grandes ambientes comerciais ou industriais. Recomendado para áreas até 70m².",
-    active: true
-  },
-  {
-    id: 7,
-    title: "Ar Condicionado Window 10000 BTUs",
-    price: 1499.99,
-    image: "/placeholder.svg",
-    description: "Modelo tradicional de janela, ideal para ambientes pequenos.",
-    active: true
-  },
-  {
-    id: 8,
-    title: "Split Inverter Dual 18000 BTUs",
-    price: 3899.99,
-    image: "/placeholder.svg",
-    description: "Sistema dual com duas unidades internas, perfeito para dois ambientes.",
-    active: true
-  }
-];
+export default function Products() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
-const Products = () => {
   useEffect(() => {
-    const existingProducts = getFromStorage('products', []);
-    if (existingProducts.length === 0) {
-      saveToStorage('products', initialProducts);
-    }
+    loadProducts();
   }, []);
 
-  const { data: products, isLoading } = useQuery({
-    queryKey: ["products"],
-    queryFn: async () => {
-      const storedProducts = getFromStorage('products', []);
-      return storedProducts
-        .filter((item: any) => item.active)
-        .map((item: any) => ({
-          id: Number(item.id),
-          title: item.title,
-          price: Number(item.price),
-          image: item.image || '/placeholder.svg',
-          description: item.description
-        }));
+  const loadProducts = async () => {
+    const loadedProducts = await getFromStorage<Product[]>('products', []);
+    setProducts(loadedProducts);
+    setFilteredProducts(loadedProducts);
+  };
+
+  const handleSearch = (term: string) => {
+    setSearchTerm(term);
+    if (!term) {
+      setFilteredProducts(products);
+      return;
     }
-  });
+
+    const filtered = products.filter(product =>
+      product.title.toLowerCase().includes(term.toLowerCase()) ||
+      product.description.toLowerCase().includes(term.toLowerCase())
+    );
+    setFilteredProducts(filtered);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <div className="pt-16">
-        {isLoading ? (
-          <div className="text-center py-16">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-4 text-gray-600">Carregando produtos...</p>
+      <div className="container mx-auto px-4 pt-24">
+        <div className="mb-8">
+          <SearchBar onSearch={handleSearch} />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredProducts.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+        {filteredProducts.length === 0 && (
+          <div className="text-center py-8">
+            <p className="text-gray-500">Nenhum produto encontrado</p>
           </div>
-        ) : (
-          <ProductsSection 
-            products={products || []} 
-            title="Todos os Produtos"
-            description="Explore nossa coleção completa de produtos"
-          />
         )}
       </div>
-      <Footer />
     </div>
   );
-};
-
-export default Products;
+}

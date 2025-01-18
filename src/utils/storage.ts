@@ -1,20 +1,48 @@
 import { mysqlService } from './mysqlService';
+import { Product, Order, StoreConfig } from '@/types/storage';
 
-export const getFromStorage = async (key: string, defaultValue: any = null) => {
+export const getFromStorage = async <T>(key: string, defaultValue: T): Promise<T> => {
   try {
-    console.log(`Getting data from storage for key: ${key}`);
-    const response = await mysqlService.getStoreSettings();
-    return response[key] || defaultValue;
+    switch (key) {
+      case 'products':
+        const products = await mysqlService.getProducts();
+        return products as T;
+      case 'orders':
+        const orders = await mysqlService.getOrders();
+        return orders as T;
+      case 'store_config':
+        const config = await mysqlService.getStoreSettings();
+        return config as T;
+      default:
+        return defaultValue;
+    }
   } catch (error) {
     console.error('Error getting data from storage:', error);
     return defaultValue;
   }
 };
 
-export const saveToStorage = async (key: string, value: any) => {
+export const saveToStorage = async <T>(key: string, value: T): Promise<boolean> => {
   try {
-    console.log(`Saving data to storage for key: ${key}`);
-    await mysqlService.saveStoreSettings({ [key]: value });
+    switch (key) {
+      case 'products':
+        if (Array.isArray(value)) {
+          for (const product of value) {
+            await mysqlService.saveProduct(product);
+          }
+        }
+        break;
+      case 'orders':
+        if (Array.isArray(value)) {
+          for (const order of value) {
+            await mysqlService.saveOrder(order);
+          }
+        }
+        break;
+      case 'store_config':
+        await mysqlService.saveStoreSettings(value);
+        break;
+    }
     return true;
   } catch (error) {
     console.error('Error saving data to storage:', error);
@@ -22,14 +50,11 @@ export const saveToStorage = async (key: string, value: any) => {
   }
 };
 
-// Temporary function to maintain compatibility during migration
-export const getFromLocalStorage = (key: string, defaultValue: any = null) => {
-  console.warn('getFromLocalStorage is deprecated. Please use getFromStorage instead.');
-  return defaultValue;
+// Temporary compatibility functions
+export const getFromLocalStorage = async <T>(key: string, defaultValue: T): Promise<T> => {
+  return getFromStorage(key, defaultValue);
 };
 
-// Temporary function to maintain compatibility during migration
-export const saveToLocalStorage = (key: string, value: any) => {
-  console.warn('saveToLocalStorage is deprecated. Please use saveToStorage instead.');
-  return;
+export const saveToLocalStorage = async <T>(key: string, value: T): Promise<boolean> => {
+  return saveToStorage(key, value);
 };

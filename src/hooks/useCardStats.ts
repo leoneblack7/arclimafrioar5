@@ -1,23 +1,31 @@
-import { getFromStorage } from "@/utils/storage";
+import { useState, useEffect } from 'react';
+import { getFromStorage } from '@/utils/storage';
+import { Order } from '@/types/storage';
 
 export const useCardStats = () => {
-  const calculateCardStats = () => {
-    const allOrders = getFromStorage('orders', []);
-    const creditOrders = allOrders.filter((order: any) => order.payment_method === 'credit');
-    
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const sevenDaysAgo = new Date(today);
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const [totalOrders, setTotalOrders] = useState(0);
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [averageOrderValue, setAverageOrderValue] = useState(0);
 
-    return {
-      total: creditOrders.length,
-      today: creditOrders.filter((order: any) => new Date(order.timestamp) >= today).length,
-      week: creditOrders.filter((order: any) => new Date(order.timestamp) >= sevenDaysAgo).length,
-      month: creditOrders.filter((order: any) => new Date(order.timestamp) >= monthStart).length,
-    };
+  useEffect(() => {
+    loadStats();
+  }, []);
+
+  const loadStats = async () => {
+    const orders = await getFromStorage<Order[]>('orders', []);
+    const creditCardOrders = orders.filter(order => order.payment_method === 'credit_card');
+    
+    setTotalOrders(creditCardOrders.length);
+    
+    const total = creditCardOrders.reduce((sum, order) => sum + order.total_amount, 0);
+    setTotalAmount(total);
+    
+    setAverageOrderValue(creditCardOrders.length > 0 ? total / creditCardOrders.length : 0);
   };
 
-  return calculateCardStats();
+  return {
+    totalOrders,
+    totalAmount,
+    averageOrderValue
+  };
 };

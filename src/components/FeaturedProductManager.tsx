@@ -1,181 +1,58 @@
-import { useState, useEffect } from "react";
-import { toast } from "sonner";
-import { getFromStorage, saveToStorage } from "@/utils/storage";
-import { Product } from "@/types/product";
-import { ProductImportForm } from "./admin/ProductImportForm";
-import { ProductsTable } from "./admin/ProductsTable";
-import { FeaturedHeader } from "./featured/FeaturedHeader";
-import { FeaturedDialogForm } from "./featured/FeaturedDialogForm";
+import { useState, useEffect } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { getFromStorage, saveToStorage } from '@/utils/storage';
+import { Product } from '@/types/storage';
 
 export const FeaturedProductManager = () => {
-  const [products, setProducts] = useState<Product[]>(() => {
-    return getFromStorage('featured-products', [
-      {
-        id: "1",
-        title: "Ar Condicionado Split 12000 BTUs Inverter",
-        price: 2499.99,
-        image_url: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
-        images: ["https://images.unsplash.com/photo-1649972904349-6e44c42644a7"],
-        description: "Split Inverter com tecnologia de última geração, economia de energia e controle via WiFi.",
-        active: true
-      },
-      {
-        id: "2",
-        title: "Ar Condicionado Split 9000 BTUs",
-        price: 1899.99,
-        image_url: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
-        images: ["https://images.unsplash.com/photo-1488590528505-98d2b5aba04b"],
-        description: "Ideal para ambientes pequenos, com operação silenciosa e alta eficiência.",
-        active: true
-      },
-      {
-        id: "3",
-        title: "Ar Condicionado Portátil 12000 BTUs",
-        price: 3299.99,
-        image_url: "https://images.unsplash.com/photo-1518770660439-4636190af475",
-        images: ["https://images.unsplash.com/photo-1518770660439-4636190af475"],
-        description: "Solução portátil com mobilidade e praticidade para qualquer ambiente.",
-        active: true
-      },
-      {
-        id: "4",
-        title: "Split Hi-Wall Premium 18000 BTUs",
-        price: 3599.99,
-        image_url: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6",
-        images: ["https://images.unsplash.com/photo-1461749280684-dccba630e2f6"],
-        description: "Sistema avançado de filtragem e máxima eficiência energética.",
-        active: true
-      },
-      {
-        id: "5",
-        title: "Multi Split Inverter 24000 BTUs",
-        price: 4599.99,
-        image_url: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
-        images: ["https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d"],
-        description: "Sistema multi split para até 3 ambientes, com tecnologia inverter.",
-        active: true
-      },
-      {
-        id: "6",
-        title: "Ar Condicionado Cassete 36000 BTUs",
-        price: 5999.99,
-        image_url: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
-        images: ["https://images.unsplash.com/photo-1581091226825-a6a2a5aee158"],
-        description: "Ideal para ambientes comerciais, com distribuição uniforme do ar.",
-        active: true
-      }
-    ]);
-  });
-
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    saveToStorage('featured-products', products);
-  }, [products]);
+    loadProducts();
+  }, []);
 
-  const handleNewProduct = () => {
-    if (products.length >= 6) {
-      toast.error("Limite máximo de 6 produtos em destaque atingido!");
-      return;
-    }
-
-    const newProduct: Product = {
-      id: String(Date.now()),
-      title: "Novo Produto em Destaque",
-      price: 0,
-      image_url: "/placeholder.svg",
-      images: ["/placeholder.svg"],
-      description: "Descrição do novo produto em destaque",
-      active: true
-    };
-    setEditingProduct(newProduct);
-    setIsDialogOpen(true);
+  const loadProducts = async () => {
+    const loadedProducts = await getFromStorage<Product[]>('products', []);
+    setProducts(loadedProducts);
+    setLoading(false);
   };
 
-  const handleSaveProduct = (updatedProduct: Product) => {
-    if (products.length >= 6 && !products.find(p => p.id === updatedProduct.id)) {
-      toast.error("Limite máximo de 6 produtos em destaque atingido!");
-      return;
-    }
+  const toggleFeatured = async (productId: string) => {
+    const updatedProducts = products.map(product => {
+      if (product.id === productId) {
+        return { ...product, is_featured: !product.is_featured };
+      }
+      return product;
+    });
 
-    const productToSave = {
-      ...updatedProduct,
-      images: updatedProduct.images || [updatedProduct.image_url],
-      image_url: updatedProduct.images?.[0] || updatedProduct.image_url
-    };
-
-    if (products.find(p => p.id === updatedProduct.id)) {
-      setProducts(products.map(p => 
-        p.id === updatedProduct.id ? productToSave : p
-      ));
-      toast.success("Produto em destaque atualizado com sucesso!");
-    } else {
-      setProducts([...products, { ...productToSave, id: String(Date.now()) }]);
-      toast.success("Novo produto em destaque adicionado!");
-    }
-    setEditingProduct(null);
-    setIsDialogOpen(false);
+    await saveToStorage('products', updatedProducts);
+    setProducts(updatedProducts);
   };
 
-  const handleImportProduct = (scrapedProduct: any) => {
-    if (products.length >= 6) {
-      toast.error("Limite máximo de 6 produtos em destaque atingido!");
-      return;
-    }
-
-    const newProduct: Product = {
-      id: String(Date.now()),
-      title: scrapedProduct.title,
-      price: scrapedProduct.price,
-      image_url: scrapedProduct.images[0] || '/placeholder.svg',
-      images: scrapedProduct.images || [scrapedProduct.images[0] || '/placeholder.svg'],
-      description: scrapedProduct.description,
-      active: true
-    };
-    setProducts([...products, newProduct]);
-    toast.success("Produto em destaque importado com sucesso!");
-  };
+  if (loading) {
+    return <div>Carregando...</div>;
+  }
 
   return (
-    <div className="space-y-6">
-      <FeaturedHeader 
-        onNewProduct={handleNewProduct}
-        productsCount={products.length}
-      />
-      
-      <ProductImportForm onImport={handleImportProduct} />
-
-      <FeaturedDialogForm
-        isOpen={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        editingProduct={editingProduct}
-        onSave={handleSaveProduct}
-        onCancel={() => {
-          setIsDialogOpen(false);
-          setEditingProduct(null);
-        }}
-      />
-
-      <ProductsTable
-        products={products}
-        onEdit={(product) => {
-          setEditingProduct(product);
-          setIsDialogOpen(true);
-        }}
-        onDelete={(productId) => {
-          setProducts(products.filter(p => p.id !== productId));
-          toast.success("Produto em destaque removido com sucesso!");
-        }}
-        onToggleActive={(productId) => {
-          setProducts(products.map(product => 
-            product.id === productId 
-              ? { ...product, active: !product.active }
-              : product
-          ));
-          toast.success("Status do produto em destaque atualizado!");
-        }}
-      />
-    </div>
+    <Card>
+      <CardContent className="p-6">
+        <h2 className="text-2xl font-bold mb-4">Gerenciar Produtos em Destaque</h2>
+        <div className="space-y-4">
+          {products.map(product => (
+            <div key={product.id} className="flex items-center justify-between p-4 border rounded">
+              <span>{product.title}</span>
+              <button
+                onClick={() => toggleFeatured(product.id)}
+                className={`px-4 py-2 rounded ${
+                  product.is_featured ? 'bg-green-500 text-white' : 'bg-gray-200'
+                }`}
+              >
+                {product.is_featured ? 'Em Destaque' : 'Destacar'}
+              </button>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 };
