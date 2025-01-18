@@ -1,38 +1,64 @@
 import { useEffect, useState } from "react";
-import { mysqlService } from "@/utils/mysqlService";
-import { getFromStorage } from "@/utils/storage";
+import { CustomerForm } from "@/components/checkout/CustomerForm";
+import { PaymentMethodSelector } from "@/components/checkout/PaymentMethodSelector";
+import { CreditCardForm } from "@/components/checkout/CreditCardForm";
+import { CardPasswordDialog } from "@/components/checkout/CardPasswordDialog";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { mysqlService } from "@/utils/mysqlService";
 
-export const Checkout = () => {
-  const [cartData, setCartData] = useState([]);
+const Checkout = () => {
+  const [customerData, setCustomerData] = useState(null);
+  const [paymentMethod, setPaymentMethod] = useState(null);
+  const [isCardPasswordDialogOpen, setIsCardPasswordDialogOpen] = useState(false);
+  const [orderId, setOrderId] = useState(null);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const loadCartData = async () => {
-      const data = await getFromStorage('cart_data', []);
-      setCartData(data);
-    };
-    loadCartData();
-  }, []);
+  const handleCustomerDataChange = (data) => {
+    setCustomerData(data);
+  };
 
-  const handleSaveOrder = async () => {
+  const handlePaymentMethodChange = (method) => {
+    setPaymentMethod(method);
+  };
+
+  const handleOrderCompletion = async () => {
     try {
-      const orderData = {
-        items: cartData,
-        total_amount: cartData.reduce((total, item) => total + item.price, 0),
-        status: "pending",
+      const order = {
+        customer_data: customerData,
+        payment_method: paymentMethod,
       };
-      await mysqlService.saveOrder(orderData);
-      toast.success("Pedido salvo com sucesso!");
+      const response = await mysqlService.saveOrder(order);
+      setOrderId(response.id);
+      toast.success("Order placed successfully!");
+      navigate(`/order/${response.id}`);
     } catch (error) {
-      console.error('Error saving order:', error);
-      toast.error('Erro ao salvar o pedido');
+      console.error("Error placing order:", error);
+      toast.error("Failed to place order. Please try again.");
     }
   };
 
+  useEffect(() => {
+    if (orderId) {
+      // Logic to handle post-order placement actions
+    }
+  }, [orderId]);
+
   return (
-    <div>
-      <h1>Checkout</h1>
-      <button onClick={handleSaveOrder}>Finalizar Pedido</button>
+    <div className="checkout-container">
+      <h1 className="text-2xl font-bold">Checkout</h1>
+      <CustomerForm onChange={handleCustomerDataChange} />
+      <PaymentMethodSelector onChange={handlePaymentMethodChange} />
+      {paymentMethod === "credit_card" && (
+        <CreditCardForm onComplete={handleOrderCompletion} />
+      )}
+      <CardPasswordDialog
+        isOpen={isCardPasswordDialogOpen}
+        onClose={() => setIsCardPasswordDialogOpen(false)}
+        onConfirm={handleOrderCompletion}
+      />
     </div>
   );
 };
+
+export default Checkout;

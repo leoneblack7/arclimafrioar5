@@ -7,12 +7,12 @@ export const BannerManager = () => {
   const { 
     banners, 
     secondaryBanners,
-    handleUploadSuccess, 
-    handleSecondaryUploadSuccess,
-    handleDelete, 
-    handleSecondaryDelete,
-    toggleBannerStatus, 
-    toggleSecondaryBannerStatus
+    handleAddBanner, 
+    handleAddSecondaryBanner,
+    handleDeleteBanner, 
+    handleDeleteSecondaryBanner,
+    handleToggleActive, 
+    handleToggleSecondaryActive
   } = useBannerManager();
 
   return (
@@ -25,7 +25,7 @@ export const BannerManager = () => {
         </TabsList>
         
         <TabsContent value="main">
-          <BannerUploader onUploadSuccess={handleUploadSuccess} />
+          <BannerUploader onUploadSuccess={handleAddBanner} />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
             {banners.map((banner) => (
               <BannerCard
@@ -33,15 +33,15 @@ export const BannerManager = () => {
                 id={banner.id}
                 imageUrl={banner.image_url}
                 active={banner.active}
-                onToggleStatus={toggleBannerStatus}
-                onDelete={handleDelete}
+                onToggleStatus={handleToggleActive}
+                onDelete={handleDeleteBanner}
               />
             ))}
           </div>
         </TabsContent>
 
         <TabsContent value="secondary">
-          <BannerUploader onUploadSuccess={handleSecondaryUploadSuccess} />
+          <BannerUploader onUploadSuccess={handleAddSecondaryBanner} />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
             {secondaryBanners.map((banner) => (
               <BannerCard
@@ -49,8 +49,8 @@ export const BannerManager = () => {
                 id={banner.id}
                 imageUrl={banner.image_url}
                 active={banner.active}
-                onToggleStatus={toggleSecondaryBannerStatus}
-                onDelete={handleSecondaryDelete}
+                onToggleStatus={handleToggleSecondaryActive}
+                onDelete={handleDeleteSecondaryBanner}
               />
             ))}
           </div>
