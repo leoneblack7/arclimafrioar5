@@ -41,6 +41,16 @@ CREATE TABLE IF NOT EXISTS store_config (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE current_timestamp
 );
 
+-- Tabela de usuários
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(50) DEFAULT 'admin',
+    active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Inserir alguns produtos de exemplo
 INSERT INTO products (title, price, image, description, active) VALUES
 ('Ar Condicionado Split 12000 BTUs', 2499.99, 'https://example.com/ac1.jpg', 'Ar condicionado Split com tecnologia Inverter', TRUE),
@@ -49,3 +59,7 @@ INSERT INTO products (title, price, image, description, active) VALUES
 -- Inserir configuração inicial da loja
 INSERT INTO store_config (store_name, logo_url) VALUES
 ('ArclimaFrio', 'https://example.com/logo.png');
+
+-- Inserir usuário admin padrão (senha: admin123)
+INSERT INTO users (username, password, role, active) VALUES
+('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', TRUE);
