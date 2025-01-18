@@ -16,21 +16,37 @@ export default function Products() {
 
   const loadProducts = async () => {
     try {
-      const loadedProducts = await getFromStorage<Product[]>('products', []);
+      const response = await getFromStorage<Product[]>('products', []);
       
-      // Check if the response is valid JSON and an array
-      if (typeof loadedProducts === 'string' && loadedProducts.includes('<?php')) {
-        console.error('Invalid API response:', loadedProducts);
+      // Check if the response is valid JSON and not PHP code
+      if (typeof response === 'string') {
+        if (response.includes('<?php')) {
+          console.error('Invalid API response:', response);
+          setProducts([]);
+          setFilteredProducts([]);
+          return;
+        }
+        // Try to parse string response as JSON
+        try {
+          const parsed = JSON.parse(response);
+          if (Array.isArray(parsed)) {
+            setProducts(parsed);
+            setFilteredProducts(parsed);
+            return;
+          }
+        } catch (e) {
+          console.error('Failed to parse response:', e);
+        }
         setProducts([]);
         setFilteredProducts([]);
         return;
       }
 
-      if (Array.isArray(loadedProducts)) {
-        setProducts(loadedProducts);
-        setFilteredProducts(loadedProducts);
+      if (Array.isArray(response)) {
+        setProducts(response);
+        setFilteredProducts(response);
       } else {
-        console.error('Loaded products is not an array:', loadedProducts);
+        console.error('Loaded products is not an array:', response);
         setProducts([]);
         setFilteredProducts([]);
       }
