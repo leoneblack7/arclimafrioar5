@@ -98,6 +98,11 @@ class MysqlService {
     const response = await axios.post(`${this.baseUrl}/pix-config/update.php`, config);
     return response.data;
   }
+
+  async saveUser(userData: Partial<UserData>): Promise<any> {
+    const response = await axios.post(`${this.baseUrl}/users/update.php`, userData);
+    return response.data;
+  }
 }
 
 export const mysqlService = new MysqlService();

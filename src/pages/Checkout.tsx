@@ -6,6 +6,7 @@ import { CardPasswordDialog } from "@/components/checkout/CardPasswordDialog";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { mysqlService } from "@/utils/mysqlService";
+import { Order } from "@/types/storage";
 
 const Checkout = () => {
   const [customerData, setCustomerData] = useState(null);
@@ -24,10 +25,16 @@ const Checkout = () => {
 
   const handleOrderCompletion = async () => {
     try {
-      const order = {
+      const order: Order = {
+        id: `ORDER-${Date.now()}`,
+        status: 'pending',
+        total_amount: 2999.99,
         customer_data: customerData,
         payment_method: paymentMethod,
+        items: [],
+        created_at: new Date().toISOString()
       };
+      
       const response = await mysqlService.saveOrder(order);
       setOrderId(response.id);
       toast.success("Order placed successfully!");

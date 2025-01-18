@@ -16,8 +16,12 @@ export default function Products() {
 
   const loadProducts = async () => {
     const loadedProducts = await getFromStorage<Product[]>('products', []);
-    setProducts(loadedProducts);
-    setFilteredProducts(loadedProducts);
+    const productsWithImage = loadedProducts.map(product => ({
+      ...product,
+      image: product.image_url // Map image_url to image for ProductCard compatibility
+    }));
+    setProducts(productsWithImage);
+    setFilteredProducts(productsWithImage);
   };
 
   const handleSearch = (term: string) => {

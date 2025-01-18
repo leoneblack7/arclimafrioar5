@@ -1,13 +1,14 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { User, UserPlus, UserMinus } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { getFromStorage, saveToStorage } from "@/utils/storage";
+import { UserData } from "@/types/storage";
 
-interface UserData {
+interface UserFormData {
   username: string;
   password: string;
 }
@@ -15,11 +16,17 @@ interface UserData {
 export function UserManager() {
   const { currentUsername } = useAuth();
   const { toast } = useToast();
-  const [users, setUsers] = useState<UserData[]>(() => {
-    return getFromStorage('additional_users', []);
-  });
+  const [users, setUsers] = useState<UserData[]>([]);
   const [newUsername, setNewUsername] = useState("");
   const [newPassword, setNewPassword] = useState("");
+
+  useEffect(() => {
+    const loadUsers = async () => {
+      const loadedUsers = await getFromStorage<UserData[]>('additional_users', []);
+      setUsers(loadedUsers);
+    };
+    loadUsers();
+  }, []);
 
   const handleAddUser = () => {
     if (newUsername === "leone") {
