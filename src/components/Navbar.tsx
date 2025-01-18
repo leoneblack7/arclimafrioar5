@@ -1,23 +1,28 @@
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SearchBar } from "./SearchBar";
 import { CartDrawer } from "./CartDrawer";
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
+import { mysqlService } from "@/utils/mysqlService";
 
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const [storeName, setStoreName] = useState("ArclimaFrio");
+  const [logoUrl, setLogoUrl] = useState("");
 
-  const scrollToProducts = () => {
-    if (location.pathname === '/') {
-      const productsSection = document.getElementById('products-section');
-      if (productsSection) {
-        productsSection.scrollIntoView({ behavior: 'smooth' });
+  useEffect(() => {
+    const loadStoreConfig = async () => {
+      const config = await mysqlService.getStoreSettings();
+      if (config) {
+        if (config.store_name) setStoreName(config.store_name);
+        if (config.logo_url) setLogoUrl(config.logo_url);
       }
-    }
-  };
+    };
+    loadStoreConfig();
+  }, []);
 
   return (
     <>
@@ -26,8 +31,12 @@ export const Navbar = () => {
           <div className="flex items-center justify-between h-16">
             {/* Logo Section */}
             <div className="flex-shrink-0">
-              <Link to="/" className="text-2xl font-bold text-primary">
-                ArclimaFrio
+              <Link to="/" className="text-2xl font-bold text-primary flex items-center">
+                {logoUrl ? (
+                  <img src={logoUrl} alt={storeName} className="h-8 mr-2" />
+                ) : (
+                  storeName
+                )}
               </Link>
             </div>
 
