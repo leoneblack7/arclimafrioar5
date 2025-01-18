@@ -28,12 +28,12 @@ export const Navbar = () => {
     <>
       <nav className="bg-white shadow-sm fixed w-full top-0 z-50">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-20">
             {/* Logo Section */}
             <div className="flex-shrink-0">
               <Link to="/" className="text-2xl font-bold text-primary flex items-center">
                 {logoUrl ? (
-                  <img src={logoUrl} alt={storeName} className="h-8 mr-2" />
+                  <img src={logoUrl} alt={storeName} className="h-10 mr-2" />
                 ) : (
                   storeName
                 )}
@@ -43,16 +43,16 @@ export const Navbar = () => {
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
               <SearchBar />
-              <Link to="/" className="text-gray-600 hover:text-primary transition-colors">
+              <Link to="/" className="text-gray-600 hover:text-primary transition-colors font-medium">
                 Início
               </Link>
-              <Link to="/produtos" className="text-gray-600 hover:text-primary transition-colors">
+              <Link to="/produtos" className="text-gray-600 hover:text-primary transition-colors font-medium">
                 Produtos
               </Link>
-              <Link to="/sobre" className="text-gray-600 hover:text-primary transition-colors">
-                Sobre
+              <Link to="/sobre" className="text-gray-600 hover:text-primary transition-colors font-medium">
+                Sobre Nós
               </Link>
-              <Link to="/rastreio" className="text-gray-600 hover:text-primary transition-colors">
+              <Link to="/rastreio" className="text-gray-600 hover:text-primary transition-colors font-medium">
                 Rastrear Pedido
               </Link>
               <CartDrawer />
@@ -74,34 +74,34 @@ export const Navbar = () => {
 
           {/* Mobile Menu */}
           {isMenuOpen && (
-            <div className="md:hidden pb-4">
+            <div className="md:hidden pb-4 bg-white">
               <div className="px-2 pt-2 pb-3 space-y-3">
                 <SearchBar />
                 <div className="flex flex-col space-y-2 mt-3">
                   <Link 
                     to="/" 
-                    className="text-gray-600 hover:text-primary transition-colors block px-3 py-2 rounded-md"
+                    className="text-gray-600 hover:text-primary transition-colors block px-3 py-2 rounded-md font-medium"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Início
                   </Link>
                   <Link 
                     to="/produtos" 
-                    className="text-gray-600 hover:text-primary transition-colors block px-3 py-2 rounded-md"
+                    className="text-gray-600 hover:text-primary transition-colors block px-3 py-2 rounded-md font-medium"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Produtos
                   </Link>
                   <Link 
                     to="/sobre" 
-                    className="text-gray-600 hover:text-primary transition-colors block px-3 py-2 rounded-md"
+                    className="text-gray-600 hover:text-primary transition-colors block px-3 py-2 rounded-md font-medium"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Sobre
+                    Sobre Nós
                   </Link>
                   <Link 
                     to="/rastreio" 
-                    className="text-gray-600 hover:text-primary transition-colors block px-3 py-2 rounded-md"
+                    className="text-gray-600 hover:text-primary transition-colors block px-3 py-2 rounded-md font-medium"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Rastrear Pedido
@@ -113,7 +113,7 @@ export const Navbar = () => {
         </div>
       </nav>
       {/* Spacer div to prevent content from being hidden under navbar */}
-      <div className="h-16"></div>
+      <div className="h-20"></div>
     </>
   );
 };
