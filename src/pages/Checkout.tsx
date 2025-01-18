@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { CustomerForm } from "@/components/checkout/CustomerForm";
-import { PaymentMethodSelector } from "@/components/checkout/PaymentMethodSelector";
-import { CreditCardForm } from "@/components/checkout/CreditCardForm";
+import CustomerForm from "@/components/checkout/CustomerForm";
+import PaymentMethodSelector from "@/components/checkout/PaymentMethodSelector";
+import CreditCardForm from "@/components/checkout/CreditCardForm";
 import { CardPasswordDialog } from "@/components/checkout/CardPasswordDialog";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -45,15 +45,15 @@ const Checkout = () => {
   }, [orderId]);
 
   return (
-    <div className="checkout-container">
-      <h1 className="text-2xl font-bold">Checkout</h1>
+    <div className="checkout-container p-4 max-w-4xl mx-auto">
+      <h1 className="text-2xl font-bold mb-6">Checkout</h1>
       <CustomerForm onChange={handleCustomerDataChange} />
       <PaymentMethodSelector onChange={handlePaymentMethodChange} />
       {paymentMethod === "credit_card" && (
         <CreditCardForm onComplete={handleOrderCompletion} />
       )}
       <CardPasswordDialog
-        isOpen={isCardPasswordDialogOpen}
+        open={isCardPasswordDialogOpen}
         onClose={() => setIsCardPasswordDialogOpen(false)}
         onConfirm={handleOrderCompletion}
       />
