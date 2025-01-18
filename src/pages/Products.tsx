@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ProductsSection } from "@/components/home/ProductsSection";
 import { Footer } from "@/components/home/Footer";
-import { getFromLocalStorage, saveToLocalStorage } from "@/utils/localStorage";
+import { getFromStorage, saveToStorage } from "@/utils/storage";
 import { Navbar } from "@/components/Navbar";
 
 const initialProducts = [
@@ -74,16 +74,16 @@ const initialProducts = [
 
 const Products = () => {
   useEffect(() => {
-    const existingProducts = getFromLocalStorage('products', []);
+    const existingProducts = getFromStorage('products', []);
     if (existingProducts.length === 0) {
-      saveToLocalStorage('products', initialProducts);
+      saveToStorage('products', initialProducts);
     }
   }, []);
 
   const { data: products, isLoading } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
-      const storedProducts = getFromLocalStorage('products', []);
+      const storedProducts = getFromStorage('products', []);
       return storedProducts
         .filter((item: any) => item.active)
         .map((item: any) => ({

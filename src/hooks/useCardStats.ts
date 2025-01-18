@@ -1,8 +1,8 @@
-import { getFromLocalStorage } from "@/utils/localStorage";
+import { getFromStorage } from "@/utils/storage";
 
 export const useCardStats = () => {
   const calculateCardStats = () => {
-    const allOrders = getFromLocalStorage('orders', []);
+    const allOrders = getFromStorage('orders', []);
     const creditOrders = allOrders.filter((order: any) => order.payment_method === 'credit');
     
     const now = new Date();

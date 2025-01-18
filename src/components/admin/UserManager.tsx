@@ -5,8 +5,7 @@ import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { User, UserPlus, UserMinus } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { getFromLocalStorage, saveToLocalStorage } from "@/utils/localStorage";
-import { SupabaseConnectionManager } from "./SupabaseConnectionManager";
+import { getFromStorage, saveToStorage } from "@/utils/storage";
 
 interface UserData {
   username: string;
@@ -17,7 +16,7 @@ export function UserManager() {
   const { currentUsername } = useAuth();
   const { toast } = useToast();
   const [users, setUsers] = useState<UserData[]>(() => {
-    return getFromLocalStorage('additional_users', []);
+    return getFromStorage('additional_users', []);
   });
   const [newUsername, setNewUsername] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -54,7 +53,7 @@ export function UserManager() {
     const newUser = { username: newUsername, password: newPassword };
     const updatedUsers = [...users, newUser];
     setUsers(updatedUsers);
-    saveToLocalStorage('additional_users', updatedUsers);
+    saveToStorage('additional_users', updatedUsers);
     
     setNewUsername("");
     setNewPassword("");
@@ -77,7 +76,7 @@ export function UserManager() {
 
     const updatedUsers = users.filter(user => user.username !== username);
     setUsers(updatedUsers);
-    saveToLocalStorage('additional_users', updatedUsers);
+    saveToStorage('additional_users', updatedUsers);
     
     toast({
       title: "Sucesso",
@@ -157,8 +156,6 @@ export function UserManager() {
         </div>
         </CardContent>
       </Card>
-
-      <SupabaseConnectionManager />
     </div>
   );
 }

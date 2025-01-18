@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { saveToLocalStorage, getFromLocalStorage } from "@/utils/localStorage";
+import { getFromStorage, saveToStorage } from "@/utils/storage";
 import { Product } from "@/types/product";
 import { ProductImportForm } from "./admin/ProductImportForm";
 import { ProductsTable } from "./admin/ProductsTable";
@@ -9,7 +9,7 @@ import { FeaturedDialogForm } from "./featured/FeaturedDialogForm";
 
 export const FeaturedProductManager = () => {
   const [products, setProducts] = useState<Product[]>(() => {
-    return getFromLocalStorage('featured-products', [
+    return getFromStorage('featured-products', [
       {
         id: "1",
         title: "Ar Condicionado Split 12000 BTUs Inverter",
@@ -71,7 +71,7 @@ export const FeaturedProductManager = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
-    saveToLocalStorage('featured-products', products);
+    saveToStorage('featured-products', products);
   }, [products]);
 
   const handleNewProduct = () => {

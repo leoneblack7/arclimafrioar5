@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { getFromLocalStorage } from '@/utils/localStorage';
+import { getFromStorage } from '@/utils/storage';
 import { Product } from '@/types/product';
 import { ProductDetailHeader } from '@/components/product/ProductDetailHeader';
 import { ProductDetailImages } from '@/components/product/ProductDetailImages';
@@ -20,7 +20,7 @@ export default function ProductDetail() {
   const { data: product, isLoading } = useQuery({
     queryKey: ['product', id],
     queryFn: async () => {
-      const products = getFromLocalStorage('products', []);
+      const products = await getFromStorage('products', []);
       const product = products.find((p: Product) => p.id === id);
       if (!product) throw new Error('Product not found');
       return product;

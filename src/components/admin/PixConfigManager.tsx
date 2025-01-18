@@ -6,7 +6,7 @@ import { PixPayForm } from "./pix-config/PixPayForm";
 import { PixUpForm } from "./pix-config/PixUpForm";
 import { PixApiKeySection } from "./pix-config/PixApiKeySection";
 import { usePixConfig } from "./pix-config/usePixConfig";
-import { getFromLocalStorage } from "@/utils/localStorage";
+import { getFromStorage } from "@/utils/storage";
 
 export const PixConfigManager = () => {
   const {
@@ -22,7 +22,7 @@ export const PixConfigManager = () => {
     handleSave,
   } = usePixConfig();
 
-  const pixLinksEnabled = getFromLocalStorage('pix-links-enabled', false);
+  const pixLinksEnabled = getFromStorage('pix-links-enabled', false);
 
   if (pixLinksEnabled) {
     return (
