@@ -15,9 +15,21 @@ export default function Products() {
   }, []);
 
   const loadProducts = async () => {
-    const loadedProducts = await getFromStorage<Product[]>('products', []);
-    setProducts(loadedProducts);
-    setFilteredProducts(loadedProducts);
+    try {
+      const loadedProducts = await getFromStorage<Product[]>('products', []);
+      if (Array.isArray(loadedProducts)) {
+        setProducts(loadedProducts);
+        setFilteredProducts(loadedProducts);
+      } else {
+        console.error('Loaded products is not an array:', loadedProducts);
+        setProducts([]);
+        setFilteredProducts([]);
+      }
+    } catch (error) {
+      console.error('Error loading products:', error);
+      setProducts([]);
+      setFilteredProducts([]);
+    }
   };
 
   const handleSearch = (term: string) => {
@@ -42,7 +54,7 @@ export default function Products() {
           <SearchBar onSearch={handleSearch} />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredProducts.map((product) => (
+          {Array.isArray(filteredProducts) && filteredProducts.map((product) => (
             <ProductCard 
               key={product.id} 
               product={{
@@ -57,7 +69,7 @@ export default function Products() {
             />
           ))}
         </div>
-        {filteredProducts.length === 0 && (
+        {(!Array.isArray(filteredProducts) || filteredProducts.length === 0) && (
           <div className="text-center py-8">
             <p className="text-gray-500">Nenhum produto encontrado</p>
           </div>
