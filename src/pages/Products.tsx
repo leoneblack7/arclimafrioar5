@@ -18,7 +18,8 @@ export default function Products() {
     const loadedProducts = await getFromStorage<Product[]>('products', []);
     const productsWithImage = loadedProducts.map(product => ({
       ...product,
-      image: product.image_url // Map image_url to image for ProductCard compatibility
+      id: Number(product.id),
+      image: product.image_url || product.image || '/placeholder.svg'
     }));
     setProducts(productsWithImage);
     setFilteredProducts(productsWithImage);
@@ -47,7 +48,18 @@ export default function Products() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard 
+              key={product.id} 
+              product={{
+                id: Number(product.id),
+                title: product.title,
+                price: product.price,
+                image: product.image_url || product.image || '/placeholder.svg',
+                description: product.description,
+                specifications: product.specifications,
+                isSpecificationsActive: product.is_specifications_active
+              }} 
+            />
           ))}
         </div>
         {filteredProducts.length === 0 && (

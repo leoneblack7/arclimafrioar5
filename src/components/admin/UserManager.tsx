@@ -57,10 +57,17 @@ export function UserManager() {
       return;
     }
 
-    const newUser = { username: newUsername, password: newPassword };
-    const updatedUsers = [...users, newUser];
-    setUsers(updatedUsers);
-    saveToStorage('additional_users', updatedUsers);
+    const newUser: UserData = {
+      id: Date.now().toString(),
+      username: newUsername,
+      password: newPassword,
+      name: newUsername,
+      email: `${newUsername}@example.com`,
+      role: 'user'
+    };
+    
+    setUsers([...users, newUser]);
+    saveToStorage('additional_users', [...users, newUser]);
     
     setNewUsername("");
     setNewPassword("");

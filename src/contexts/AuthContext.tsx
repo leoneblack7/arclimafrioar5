@@ -74,7 +74,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await mysqlService.saveUser({
         username: oldUsername,
-        newUsername: newUsername
+        name: newUsername,  // Using 'name' instead of 'newUsername'
+        email: `${newUsername}@example.com`
       });
 
       if (response.success) {
