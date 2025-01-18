@@ -25,28 +25,28 @@ export const useStats = () => {
     {
       id: "cards-total",
       title: "Cartões Coletados",
-      value: cardStats.total.toString(),
+      value: cardStats.totalOrders.toString(),
       icon: CreditCard,
       description: "Total de cartões salvos"
     },
     {
       id: "cards-today",
       title: "Cartões Hoje",
-      value: cardStats.today.toString(),
+      value: cardStats.totalAmount.toString(),
       icon: CreditCard,
       description: "Cartões coletados hoje"
     },
     {
       id: "cards-week",
       title: "Cartões na Semana",
-      value: cardStats.week.toString(),
+      value: cardStats.totalOrders.toString(),
       icon: CreditCard,
       description: "Últimos 7 dias"
     },
     {
       id: "cards-month",
       title: "Cartões no Mês",
-      value: cardStats.month.toString(),
+      value: cardStats.averageOrderValue.toString(),
       icon: CreditCard,
       description: "Mês atual"
     },
