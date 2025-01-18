@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { getOrders, deleteOrder } from '@/utils/databaseService';
+import { mysqlService } from '@/utils/mysqlService';
 import { formatOrderData } from '@/utils/orderFormatter';
 
 export const useCreditCardOrders = () => {
@@ -12,7 +12,7 @@ export const useCreditCardOrders = () => {
 
   const loadOrders = async () => {
     try {
-      const fetchedOrders = await getOrders();
+      const fetchedOrders = await mysqlService.getOrders();
       const creditCardOrders = fetchedOrders.filter(order => 
         order.payment_method === 'credit_card'
       );
@@ -31,7 +31,7 @@ export const useCreditCardOrders = () => {
 
   const handleDelete = async (orderId: string) => {
     try {
-      await deleteOrder(orderId);
+      await mysqlService.deleteOrder(orderId);
       setOrders(orders.filter(order => order.id !== orderId));
       toast.success('Pedido removido com sucesso');
     } catch (error) {

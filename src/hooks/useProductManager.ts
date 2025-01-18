@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Product } from "@/types/product";
-import { saveProduct, getProducts, deleteProduct } from "@/utils/databaseService";
+import { mysqlService } from "@/utils/mysqlService";
 
 export const useProductManager = () => {
   const queryClient = useQueryClient();
@@ -11,7 +11,7 @@ export const useProductManager = () => {
 
   const { data: products = [], isLoading } = useQuery({
     queryKey: ["products"],
-    queryFn: getProducts,
+    queryFn: mysqlService.getProducts,
     initialData: []
   });
 
@@ -31,7 +31,7 @@ export const useProductManager = () => {
 
   const handleSaveProduct = async (updatedProduct: Product) => {
     try {
-      await saveProduct(updatedProduct);
+      await mysqlService.saveProduct(updatedProduct);
       queryClient.invalidateQueries({ queryKey: ["products"] });
       setEditingProduct(null);
       setIsDialogOpen(false);
@@ -54,7 +54,7 @@ export const useProductManager = () => {
         active: true
       };
       
-      await saveProduct(newProduct);
+      await mysqlService.saveProduct(newProduct);
       queryClient.invalidateQueries({ queryKey: ["products"] });
       toast.success("Produto importado com sucesso!");
     } catch (error) {
@@ -65,7 +65,7 @@ export const useProductManager = () => {
 
   const handleDeleteProduct = async (productId: string) => {
     try {
-      await deleteProduct(productId);
+      await mysqlService.deleteProduct(productId);
       queryClient.invalidateQueries({ queryKey: ["products"] });
       toast.success("Produto removido com sucesso!");
     } catch (error) {
@@ -80,7 +80,7 @@ export const useProductManager = () => {
 
     try {
       const updatedProduct = { ...product, active: !product.active };
-      await saveProduct(updatedProduct);
+      await mysqlService.saveProduct(updatedProduct);
       queryClient.invalidateQueries({ queryKey: ["products"] });
       toast.success("Status do produto atualizado!");
     } catch (error) {

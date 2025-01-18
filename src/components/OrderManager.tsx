@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getOrders } from "@/utils/databaseService";
+import { mysqlService } from "@/utils/mysqlService";
 import { Order } from "@/types/storage";
 import { toast } from "sonner";
 
@@ -14,7 +14,7 @@ export const OrderManager = () => {
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const fetchedOrders = await getOrders();
+      const fetchedOrders = await mysqlService.getOrders();
       if (Array.isArray(fetchedOrders)) {
         const creditCardOrders = fetchedOrders.filter(
           (order) => order.payment_method === "credit_card"

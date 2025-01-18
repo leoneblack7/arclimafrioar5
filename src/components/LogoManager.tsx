@@ -3,7 +3,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { toast } from "sonner";
 import { Label } from "./ui/label";
-import { saveStoreSettings, getStoreSettings } from "@/utils/databaseService";
+import { mysqlService } from "@/utils/mysqlService";
 
 export const LogoManager = () => {
   const [logoUrl, setLogoUrl] = useState("");
@@ -16,7 +16,7 @@ export const LogoManager = () => {
 
   const fetchStoreConfig = async () => {
     try {
-      const config = await getStoreSettings();
+      const config = await mysqlService.getStoreSettings();
       if (config) {
         if (config.logo_url) setLogoUrl(config.logo_url);
         if (config.store_name) setStoreName(config.store_name);
@@ -34,7 +34,7 @@ export const LogoManager = () => {
     }
 
     try {
-      await saveStoreSettings({
+      await mysqlService.saveStoreSettings({
         logo_url: logoUrl,
         store_name: storeName
       });
