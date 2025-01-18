@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { CartPayment } from "@/components/cart/CartPayment";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
-import { getFromLocalStorage, saveToLocalStorage } from "@/utils/localStorage";
+import { getFromStorage, saveToStorage } from "@/utils/storage";
 import { generateOrderId } from "@/utils/orderUtils";
 
 const Cart = () => {
@@ -24,11 +24,15 @@ const Cart = () => {
         status: 'paid'
       };
       
-      const existingOrders = getFromLocalStorage('orders', []);
-      saveToLocalStorage('orders', [...existingOrders, order]);
-      
-      // Redirect to tracking page
-      navigate('/rastreio');
+      try {
+        const existingOrders = await getFromStorage('orders', []);
+        await saveToStorage('orders', [...existingOrders, order]);
+        
+        // Redirect to tracking page
+        navigate('/rastreio');
+      } catch (error) {
+        console.error('Error saving order:', error);
+      }
     } else {
       // Handle credit card payment logic here
     }
@@ -37,7 +41,6 @@ const Cart = () => {
   return (
     <div>
       <h1>Carrinho</h1>
-      {/* Render cart items and total */}
       <CartPayment
         total={total}
         disabled={items.length === 0}

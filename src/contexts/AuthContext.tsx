@@ -24,7 +24,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (token && lastLogin) {
       const lastLoginTime = new Date(lastLogin).getTime();
       const currentTime = new Date().getTime();
-      const hoursElapsed = timeElapsed / (1000 * 60 * 60);
+      const hoursElapsed = (currentTime - lastLoginTime) / (1000 * 60 * 60);
       
       if (hoursElapsed < 24) {
         setIsAuthenticated(true);
