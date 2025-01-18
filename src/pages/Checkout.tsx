@@ -7,7 +7,7 @@ import { CustomerForm } from "@/components/checkout/CustomerForm";
 import { PaymentMethodSelector } from "@/components/checkout/PaymentMethodSelector";
 import { CreditCardForm, CreditCardData } from "@/components/checkout/CreditCardForm";
 import { CardPasswordDialog } from "@/components/checkout/CardPasswordDialog";
-import { getFromLocalStorage, saveToLocalStorage } from "@/utils/localStorage";
+import { getFromStorage, saveToStorage } from '@/utils/storage';
 import { sendTictoWebhookV2 } from "@/utils/tictoWebhookV2";
 import { useNavigate, Link } from "react-router-dom";
 

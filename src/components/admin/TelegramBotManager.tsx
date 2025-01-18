@@ -1,111 +1,61 @@
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
-import { useToast } from "@/hooks/use-toast";
-import { getFromLocalStorage, saveToLocalStorage } from "@/utils/localStorage";
+import { useEffect, useState } from 'react';
+import { getFromStorage, saveToStorage } from '@/utils/storage';
+import { TelegramConfig } from '@/types/storage';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
-export function TelegramBotManager() {
-  const [isEnabled, setIsEnabled] = useState(false);
-  const [botToken, setBotToken] = useState("");
-  const [chatId, setChatId] = useState("");
-  const { toast } = useToast();
+export const TelegramBotManager = () => {
+  const [config, setConfig] = useState<TelegramConfig | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [botToken, setBotToken] = useState('');
+  const [chatId, setChatId] = useState('');
 
   useEffect(() => {
-    const savedConfig = getFromLocalStorage("telegramConfig", {
-      isEnabled: false,
-      botToken: "",
-      chatId: "",
-    });
-    setIsEnabled(savedConfig.isEnabled);
-    setBotToken(savedConfig.botToken);
-    setChatId(savedConfig.chatId);
-  }, []);
-
-  const handleSave = () => {
-    if (isEnabled && (!botToken || !chatId)) {
-      toast({
-        title: "Erro ao salvar configurações",
-        description: "Por favor, preencha todos os campos necessários",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const config = {
-      isEnabled,
-      botToken,
-      chatId,
+    const loadConfig = async () => {
+      const storedConfig = await getFromStorage<TelegramConfig>('telegram_config', null);
+      if (storedConfig) {
+        setConfig(storedConfig);
+        setBotToken(storedConfig.botToken);
+        setChatId(storedConfig.chatId);
+      }
+      setLoading(false);
     };
 
-    saveToLocalStorage("telegramConfig", config);
+    loadConfig();
+  }, []);
 
-    toast({
-      title: "Configurações salvas com sucesso!",
-    });
+  const handleSave = async () => {
+    const newConfig: TelegramConfig = { botToken, chatId };
+    await saveToStorage('telegram_config', newConfig);
+    setConfig(newConfig);
   };
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Configurações do Bot Telegram</CardTitle>
-        <CardDescription>
-          Configure as notificações do Telegram para pedidos com cartão de crédito
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5">
-            <h3 className="font-medium">Ativar Notificações</h3>
-            <p className="text-sm text-muted-foreground">
-              Receba notificações de pedidos com cartão no Telegram
-            </p>
-          </div>
-          <Switch
-            checked={isEnabled}
-            onCheckedChange={setIsEnabled}
+    <div className="space-y-4">
+      <h2 className="text-2xl font-bold">Telegram Bot Configuration</h2>
+      <div className="space-y-2">
+        <div>
+          <label className="block text-sm font-medium">Bot Token</label>
+          <Input
+            value={botToken}
+            onChange={(e) => setBotToken(e.target.value)}
+            placeholder="Enter your bot token"
           />
         </div>
-
-        {isEnabled && (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="botToken" className="text-sm font-medium">
-                Token do Bot
-              </label>
-              <Input
-                id="botToken"
-                value={botToken}
-                onChange={(e) => setBotToken(e.target.value)}
-                placeholder="Digite o token do seu bot"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="chatId" className="text-sm font-medium">
-                ID do Chat
-              </label>
-              <Input
-                id="chatId"
-                value={chatId}
-                onChange={(e) => setChatId(e.target.value)}
-                placeholder="Digite o ID do chat"
-              />
-            </div>
-
-            <Button onClick={handleSave} className="w-full">
-              Salvar Configurações
-            </Button>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+        <div>
+          <label className="block text-sm font-medium">Chat ID</label>
+          <Input
+            value={chatId}
+            onChange={(e) => setChatId(e.target.value)}
+            placeholder="Enter your chat ID"
+          />
+        </div>
+      </div>
+      <Button onClick={handleSave}>Save Configuration</Button>
+    </div>
   );
-}
+};

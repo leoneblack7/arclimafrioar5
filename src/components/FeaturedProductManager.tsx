@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { getFromStorage, saveToStorage } from '@/utils/storage';
-import { Product } from '@/types/storage';
+import { Product } from '@/types/product';
 
 export const FeaturedProductManager = () => {
   const [products, setProducts] = useState<Product[]>([]);

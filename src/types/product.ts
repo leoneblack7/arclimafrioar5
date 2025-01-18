@@ -10,8 +10,11 @@ export interface Product {
   is_images_active?: boolean;
   is_specifications_active?: boolean;
   is_featured?: boolean;
+  is_additional_images_active?: boolean;
+  is_related_products_active?: boolean;
+  additional_images?: string[];
+  related_product_ids?: string[];
   active?: boolean;
-  pixLink?: string;
   created_at?: string;
   updated_at?: string;
 }

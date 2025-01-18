@@ -1,4 +1,4 @@
-import { getFromStorage } from './storage';
+import { getFromStorage } from '@/utils/storage';
 
 export const sendTictoWebhookV2 = async (items: any[], customerData: any) => {
   try {

@@ -1,69 +1,41 @@
-import { useQuery } from "@tanstack/react-query";
-import { getFromLocalStorage } from "@/utils/localStorage";
-import { ProductCard } from "@/components/ProductCard";
-import { Product } from "@/types/product";
+import { useEffect, useState } from 'react';
+import { getFromStorage } from '@/utils/storage';
+import { Product } from '@/types/product';
 
 interface RelatedProductsProps {
-  currentProductId: string;
-  isActive?: boolean;
-  relatedProductIds?: string[];
+  productId: string;
 }
 
-export const RelatedProducts = ({ 
-  currentProductId, 
-  isActive = true,
-  relatedProductIds = []
-}: RelatedProductsProps) => {
-  const { data: relatedProducts } = useQuery({
-    queryKey: ["featured-products", relatedProductIds],
-    queryFn: async () => {
-      const products = getFromLocalStorage('featured-products', []);
-      
-      // If specific products are selected, show those
-      if (relatedProductIds.length > 0) {
-        return products
-          .filter((product: Product) => 
-            product.active && 
-            relatedProductIds.includes(product.id)
-          )
-          .slice(0, 3)
-          .map((item: Product) => ({
-            id: item.id,
-            title: item.title,
-            price: item.price,
-            image_url: item.image_url || '/placeholder.svg',
-            description: item.description,
-          }));
-      }
+export const RelatedProducts = ({ productId }: RelatedProductsProps) => {
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
-      // Otherwise, show random featured products
-      return products
-        .filter((product: Product) => 
-          product.active && 
-          product.id !== currentProductId
-        )
-        .slice(0, 3)
-        .map((item: Product) => ({
-          id: item.id,
-          title: item.title,
-          price: item.price,
-          image_url: item.image_url || '/placeholder.svg',
-          description: item.description,
-        }));
-    }
-  });
+  useEffect(() => {
+    const fetchRelatedProducts = async () => {
+      const products = await getFromStorage<Product[]>('products', []);
+      const filteredProducts = products.filter(product => product.related_product_ids?.includes(productId));
+      setRelatedProducts(filteredProducts);
+      setLoading(false);
+    };
 
-  if (!isActive || !relatedProducts?.length) return null;
+    fetchRelatedProducts();
+  }, [productId]);
+
+  if (loading) {
+    return <div>Loading related products...</div>;
+  }
 
   return (
-    <div className="border rounded-lg p-4 mb-6 w-full">
-      <h2 className="text-xl font-semibold mb-4 text-center">
-        Quem viu, também viu
-      </h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {relatedProducts.map((product) => (
-          <div key={product.id} className="transform hover:-translate-y-1 transition-transform duration-300">
-            <ProductCard {...product} />
+    <div>
+      <h2 className="text-xl font-bold">Related Products</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {relatedProducts.map(product => (
+          <div key={product.id} className="border rounded p-4">
+            <img src={product.image_url} alt={product.title} className="w-full h-32 object-cover mb-2" />
+            <h3 className="font-semibold">{product.title}</h3>
+            <p className="text-lg font-bold">
+              {product.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+            </p>
           </div>
         ))}
       </div>

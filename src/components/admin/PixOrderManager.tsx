@@ -1,80 +1,53 @@
-import { useState, useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { getFromLocalStorage } from "@/utils/localStorage";
-import { Badge } from "@/components/ui/badge";
+import { useEffect, useState } from 'react';
+import { getFromStorage } from '@/utils/storage';
+import { Order } from '@/types/storage';
 
 export const PixOrderManager = () => {
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const allOrders = getFromLocalStorage('orders', []);
-    const pixOrders = allOrders.filter((order: any) => order.payment_method === 'pix');
-    setOrders(pixOrders);
+    loadOrders();
   }, []);
 
-  const formatDate = (timestamp: number) => {
-    return new Date(timestamp).toLocaleString('pt-BR');
+  const loadOrders = async () => {
+    const loadedOrders = await getFromStorage<Order[]>('orders', []);
+    setOrders(loadedOrders);
+    setLoading(false);
   };
 
+  if (loading) {
+    return <div>Carregando...</div>;
+  }
+
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>Pedidos PIX</CardTitle>
-          <CardDescription>
-            Visualize todos os pedidos realizados via PIX
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Data</TableHead>
-                <TableHead>Produto</TableHead>
-                <TableHead>Cliente</TableHead>
-                <TableHead>Valor</TableHead>
-                <TableHead>Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {orders.map((order) => (
-                <TableRow key={order.id}>
-                  <TableCell>{formatDate(order.timestamp)}</TableCell>
-                  <TableCell>{order.product.title}</TableCell>
-                  <TableCell>{order.customer.name}</TableCell>
-                  <TableCell>
-                    {order.total.toLocaleString('pt-BR', {
-                      style: 'currency',
-                      currency: 'BRL'
-                    })}
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={order.status === 'paid' ? 'default' : 'secondary'}
-                    >
-                      {order.status === 'paid' ? 'Pago' : 'Pendente'}
-                    </Badge>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+    <div>
+      <h2 className="text-2xl font-bold mb-4">Gerenciar Pedidos PIX</h2>
+      <table className="min-w-full">
+        <thead>
+          <tr>
+            <th className="px-4 py-2">ID</th>
+            <th className="px-4 py-2">Cliente</th>
+            <th className="px-4 py-2">Total</th>
+            <th className="px-4 py-2">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {orders.map(order => (
+            <tr key={order.id}>
+              <td className="border px-4 py-2">{order.id}</td>
+              <td className="border px-4 py-2">{order.customer_data?.name}</td>
+              <td className="border px-4 py-2">
+                {order.total_amount.toLocaleString('pt-BR', {
+                  style: 'currency',
+                  currency: 'BRL'
+                })}
+              </td>
+              <td className="border px-4 py-2">{order.status}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
