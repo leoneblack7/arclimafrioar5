@@ -33,7 +33,8 @@ export interface UserData {
   id: string;
   name: string;
   email: string;
-  username?: string;
+  username: string;
+  password?: string;
   role?: string;
   created_at?: string;
   updated_at?: string;
@@ -82,4 +83,13 @@ export interface StoreConfig {
   theme_mode?: 'light' | 'dark';
   cart_data?: any[];
   apiKey?: string;
+}
+
+export interface TelegramConfig {
+  botToken: string;
+  chatId: string;
+}
+
+export interface TictoConfig {
+  apiKey: string;
 }

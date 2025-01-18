@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Product, Banner, Order, UserData, StoreConfig } from '@/types/storage';
+import { Product, Banner, Order, UserData, StoreConfig, TelegramConfig, TictoConfig } from '@/types/storage';
 
 class MysqlService {
   private baseUrl = '/api';
@@ -44,33 +44,58 @@ class MysqlService {
     return response.data;
   }
 
+  async saveBanner(banner: Banner): Promise<any> {
+    const response = await axios.post(`${this.baseUrl}/banners/update.php`, { banner });
+    return response.data;
+  }
+
   async deleteBanner(id: string): Promise<any> {
     const response = await axios.post(`${this.baseUrl}/banners/delete.php`, { id });
     return response.data;
   }
 
-  async savePixConfig(config: any): Promise<any> {
-    const response = await axios.post(`${this.baseUrl}/pix-config/update.php`, config);
+  async getOrders(): Promise<Order[]> {
+    const response = await axios.get(`${this.baseUrl}/orders/read.php`);
     return response.data;
   }
 
-  async getUsers(): Promise<UserData[]> {
-    const response = await axios.get(`${this.baseUrl}/users/read.php`);
-    return response.data;
-  }
-
-  async saveUser(user: UserData): Promise<any> {
-    if (user.id) {
-      const response = await axios.post(`${this.baseUrl}/users/update.php`, user);
+  async saveOrder(order: Order): Promise<any> {
+    if (order.id) {
+      const response = await axios.post(`${this.baseUrl}/orders/update.php`, order);
       return response.data;
     } else {
-      const response = await axios.post(`${this.baseUrl}/users/create.php`, user);
+      const response = await axios.post(`${this.baseUrl}/orders/create.php`, order);
       return response.data;
     }
   }
 
-  async deleteUser(id: string): Promise<any> {
-    const response = await axios.post(`${this.baseUrl}/users/delete.php`, { id });
+  async deleteOrder(id: string): Promise<any> {
+    const response = await axios.post(`${this.baseUrl}/orders/delete.php`, { id });
+    return response.data;
+  }
+
+  async getTelegramConfig(): Promise<TelegramConfig> {
+    const response = await axios.get(`${this.baseUrl}/store-config/get-telegram.php`);
+    return response.data;
+  }
+
+  async saveTelegramConfig(config: TelegramConfig): Promise<any> {
+    const response = await axios.post(`${this.baseUrl}/store-config/save-telegram.php`, config);
+    return response.data;
+  }
+
+  async getTictoConfig(): Promise<TictoConfig> {
+    const response = await axios.get(`${this.baseUrl}/store-config/get-ticto.php`);
+    return response.data;
+  }
+
+  async saveTictoConfig(config: TictoConfig): Promise<any> {
+    const response = await axios.post(`${this.baseUrl}/store-config/save-ticto.php`, config);
+    return response.data;
+  }
+
+  async savePixConfig(config: any): Promise<any> {
+    const response = await axios.post(`${this.baseUrl}/pix-config/update.php`, config);
     return response.data;
   }
 }
