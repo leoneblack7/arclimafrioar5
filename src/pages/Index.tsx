@@ -7,7 +7,7 @@ import { FeaturesSection } from "@/components/home/FeaturesSection";
 import { ProductsSection } from "@/components/home/ProductsSection";
 import { CTASection } from "@/components/home/CTASection";
 import { Footer } from "@/components/home/Footer";
-import { getFromLocalStorage } from "@/utils/localStorage";
+import { getFromStorage } from "@/utils/storage";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const Index = () => {
@@ -17,7 +17,7 @@ const Index = () => {
     queryKey: ["featured-products"],
     queryFn: async () => {
       console.log("Fetching featured products");
-      const storedProducts = getFromLocalStorage('featured-products', []);
+      const storedProducts = await getFromStorage('featured-products', []);
       console.log("Stored products:", storedProducts);
       return storedProducts
         .filter((item: any) => item.active)
