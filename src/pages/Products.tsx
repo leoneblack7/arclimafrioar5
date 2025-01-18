@@ -16,7 +16,7 @@ export default function Products() {
 
   const loadProducts = async () => {
     try {
-      const response = await getFromStorage<Product[]>('products', []);
+      const response = await getFromStorage<Product[] | string>('products', []);
       
       // Check if the response is valid JSON and not PHP code
       if (typeof response === 'string') {
