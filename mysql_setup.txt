@@ -1,0 +1,34 @@
+MySQL Setup Instructions:
+
+1. Start XAMPP and ensure Apache and MySQL are running
+2. Open phpMyAdmin: http://localhost/phpmyadmin
+3. Create a new database named 'arclimafrio'
+
+Database Configuration:
+- Host: localhost
+- Database: arclimafrio
+- Username: root
+- Password: (leave blank for default XAMPP setup)
+
+API Routes (use with localhost):
+
+Products:
+- GET    http://localhost/api/products/read.php
+- POST   http://localhost/api/products/create.php
+- PUT    http://localhost/api/products/update.php
+- DELETE http://localhost/api/products/delete.php
+
+Orders:
+- GET    http://localhost/api/orders/read.php
+- POST   http://localhost/api/orders/create.php
+- PUT    http://localhost/api/orders/update.php
+- DELETE http://localhost/api/orders/delete.php
+
+Cart:
+- GET    http://localhost/api/store-config/get-cart.php
+- POST   http://localhost/api/store-config/save-cart.php
+
+Important:
+1. Place the 'api' folder in your XAMPP htdocs directory
+2. Make sure PHP and MySQL are running in XAMPP
+3. Test the connection using the read.php endpoints first
