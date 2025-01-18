@@ -1,4 +1,5 @@
-import { ProductCard } from "@/components/ProductCard";
+import ProductCard from "@/components/ProductCard";
+import type { ProductCardProps } from "@/components/ProductCard";
 
 interface Product {
   id: number;
@@ -29,11 +30,7 @@ export const ProductsSection = ({ products, title, description }: ProductsSectio
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {products?.map((product) => (
             <div key={product.id} className="transform hover:-translate-y-1 transition-transform duration-300">
-              <ProductCard 
-                {...product}
-                specifications={product.specifications}
-                isSpecificationsActive={product.isSpecificationsActive}
-              />
+              <ProductCard product={product} />
             </div>
           ))}
         </div>

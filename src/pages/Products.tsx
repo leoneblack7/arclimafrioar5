@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ProductCard } from "@/components/ProductCard";
+import ProductCard from "@/components/ProductCard";
 import { SearchBar } from "@/components/SearchBar";
 import { Navbar } from "@/components/Navbar";
 import { getFromStorage } from "@/utils/storage";

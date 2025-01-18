@@ -13,7 +13,7 @@ export interface ProductCardProps {
   };
 }
 
-const ProductCard = ({ product }: ProductCardProps) => {
+export const ProductCard = ({ product }: ProductCardProps) => {
   return (
     <div className="border rounded-lg p-4">
       <img src={product.image} alt={product.title} className="w-full h-48 object-cover rounded" />
