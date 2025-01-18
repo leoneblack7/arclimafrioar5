@@ -1,35 +1,75 @@
-import { toast } from "sonner";
+import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost/api';
+const API_URL = 'http://localhost/api';
 
 export const mysqlService = {
-  // Store settings operations
   async getStoreSettings() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/store-config/read.php`);
-      if (!response.ok) throw new Error('Failed to fetch store settings');
-      return await response.json();
-    } catch (error) {
-      console.error('Error fetching store settings:', error);
-      toast.error("Erro ao carregar configurações da loja");
-      return null;
-    }
+    const response = await axios.get(`${API_URL}/store-config/read.php`);
+    return response.data;
   },
 
   async saveStoreSettings(settings: any) {
-    try {
-      const response = await fetch(`${API_BASE_URL}/store-config/update.php`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(settings)
-      });
-      
-      if (!response.ok) throw new Error('Failed to save store settings');
-      return await response.json();
-    } catch (error) {
-      console.error('Error saving store settings:', error);
-      toast.error("Erro ao salvar configurações da loja");
-      throw error;
+    const response = await axios.post(`${API_URL}/store-config/update.php`, settings);
+    return response.data;
+  },
+
+  async getProducts() {
+    const response = await axios.get(`${API_URL}/products/read.php`);
+    return response.data;
+  },
+
+  async saveProduct(product: any) {
+    if (product.id) {
+      const response = await axios.post(`${API_URL}/products/update.php`, product);
+      return response.data;
+    } else {
+      const response = await axios.post(`${API_URL}/products/create.php`, product);
+      return response.data;
     }
+  },
+
+  async deleteProduct(id: string) {
+    const response = await axios.post(`${API_URL}/products/delete.php`, { id });
+    return response.data;
+  },
+
+  async getOrders() {
+    const response = await axios.get(`${API_URL}/orders/read.php`);
+    return response.data;
+  },
+
+  async saveOrder(order: any) {
+    if (order.id) {
+      const response = await axios.post(`${API_URL}/orders/update.php`, order);
+      return response.data;
+    } else {
+      const response = await axios.post(`${API_URL}/orders/create.php`, order);
+      return response.data;
+    }
+  },
+
+  async deleteOrder(id: string) {
+    const response = await axios.post(`${API_URL}/orders/delete.php`, { id });
+    return response.data;
+  },
+
+  async getUsers() {
+    const response = await axios.get(`${API_URL}/users/read.php`);
+    return response.data;
+  },
+
+  async saveUser(user: any) {
+    if (user.id) {
+      const response = await axios.post(`${API_URL}/users/update.php`, user);
+      return response.data;
+    } else {
+      const response = await axios.post(`${API_URL}/users/create.php`, user);
+      return response.data;
+    }
+  },
+
+  async deleteUser(id: string) {
+    const response = await axios.post(`${API_URL}/users/delete.php`, { id });
+    return response.data;
   }
 };

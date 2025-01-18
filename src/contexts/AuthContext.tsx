@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { getFromLocalStorage, saveToLocalStorage } from "@/utils/localStorage";
+import { mysqlService } from "@/utils/mysqlService";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -20,14 +20,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const token = localStorage.getItem("auth_token");
     const lastLogin = localStorage.getItem("last_login");
-    const savedUsername = getFromLocalStorage("current_username", "leone");
-    
-    setCurrentUsername(savedUsername);
     
     if (token && lastLogin) {
       const lastLoginTime = new Date(lastLogin).getTime();
       const currentTime = new Date().getTime();
-      const timeElapsed = currentTime - lastLoginTime;
       const hoursElapsed = timeElapsed / (1000 * 60 * 60);
       
       if (hoursElapsed < 24) {
@@ -43,71 +39,61 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = async (username: string, password: string) => {
-    // Always allow leone/2601
-    if (username === "leone" && password === "2601") {
-      localStorage.setItem("auth_token", "admin_token");
-      localStorage.setItem("last_login", new Date().toISOString());
-      setIsAuthenticated(true);
-      setCurrentUsername(username);
-      saveToLocalStorage("current_username", username);
+    try {
+      const response = await mysqlService.saveUser({ username, password });
+      
+      if (response.success) {
+        localStorage.setItem("auth_token", "admin_token");
+        localStorage.setItem("last_login", new Date().toISOString());
+        setIsAuthenticated(true);
+        setCurrentUsername(username);
+        toast({
+          title: "Login realizado com sucesso!",
+          description: "Bem-vindo ao painel administrativo.",
+        });
+        return true;
+      }
+      
       toast({
-        title: "Login realizado com sucesso!",
-        description: "Bem-vindo ao painel administrativo.",
+        variant: "destructive",
+        title: "Erro no login",
+        description: "Usuário ou senha incorretos.",
       });
-      return true;
-    }
-    
-    // Check additional users
-    const additionalUsers = getFromLocalStorage('additional_users', []);
-    const user = additionalUsers.find((u: any) => u.username === username && u.password === password);
-    
-    if (user) {
-      localStorage.setItem("auth_token", "admin_token");
-      localStorage.setItem("last_login", new Date().toISOString());
-      setIsAuthenticated(true);
-      setCurrentUsername(username);
-      saveToLocalStorage("current_username", username);
+      return false;
+    } catch (error) {
       toast({
-        title: "Login realizado com sucesso!",
-        description: "Bem-vindo ao painel administrativo.",
+        variant: "destructive",
+        title: "Erro no login",
+        description: "Erro ao tentar fazer login.",
       });
-      return true;
+      return false;
     }
-    
-    toast({
-      variant: "destructive",
-      title: "Erro no login",
-      description: "Usuário ou senha incorretos.",
-    });
-    return false;
   };
 
-  const changeUsername = (oldUsername: string, newUsername: string) => {
-    if (oldUsername === "leone") {
+  const changeUsername = async (oldUsername: string, newUsername: string) => {
+    try {
+      const response = await mysqlService.saveUser({
+        username: oldUsername,
+        newUsername: newUsername
+      });
+
+      if (response.success) {
+        if (currentUsername === oldUsername) {
+          setCurrentUsername(newUsername);
+        }
+        
+        toast({
+          title: "Usuário alterado com sucesso!",
+          description: `Nome de usuário alterado de ${oldUsername} para ${newUsername}.`,
+        });
+      }
+    } catch (error) {
       toast({
         variant: "destructive",
         title: "Erro na alteração",
-        description: "Não é possível alterar o usuário padrão 'leone'.",
+        description: "Não foi possível alterar o usuário.",
       });
-      return;
     }
-
-    const additionalUsers = getFromLocalStorage('additional_users', []);
-    const updatedUsers = additionalUsers.map((user: any) => 
-      user.username === oldUsername ? { ...user, username: newUsername } : user
-    );
-    
-    saveToLocalStorage('additional_users', updatedUsers);
-    
-    if (currentUsername === oldUsername) {
-      setCurrentUsername(newUsername);
-      saveToLocalStorage("current_username", newUsername);
-    }
-    
-    toast({
-      title: "Usuário alterado com sucesso!",
-      description: `Nome de usuário alterado de ${oldUsername} para ${newUsername}.`,
-    });
   };
 
   const logout = () => {
