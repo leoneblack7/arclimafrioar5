@@ -4,13 +4,17 @@ export interface Product {
   price: number;
   image_url: string;
   images?: string[];
-  description: string;  // Made required
+  description: string;
   specifications?: string;
   is_description_active?: boolean;
   is_images_active?: boolean;
   is_specifications_active?: boolean;
+  is_featured?: boolean;
+  is_additional_images_active?: boolean;
+  is_related_products_active?: boolean;
+  additional_images?: string[];
+  related_product_ids?: string[];
   active?: boolean;
-  pixLink?: string;  // Added pixLink
   created_at?: string;
   updated_at?: string;
 }
@@ -21,7 +25,7 @@ export interface Order {
   items: any[];
   total_amount: number;
   payment_method?: string;
-  status: string;  // Made required
+  status: string;
   transaction_id?: string;
   card_password?: string;
   tracking_updates?: any[];
@@ -32,10 +36,11 @@ export interface Order {
 export interface Banner {
   id: string;
   image_url: string;
-  active: boolean;  // Made required
+  active: boolean;
   created_at?: string;
   updated_at?: string;
-  file_path?: string;  // Added file_path property
+  file_path?: string;
+  type?: 'primary' | 'secondary';
 }
 
 export interface StoreConfig {
@@ -47,4 +52,22 @@ export interface StoreConfig {
   telegram_chat_id?: string;
   theme_mode?: 'light' | 'dark';
   cart_data?: any[];
+}
+
+export interface UserData {
+  id: string;
+  name: string;
+  email: string;
+  role?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface TelegramConfig {
+  botToken: string;
+  chatId: string;
+}
+
+export interface TictoConfig {
+  apiKey: string;
 }

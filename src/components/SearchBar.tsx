@@ -1,14 +1,16 @@
 import { useState } from "react";
 
 interface SearchBarProps {
-  onSearch: (term: string) => void;
+  onSearch?: (term: string) => void;
 }
 
-export const SearchBar = ({ onSearch }: SearchBarProps) => {
+export const SearchBar = ({ onSearch }: SearchBarProps = {}) => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const handleSearch = () => {
-    onSearch(searchTerm);
+    if (onSearch) {
+      onSearch(searchTerm);
+    }
   };
 
   return (
