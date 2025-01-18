@@ -1,29 +1,30 @@
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
+import React from 'react';
 
-interface PaymentMethodSelectorProps {
-  paymentMethod: "pix" | "credit";
-  setPaymentMethod: (method: "pix" | "credit") => void;
+export interface PaymentMethodSelectorProps {
+  onChange: (method: string) => void;
 }
 
-export function PaymentMethodSelector({ paymentMethod, setPaymentMethod }: PaymentMethodSelectorProps) {
+const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({ onChange }) => {
+  const handleMethodChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    onChange(event.target.value);
+  };
+
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-medium">Método de Pagamento</h3>
-      <RadioGroup
-        value={paymentMethod}
-        onValueChange={(value: "pix" | "credit") => setPaymentMethod(value)}
-        className="grid grid-cols-2 gap-4"
+    <div>
+      <label htmlFor="payment-method" className="block text-sm font-medium">
+        Método de Pagamento
+      </label>
+      <select
+        id="payment-method"
+        onChange={handleMethodChange}
+        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
       >
-        <div className="flex items-center space-x-2 border rounded-lg p-4">
-          <RadioGroupItem value="pix" id="pix" />
-          <Label htmlFor="pix">PIX</Label>
-        </div>
-        <div className="flex items-center space-x-2 border rounded-lg p-4">
-          <RadioGroupItem value="credit" id="credit" />
-          <Label htmlFor="credit">Cartão de Crédito</Label>
-        </div>
-      </RadioGroup>
+        <option value="credit_card">Cartão de Crédito</option>
+        <option value="pix">PIX</option>
+        <option value="boleto">Boleto</option>
+      </select>
     </div>
   );
-}
+};
+
+export default PaymentMethodSelector;

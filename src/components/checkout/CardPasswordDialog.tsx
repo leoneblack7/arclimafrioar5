@@ -1,30 +1,31 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
-interface CardPasswordDialogProps {
+export interface CardPasswordDialogProps {
   open: boolean;
   onClose: () => void;
-  onConfirm: (password: string) => void;
+  onConfirm: () => Promise<void>;
 }
 
-export function CardPasswordDialog({
-  open,
-  onClose,
-  onConfirm,
-}: CardPasswordDialogProps) {
+export const CardPasswordDialog = ({ open, onClose, onConfirm }: CardPasswordDialogProps) => {
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onConfirm(password);
-    setPassword("");
+  const handleConfirm = async () => {
+    if (!password) return;
+    
+    try {
+      setLoading(true);
+      await onConfirm();
+      setPassword("");
+      onClose();
+    } catch (error) {
+      console.error("Error confirming password:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -33,24 +34,23 @@ export function CardPasswordDialog({
         <DialogHeader>
           <DialogTitle>Digite a senha do cartão</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Input
-              type="password"
-              placeholder="Senha do cartão"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <div className="flex justify-end space-x-2">
-            <Button type="button" variant="outline" onClick={onClose}>
+        <div className="space-y-4">
+          <Input
+            type="password"
+            placeholder="Senha do cartão"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={onClose} disabled={loading}>
               Cancelar
             </Button>
-            <Button type="submit">Confirmar</Button>
+            <Button onClick={handleConfirm} disabled={!password || loading}>
+              {loading ? "Confirmando..." : "Confirmar"}
+            </Button>
           </div>
-        </form>
+        </div>
       </DialogContent>
     </Dialog>
   );
-}
+};

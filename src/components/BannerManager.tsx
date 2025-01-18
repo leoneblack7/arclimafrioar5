@@ -2,6 +2,8 @@ import { BannerUploader } from "./banner/BannerUploader";
 import { BannerCard } from "./banner/BannerCard";
 import { useBannerManager } from "@/hooks/useBannerManager";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { v4 as uuidv4 } from 'uuid';
+import { Banner } from "@/types/storage";
 
 export const BannerManager = () => {
   const { 
@@ -15,6 +17,26 @@ export const BannerManager = () => {
     handleToggleSecondaryActive
   } = useBannerManager();
 
+  const handlePrimaryUpload = (base64String: string) => {
+    const newBanner: Banner = {
+      id: uuidv4(),
+      image_url: base64String,
+      active: true,
+      type: 'primary'
+    };
+    handleAddBanner(newBanner);
+  };
+
+  const handleSecondaryUpload = (base64String: string) => {
+    const newBanner: Banner = {
+      id: uuidv4(),
+      image_url: base64String,
+      active: true,
+      type: 'secondary'
+    };
+    handleAddSecondaryBanner(newBanner);
+  };
+
   return (
     <div className="space-y-4">
       <h2 className="text-2xl font-bold">Gerenciar Banners</h2>
@@ -25,7 +47,7 @@ export const BannerManager = () => {
         </TabsList>
         
         <TabsContent value="main">
-          <BannerUploader onUploadSuccess={handleAddBanner} />
+          <BannerUploader onUploadSuccess={handlePrimaryUpload} />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
             {banners.map((banner) => (
               <BannerCard
@@ -41,7 +63,7 @@ export const BannerManager = () => {
         </TabsContent>
 
         <TabsContent value="secondary">
-          <BannerUploader onUploadSuccess={handleAddSecondaryBanner} />
+          <BannerUploader onUploadSuccess={handleSecondaryUpload} />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
             {secondaryBanners.map((banner) => (
               <BannerCard

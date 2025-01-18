@@ -1,131 +1,106 @@
-import { Input } from "@/components/ui/input";
-import { useState, useEffect } from "react";
-import { toast } from "@/components/ui/use-toast";
+import React, { useState } from 'react';
 
-interface CustomerFormData {
-  name: string;
-  cpf: string;
-  email: string;
-  phone: string;
-  address: string;
-  city: string;
-  state: string;
-  zipCode: string;
+export interface CustomerFormProps {
+  onChange: (data: any) => void;
 }
 
-interface CustomerFormProps {
-  formData: CustomerFormData;
-  setFormData: (data: CustomerFormData) => void;
-}
+const CustomerForm: React.FC<CustomerFormProps> = ({ onChange }) => {
+  const [customerData, setCustomerData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    state: '',
+    zipCode: '',
+  });
 
-export function CustomerForm({ formData, setFormData }: CustomerFormProps) {
-  const [isFormComplete, setIsFormComplete] = useState(false);
-
-  useEffect(() => {
-    const allFieldsFilled = Object.values(formData).every(value => value.trim() !== "");
-    
-    if (allFieldsFilled && !isFormComplete) {
-      setIsFormComplete(true);
-      toast({
-        title: "Entrega Grátis!",
-        description: "Sua entrega será feita por transportadora sem custo adicional. Prazo estimado: 15 dias úteis.",
-        duration: 5000,
-      });
-    }
-  }, [formData, isFormComplete]);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setCustomerData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+    onChange({ ...customerData, [name]: value });
+  };
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <label htmlFor="name">Nome Completo</label>
-          <Input
-            id="name"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            placeholder="João Silva Santos"
-            required
+    <div>
+      <h2 className="text-2xl font-bold">Customer Information</h2>
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium">Name</label>
+          <input
+            type="text"
+            name="name"
+            value={customerData.name}
+            onChange={handleChange}
+            className="mt-1 block w-full border rounded-md"
           />
         </div>
-        <div className="space-y-2">
-          <label htmlFor="cpf">CPF</label>
-          <Input
-            id="cpf"
-            value={formData.cpf}
-            onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
-            placeholder="123.456.789-00"
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <label htmlFor="email">Email</label>
-          <Input
-            id="email"
+        <div>
+          <label className="block text-sm font-medium">Email</label>
+          <input
             type="email"
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            placeholder="joao.silva@email.com"
-            required
+            name="email"
+            value={customerData.email}
+            onChange={handleChange}
+            className="mt-1 block w-full border rounded-md"
           />
         </div>
-        <div className="space-y-2">
-          <label htmlFor="phone">Telefone</label>
-          <Input
-            id="phone"
-            value={formData.phone}
-            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-            placeholder="(11) 98765-4321"
-            required
+        <div>
+          <label className="block text-sm font-medium">Phone</label>
+          <input
+            type="tel"
+            name="phone"
+            value={customerData.phone}
+            onChange={handleChange}
+            className="mt-1 block w-full border rounded-md"
           />
         </div>
-        <div className="space-y-2">
-          <label htmlFor="address">Endereço</label>
-          <Input
-            id="address"
-            value={formData.address}
-            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-            placeholder="Rua das Flores, 123"
-            required
+        <div>
+          <label className="block text-sm font-medium">Address</label>
+          <input
+            type="text"
+            name="address"
+            value={customerData.address}
+            onChange={handleChange}
+            className="mt-1 block w-full border rounded-md"
           />
         </div>
-        <div className="space-y-2">
-          <label htmlFor="city">Cidade</label>
-          <Input
-            id="city"
-            value={formData.city}
-            onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-            placeholder="São Paulo"
-            required
+        <div>
+          <label className="block text-sm font-medium">City</label>
+          <input
+            type="text"
+            name="city"
+            value={customerData.city}
+            onChange={handleChange}
+            className="mt-1 block w-full border rounded-md"
           />
         </div>
-        <div className="space-y-2">
-          <label htmlFor="state">Estado</label>
-          <Input
-            id="state"
-            value={formData.state}
-            onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-            placeholder="SP"
-            required
+        <div>
+          <label className="block text-sm font-medium">State</label>
+          <input
+            type="text"
+            name="state"
+            value={customerData.state}
+            onChange={handleChange}
+            className="mt-1 block w-full border rounded-md"
           />
         </div>
-        <div className="space-y-2">
-          <label htmlFor="zipCode">CEP</label>
-          <Input
-            id="zipCode"
-            value={formData.zipCode}
-            onChange={(e) => setFormData({ ...formData, zipCode: e.target.value })}
-            placeholder="12345-678"
-            required
+        <div>
+          <label className="block text-sm font-medium">Zip Code</label>
+          <input
+            type="text"
+            name="zipCode"
+            value={customerData.zipCode}
+            onChange={handleChange}
+            className="mt-1 block w-full border rounded-md"
           />
         </div>
       </div>
-      {isFormComplete && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-4">
-          <p className="text-green-700 text-sm">
-            ✨ Entrega grátis por transportadora! Prazo estimado: 15 dias úteis
-          </p>
-        </div>
-      )}
     </div>
   );
-}
+};
+
+export default CustomerForm;
