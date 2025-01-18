@@ -17,6 +17,15 @@ export default function Products() {
   const loadProducts = async () => {
     try {
       const loadedProducts = await getFromStorage<Product[]>('products', []);
+      
+      // Check if the response is valid JSON and an array
+      if (typeof loadedProducts === 'string' && loadedProducts.includes('<?php')) {
+        console.error('Invalid API response:', loadedProducts);
+        setProducts([]);
+        setFilteredProducts([]);
+        return;
+      }
+
       if (Array.isArray(loadedProducts)) {
         setProducts(loadedProducts);
         setFilteredProducts(loadedProducts);
