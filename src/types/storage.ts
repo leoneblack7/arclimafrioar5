@@ -33,6 +33,7 @@ export interface UserData {
   id: string;
   name: string;
   email: string;
+  username?: string;
   role?: string;
   created_at?: string;
   updated_at?: string;
@@ -51,6 +52,7 @@ export interface Order {
     city?: string;
     state?: string;
     zipCode?: string;
+    document?: string;
   };
   items: OrderItem[];
   payment_method?: string;
@@ -70,15 +72,6 @@ export interface OrderItem {
   created_at?: string;
 }
 
-export interface TelegramConfig {
-  botToken: string;
-  chatId: string;
-}
-
-export interface TictoConfig {
-  apiKey: string;
-}
-
 export interface StoreConfig {
   logo_url?: string;
   store_name?: string;
@@ -88,4 +81,5 @@ export interface StoreConfig {
   telegram_chat_id?: string;
   theme_mode?: 'light' | 'dark';
   cart_data?: any[];
+  apiKey?: string;
 }

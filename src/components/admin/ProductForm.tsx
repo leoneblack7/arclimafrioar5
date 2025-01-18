@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Product } from "@/types/product";
+import { Product } from "@/types/storage";
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ImageUploader } from "./product-form/ImageUploader";
@@ -19,13 +19,13 @@ export const ProductForm = ({ product, onSave, onCancel }: ProductFormProps) => 
   const [formData, setFormData] = useState<Product>({
     ...product,
     images: product.images || [product.image_url],
-    additionalImages: product.additionalImages || [],
-    isDescriptionActive: product.isDescriptionActive ?? true,
-    isImagesActive: product.isImagesActive ?? true,
-    isSpecificationsActive: product.isSpecificationsActive ?? true,
-    isAdditionalImagesActive: product.isAdditionalImagesActive ?? true,
-    isRelatedProductsActive: product.isRelatedProductsActive ?? true,
-    relatedProductIds: product.relatedProductIds || [],
+    additional_images: product.additional_images || [],
+    is_description_active: product.is_description_active ?? true,
+    is_images_active: product.is_images_active ?? true,
+    is_specifications_active: product.is_specifications_active ?? true,
+    is_additional_images_active: product.is_additional_images_active ?? true,
+    is_related_products_active: product.is_related_products_active ?? true,
+    related_product_ids: product.related_product_ids || [],
     specifications: product.specifications || "",
   });
 
@@ -35,7 +35,7 @@ export const ProductForm = ({ product, onSave, onCancel }: ProductFormProps) => 
       ...formData,
       image_url: formData.images[0] || '/placeholder.svg',
       images: formData.images.filter(Boolean),
-      additionalImages: formData.additionalImages.filter(Boolean)
+      additional_images: formData.additional_images.filter(Boolean)
     });
   };
 
@@ -67,54 +67,54 @@ export const ProductForm = ({ product, onSave, onCancel }: ProductFormProps) => 
 
           <DescriptionEditor
             description={formData.description}
-            isActive={formData.isDescriptionActive}
+            isActive={formData.is_description_active}
             onDescriptionChange={(description) => setFormData({ ...formData, description })}
-            onActiveChange={(isDescriptionActive) => setFormData({ ...formData, isDescriptionActive })}
+            onActiveChange={(is_description_active) => setFormData({ ...formData, is_description_active })}
           />
 
           <ImageUploader
             images={formData.images}
-            isActive={formData.isImagesActive}
+            isActive={formData.is_images_active}
             onImagesChange={(images) => setFormData({
               ...formData,
               images,
               image_url: images[0] || '/placeholder.svg'
             })}
-            onActiveChange={(isImagesActive) => setFormData({ ...formData, isImagesActive })}
+            onActiveChange={(is_images_active) => setFormData({ ...formData, is_images_active })}
           />
 
           <SpecificationsEditor
             specifications={formData.specifications}
-            isActive={formData.isSpecificationsActive}
+            isActive={formData.is_specifications_active}
             onSpecificationsChange={(specifications) => 
               setFormData({ ...formData, specifications })
             }
-            onActiveChange={(isSpecificationsActive) => 
-              setFormData({ ...formData, isSpecificationsActive })
+            onActiveChange={(is_specifications_active) => 
+              setFormData({ ...formData, is_specifications_active })
             }
           />
 
           <RelatedProductsEditor
-            relatedProductIds={formData.relatedProductIds}
-            isActive={formData.isRelatedProductsActive}
-            onRelatedProductsChange={(relatedProductIds) => 
-              setFormData({ ...formData, relatedProductIds })
+            relatedProductIds={formData.related_product_ids}
+            isActive={formData.is_related_products_active}
+            onRelatedProductsChange={(related_product_ids) => 
+              setFormData({ ...formData, related_product_ids })
             }
-            onActiveChange={(isRelatedProductsActive) => 
-              setFormData({ ...formData, isRelatedProductsActive })
+            onActiveChange={(is_related_products_active) => 
+              setFormData({ ...formData, is_related_products_active })
             }
           />
 
           <ImageUploader
             title="Imagens Adicionais"
-            images={formData.additionalImages || []}
-            isActive={formData.isAdditionalImagesActive}
-            onImagesChange={(additionalImages) => setFormData({
+            images={formData.additional_images || []}
+            isActive={formData.is_additional_images_active}
+            onImagesChange={(additional_images) => setFormData({
               ...formData,
-              additionalImages
+              additional_images
             })}
-            onActiveChange={(isAdditionalImagesActive) => 
-              setFormData({ ...formData, isAdditionalImagesActive })
+            onActiveChange={(is_additional_images_active) => 
+              setFormData({ ...formData, is_additional_images_active })
             }
           />
 
