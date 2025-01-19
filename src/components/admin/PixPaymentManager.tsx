@@ -18,16 +18,27 @@ export const PixPaymentManager = () => {
     try {
       setLoading(true);
       const response = await mysqlService.getOrders();
+      console.log('Orders response:', response); // Debug log
+      
+      // Ensure we have a valid array response
+      if (!response) {
+        setOrders([]);
+        return;
+      }
+
+      // Parse the response if it's a string
+      const parsedResponse = typeof response === 'string' ? JSON.parse(response) : response;
       
       // Filter only PIX orders and ensure we have an array
-      const pixOrders = Array.isArray(response) 
-        ? response.filter(order => order.payment_method === 'pix')
+      const pixOrders = Array.isArray(parsedResponse) 
+        ? parsedResponse.filter(order => order.payment_method === 'pix')
         : [];
       
       setOrders(pixOrders);
     } catch (error) {
       console.error('Error loading orders:', error);
       toast.error('Erro ao carregar pedidos PIX');
+      setOrders([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
@@ -41,7 +52,7 @@ export const PixPaymentManager = () => {
     );
   }
 
-  if (orders.length === 0) {
+  if (!Array.isArray(orders) || orders.length === 0) {
     return (
       <Card className="p-6">
         <p className="text-center text-muted-foreground">
