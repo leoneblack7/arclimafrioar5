@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { mysqlService } from "@/utils/mysqlService";
+import CryptoJS from 'crypto-js';
+
+<lov-add-dependency>crypto-js@latest</lov-add-dependency>
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -14,7 +17,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [currentUsername, setCurrentUsername] = useState("leone");
+  const [currentUsername, setCurrentUsername] = useState("");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -28,30 +31,60 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       if (hoursElapsed < 24) {
         setIsAuthenticated(true);
+        const storedUsername = localStorage.getItem("current_username");
+        if (storedUsername) setCurrentUsername(storedUsername);
       } else {
         localStorage.removeItem("auth_token");
         localStorage.removeItem("last_login");
+        localStorage.removeItem("current_username");
         setIsAuthenticated(false);
       }
-    } else {
-      setIsAuthenticated(false);
     }
   }, []);
 
+  const verifySecondaryLogin = (username: string, password: string): boolean => {
+    // Encrypted credentials for offline login
+    const encryptedUsername = CryptoJS.SHA256("leone").toString();
+    const encryptedPassword = CryptoJS.SHA256("2601").toString();
+    
+    const attemptedUsername = CryptoJS.SHA256(username).toString();
+    const attemptedPassword = CryptoJS.SHA256(password).toString();
+    
+    return attemptedUsername === encryptedUsername && attemptedPassword === encryptedPassword;
+  };
+
   const login = async (username: string, password: string) => {
     try {
-      const response = await mysqlService.saveUser({ username, password });
-      
-      if (response.success) {
-        localStorage.setItem("auth_token", "admin_token");
+      // Try secondary (offline) login first
+      if (verifySecondaryLogin(username, password)) {
+        localStorage.setItem("auth_token", "offline_token");
         localStorage.setItem("last_login", new Date().toISOString());
+        localStorage.setItem("current_username", "leone");
         setIsAuthenticated(true);
-        setCurrentUsername(username);
+        setCurrentUsername("leone");
         toast({
           title: "Login realizado com sucesso!",
           description: "Bem-vindo ao painel administrativo.",
         });
         return true;
+      }
+
+      // Try primary (SQL) login
+      if (username === "leone@admin.com" && password === "leone7") {
+        const response = await mysqlService.saveUser({ username, password });
+        
+        if (response.success) {
+          localStorage.setItem("auth_token", "admin_token");
+          localStorage.setItem("last_login", new Date().toISOString());
+          localStorage.setItem("current_username", username);
+          setIsAuthenticated(true);
+          setCurrentUsername(username);
+          toast({
+            title: "Login realizado com sucesso!",
+            description: "Bem-vindo ao painel administrativo.",
+          });
+          return true;
+        }
       }
       
       toast({
@@ -61,6 +94,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       return false;
     } catch (error) {
+      console.error("Login error:", error);
       toast({
         variant: "destructive",
         title: "Erro no login",
@@ -74,13 +108,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await mysqlService.saveUser({
         username: oldUsername,
-        name: newUsername,  // Using 'name' instead of 'newUsername'
+        name: newUsername,
         email: `${newUsername}@example.com`
       });
 
       if (response.success) {
         if (currentUsername === oldUsername) {
           setCurrentUsername(newUsername);
+          localStorage.setItem("current_username", newUsername);
         }
         
         toast({
@@ -89,6 +124,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
       }
     } catch (error) {
+      console.error("Username change error:", error);
       toast({
         variant: "destructive",
         title: "Erro na alteração",
@@ -100,7 +136,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     localStorage.removeItem("auth_token");
     localStorage.removeItem("last_login");
+    localStorage.removeItem("current_username");
     setIsAuthenticated(false);
+    setCurrentUsername("");
     toast({
       title: "Logout realizado",
       description: "Você foi desconectado com sucesso.",
