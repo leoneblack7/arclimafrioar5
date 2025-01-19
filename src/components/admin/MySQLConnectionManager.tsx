@@ -1,12 +1,29 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, Database } from "lucide-react";
 import axios from "axios";
+
+interface MySQLConfig {
+  host: string;
+  database: string;
+  username: string;
+  password: string;
+  port: string;
+}
 
 export const MySQLConnectionManager = () => {
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isChecking, setIsChecking] = useState<boolean>(true);
+  const [config, setConfig] = useState<MySQLConfig>({
+    host: 'localhost',
+    database: 'arclimafrio',
+    username: 'root',
+    password: '',
+    port: '3306'
+  });
 
   const checkConnection = async () => {
     setIsChecking(true);
@@ -26,30 +43,58 @@ export const MySQLConnectionManager = () => {
     }
   };
 
+  const saveConfig = async () => {
+    try {
+      const response = await axios.post('/api/config/save-mysql-config.php', config);
+      if (response.data.success) {
+        toast.success("Configurações do MySQL salvas com sucesso!");
+        checkConnection();
+      } else {
+        toast.error("Erro ao salvar configurações do MySQL");
+      }
+    } catch (error) {
+      toast.error("Erro ao salvar configurações");
+    }
+  };
+
+  const loadConfig = async () => {
+    try {
+      const response = await axios.get('/api/config/get-mysql-config.php');
+      if (response.data) {
+        setConfig(response.data);
+      }
+    } catch (error) {
+      console.error('Error loading MySQL config:', error);
+    }
+  };
+
   useEffect(() => {
+    loadConfig();
     checkConnection();
   }, []);
 
   return (
-    <div className="space-y-4 p-6 bg-card rounded-lg border border-border">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Conexão MySQL</h2>
-        <div className="flex items-center gap-2">
-          {isConnected ? (
-            <CheckCircle2 className="w-5 h-5 text-green-500" />
-          ) : (
-            <AlertCircle className="w-5 h-5 text-red-500" />
-          )}
-          <span className={isConnected ? "text-green-500" : "text-red-500"}>
-            {isConnected ? "Conectado" : "Desconectado"}
-          </span>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between p-6 bg-card rounded-lg border border-border">
+        <div className="space-y-1">
+          <h2 className="text-2xl font-bold flex items-center gap-2">
+            <Database className="w-6 h-6" />
+            Conexão MySQL
+          </h2>
+          <div className="flex items-center gap-2 text-sm">
+            {isConnected ? (
+              <>
+                <CheckCircle2 className="w-4 h-4 text-green-500" />
+                <span className="text-green-500">Conectado</span>
+              </>
+            ) : (
+              <>
+                <AlertCircle className="w-4 h-4 text-red-500" />
+                <span className="text-red-500">Desconectado</span>
+              </>
+            )}
+          </div>
         </div>
-      </div>
-
-      <div className="space-y-2">
-        <p className="text-muted-foreground">
-          Status da conexão com o banco de dados MySQL
-        </p>
         <Button 
           onClick={checkConnection} 
           disabled={isChecking}
@@ -59,12 +104,74 @@ export const MySQLConnectionManager = () => {
         </Button>
       </div>
 
-      <div className="mt-4 text-sm text-muted-foreground">
-        <p>Configurações atuais:</p>
-        <ul className="list-disc list-inside mt-2 space-y-1">
-          <li>Host: localhost</li>
-          <li>Database: arclimafrio</li>
-          <li>User: root</li>
+      <div className="grid gap-6 p-6 bg-card rounded-lg border border-border">
+        <h3 className="text-lg font-semibold">Configurações de Conexão</h3>
+        
+        <div className="grid gap-4">
+          <div className="grid gap-2">
+            <Label htmlFor="host">Host</Label>
+            <Input
+              id="host"
+              value={config.host}
+              onChange={(e) => setConfig({ ...config, host: e.target.value })}
+              placeholder="localhost"
+            />
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="port">Porta</Label>
+            <Input
+              id="port"
+              value={config.port}
+              onChange={(e) => setConfig({ ...config, port: e.target.value })}
+              placeholder="3306"
+            />
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="database">Nome do Banco</Label>
+            <Input
+              id="database"
+              value={config.database}
+              onChange={(e) => setConfig({ ...config, database: e.target.value })}
+              placeholder="arclimafrio"
+            />
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="username">Usuário</Label>
+            <Input
+              id="username"
+              value={config.username}
+              onChange={(e) => setConfig({ ...config, username: e.target.value })}
+              placeholder="root"
+            />
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="password">Senha</Label>
+            <Input
+              id="password"
+              type="password"
+              value={config.password}
+              onChange={(e) => setConfig({ ...config, password: e.target.value })}
+              placeholder="Digite a senha do MySQL"
+            />
+          </div>
+        </div>
+
+        <Button onClick={saveConfig} className="w-full">
+          Salvar Configurações
+        </Button>
+      </div>
+
+      <div className="text-sm text-muted-foreground">
+        <p className="font-semibold mb-2">Dicas de Conexão:</p>
+        <ul className="list-disc list-inside space-y-1">
+          <li>Para XAMPP: Use localhost como host e root como usuário (senha geralmente vazia)</li>
+          <li>Para aapanel: Use o host do seu servidor e as credenciais fornecidas</li>
+          <li>A porta padrão do MySQL é 3306</li>
+          <li>Certifique-se que o servidor MySQL está rodando antes de testar a conexão</li>
         </ul>
       </div>
     </div>
