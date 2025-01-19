@@ -5,8 +5,17 @@ class MysqlService {
   private baseUrl = '/api';
 
   async getStoreSettings(): Promise<StoreConfig> {
-    const response = await axios.get(`${this.baseUrl}/store-config/read.php`);
-    return response.data;
+    try {
+      const response = await axios.get(`${this.baseUrl}/store-config/read.php`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching store settings:', error);
+      // Return default values if the request fails
+      return {
+        logo_url: '',
+        store_name: 'ArclimaFrio'
+      };
+    }
   }
 
   async saveStoreSettings(settings: StoreConfig): Promise<any> {

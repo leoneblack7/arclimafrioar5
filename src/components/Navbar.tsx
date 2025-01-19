@@ -15,10 +15,15 @@ export const Navbar = () => {
 
   useEffect(() => {
     const loadStoreConfig = async () => {
-      const config = await mysqlService.getStoreSettings();
-      if (config) {
-        if (config.store_name) setStoreName(config.store_name);
-        if (config.logo_url) setLogoUrl(config.logo_url);
+      try {
+        const config = await mysqlService.getStoreSettings();
+        if (config) {
+          if (config.store_name) setStoreName(config.store_name);
+          if (config.logo_url) setLogoUrl(config.logo_url);
+        }
+      } catch (error) {
+        console.error('Error loading store settings:', error);
+        // Keep default values if there's an error
       }
     };
     loadStoreConfig();
