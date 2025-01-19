@@ -16,7 +16,8 @@ interface MySQLConfig {
 
 export const MySQLConnectionManager = () => {
   const [isConnected, setIsConnected] = useState<boolean>(false);
-  const [isChecking, setIsChecking] = useState<boolean>(true);
+  const [isChecking, setIsChecking] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [config, setConfig] = useState<MySQLConfig>({
     host: 'localhost',
     database: 'arclimafrio',
@@ -44,6 +45,7 @@ export const MySQLConnectionManager = () => {
   };
 
   const saveConfig = async () => {
+    setIsSaving(true);
     try {
       const response = await axios.post('/api/config/save-mysql-config.php', config);
       if (response.data.success) {
@@ -54,6 +56,8 @@ export const MySQLConnectionManager = () => {
       }
     } catch (error) {
       toast.error("Erro ao salvar configurações");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -160,8 +164,8 @@ export const MySQLConnectionManager = () => {
           </div>
         </div>
 
-        <Button onClick={saveConfig} className="w-full">
-          Salvar Configurações
+        <Button onClick={saveConfig} disabled={isSaving} className="w-full">
+          {isSaving ? "Salvando..." : "Salvar Configurações"}
         </Button>
       </div>
 

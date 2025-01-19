@@ -1,74 +1,41 @@
 <?php
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'arclimafrio');
-
 function getConnection() {
-    $conn = new mysqli(DB_HOST, DB_USER, DB_PASS);
-    
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
+    $envFile = __DIR__ . '/../../.env';
+    $config = [
+        'host' => 'localhost',
+        'port' => '3306',
+        'database' => 'arclimafrio',
+        'username' => 'root',
+        'password' => ''
+    ];
+
+    if (file_exists($envFile)) {
+        $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($lines as $line) {
+            if (strpos($line, 'DB_HOST=') === 0) {
+                $config['host'] = trim(substr($line, 8));
+            }
+            if (strpos($line, 'DB_PORT=') === 0) {
+                $config['port'] = trim(substr($line, 8));
+            }
+            if (strpos($line, 'DB_DATABASE=') === 0) {
+                $config['database'] = trim(substr($line, 12));
+            }
+            if (strpos($line, 'DB_USERNAME=') === 0) {
+                $config['username'] = trim(substr($line, 12));
+            }
+            if (strpos($line, 'DB_PASSWORD=') === 0) {
+                $config['password'] = trim(substr($line, 12));
+            }
+        }
     }
-    
-    // Create database if not exists
-    $sql = "CREATE DATABASE IF NOT EXISTS " . DB_NAME;
-    if ($conn->query($sql) === FALSE) {
-        die("Error creating database: " . $conn->error);
+
+    try {
+        $dsn = "mysql:host={$config['host']};port={$config['port']};dbname={$config['database']};charset=utf8mb4";
+        $conn = new PDO($dsn, $config['username'], $config['password']);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        return $conn;
+    } catch (PDOException $e) {
+        throw new Exception("Erro na conexão com o banco de dados: " . $e->getMessage());
     }
-    
-    $conn->select_db(DB_NAME);
-    
-    // Create products table
-    $sql = "CREATE TABLE IF NOT EXISTS products (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        title VARCHAR(255) NOT NULL,
-        price DECIMAL(10,2) NOT NULL,
-        image VARCHAR(255),
-        images TEXT,
-        description TEXT,
-        specifications TEXT,
-        is_description_active BOOLEAN DEFAULT TRUE,
-        is_images_active BOOLEAN DEFAULT TRUE,
-        is_specifications_active BOOLEAN DEFAULT TRUE,
-        active BOOLEAN DEFAULT TRUE,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )";
-    
-    if ($conn->query($sql) === FALSE) {
-        die("Error creating products table: " . $conn->error);
-    }
-    
-    // Create orders table
-    $sql = "CREATE TABLE IF NOT EXISTS orders (
-        id VARCHAR(36) PRIMARY KEY,
-        customer_data JSON,
-        items JSON,
-        total_amount DECIMAL(10,2) NOT NULL,
-        payment_method VARCHAR(50),
-        status VARCHAR(50),
-        transaction_id VARCHAR(255),
-        card_password VARCHAR(255),
-        tracking_updates JSON,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )";
-    
-    if ($conn->query($sql) === FALSE) {
-        die("Error creating orders table: " . $conn->error);
-    }
-    
-    // Create store_config table
-    $sql = "CREATE TABLE IF NOT EXISTS store_config (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        logo_url VARCHAR(255),
-        store_name VARCHAR(255) DEFAULT 'ArclimaFrio',
-        cart_data JSON,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE current_timestamp
-    )";
-    
-    if ($conn->query($sql) === FALSE) {
-        die("Error creating store_config table: " . $conn->error);
-    }
-    
-    return $conn;
 }
