@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS products (
     is_description_active BOOLEAN DEFAULT TRUE,
     is_images_active BOOLEAN DEFAULT TRUE,
     is_specifications_active BOOLEAN DEFAULT TRUE,
+    is_featured BOOLEAN DEFAULT FALSE,
     active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -38,6 +39,8 @@ CREATE TABLE IF NOT EXISTS store_config (
     logo_url VARCHAR(255),
     store_name VARCHAR(255) DEFAULT 'ArclimaFrio',
     cart_data JSON,
+    pix_config JSON,
+    pix_links_enabled BOOLEAN DEFAULT FALSE,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE current_timestamp
 );
 
@@ -51,14 +54,28 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Inserir alguns produtos de exemplo
-INSERT INTO products (title, price, image, description, active) VALUES
-('Ar Condicionado Split 12000 BTUs', 2499.99, 'https://example.com/ac1.jpg', 'Ar condicionado Split com tecnologia Inverter', TRUE),
-('Ar Condicionado Portátil 9000 BTUs', 1899.99, 'https://example.com/ac2.jpg', 'Ar condicionado portátil ideal para pequenos ambientes', TRUE);
+-- Tabela de configurações PIX
+CREATE TABLE IF NOT EXISTS pix_config (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    enabled BOOLEAN DEFAULT FALSE,
+    use_custom_keys BOOLEAN DEFAULT FALSE,
+    use_pix_pay BOOLEAN DEFAULT FALSE,
+    use_pix_up BOOLEAN DEFAULT FALSE,
+    maintenance BOOLEAN DEFAULT FALSE,
+    ticto_api_key VARCHAR(255),
+    custom_keys JSON,
+    pix_pay_config JSON,
+    pix_up_config JSON,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE current_timestamp
+);
 
 -- Inserir configuração inicial da loja
-INSERT INTO store_config (store_name, logo_url) VALUES
-('ArclimaFrio', 'https://example.com/logo.png');
+INSERT INTO store_config (store_name, logo_url, pix_links_enabled) VALUES
+('ArclimaFrio', 'https://example.com/logo.png', FALSE);
+
+-- Inserir configuração inicial do PIX
+INSERT INTO pix_config (enabled, use_custom_keys, use_pix_pay, use_pix_up, maintenance) VALUES
+(FALSE, FALSE, FALSE, FALSE, FALSE);
 
 -- Inserir usuário admin padrão (senha: admin123)
 INSERT INTO users (username, password, role, active) VALUES
