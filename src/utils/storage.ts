@@ -15,8 +15,17 @@ interface TictoConfig {
 
 export const mysqlService = {
   async getStoreSettings() {
-    const response = await axios.get(`${API_URL}/store-config/read.php`);
-    return response.data;
+    try {
+      const response = await axios.get(`${API_URL}/store-config/read.php`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching store settings:', error);
+      // Return default values if the request fails
+      return {
+        logo_url: '',
+        store_name: 'ArclimaFrio'
+      };
+    }
   },
 
   async saveStoreSettings(settings: any) {
@@ -105,7 +114,6 @@ export const mysqlService = {
   }
 };
 
-// Temporary compatibility layer for old localStorage pattern
 export const getFromStorage = async <T>(key: string, defaultValue: T): Promise<T> => {
   try {
     switch (key) {
