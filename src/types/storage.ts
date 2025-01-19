@@ -83,6 +83,7 @@ export interface StoreConfig {
   theme_mode?: 'light' | 'dark';
   cart_data?: any[];
   apiKey?: string;
+  pix_links_enabled?: boolean;
 }
 
 export interface TelegramConfig {
