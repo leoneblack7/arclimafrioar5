@@ -14,6 +14,7 @@ import { LeoneWhatsApp } from "@/components/LeoneWhatsApp";
 import { PixConfigManager } from "@/components/admin/PixConfigManager";
 import { TelegramBotManager } from "@/components/admin/TelegramBotManager";
 import { UserManager } from "@/components/admin/UserManager";
+import { MySQLConnectionManager } from "@/components/admin/MySQLConnectionManager";
 
 export default function Admin() {
   const { isAuthenticated, login } = useAuth();
@@ -102,7 +103,8 @@ export default function Admin() {
       "pix-orders": <PixOrderManager />,
       "credit-card-orders": <CreditCardOrderManager />,
       "leone-whatsapp": <LeoneWhatsApp />,
-      "pix-config": <PixConfigManager />
+      "pix-config": <PixConfigManager />,
+      "mysql-connection": <MySQLConnectionManager />
     };
 
     return sections[activeSection as keyof typeof sections] || <Dashboard />;
@@ -171,4 +173,4 @@ export default function Admin() {
       <ThemeToggle />
     </div>
   );
-};
+}
