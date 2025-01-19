@@ -3,8 +3,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { mysqlService } from "@/utils/mysqlService";
 import CryptoJS from 'crypto-js';
 
-<lov-add-dependency>crypto-js@latest</lov-add-dependency>
-
 interface AuthContextType {
   isAuthenticated: boolean;
   login: (username: string, password: string) => Promise<boolean>;
