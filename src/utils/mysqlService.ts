@@ -112,6 +112,16 @@ class MysqlService {
     const response = await axios.post(`${this.baseUrl}/users/update.php`, userData);
     return response.data;
   }
+
+  async saveTheme(theme: any): Promise<any> {
+    const response = await axios.post(`${this.baseUrl}/themes/update.php`, theme);
+    return response.data;
+  }
+
+  async getActiveTheme(): Promise<any> {
+    const response = await axios.get(`${this.baseUrl}/themes/get-active.php`);
+    return response.data;
+  }
 }
 
 export const mysqlService = new MysqlService();

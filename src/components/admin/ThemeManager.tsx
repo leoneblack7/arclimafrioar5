@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { mysqlService } from "@/utils/mysqlService";
 
 interface Theme {
   id: string;
@@ -139,32 +140,7 @@ const themes: Theme[] = [
 ];
 
 export const ThemeManager = () => {
-  const [currentTheme, setCurrentTheme] = useState<string>(() => {
-    return window.indexedDB ? "pandora" : "pandora";
-  });
-
-  const initializeDB = () => {
-    return new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("ThemeDB", 1);
-      
-      request.onerror = () => {
-        console.error("Error opening IndexedDB");
-        reject(new Error("Failed to open database"));
-      };
-
-      request.onupgradeneeded = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result;
-        if (!db.objectStoreNames.contains("themes")) {
-          db.createObjectStore("themes", { keyPath: "id" });
-        }
-      };
-
-      request.onsuccess = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result;
-        resolve(db);
-      };
-    });
-  };
+  const [currentTheme, setCurrentTheme] = useState<string>("default");
 
   const applyTheme = async (theme: Theme) => {
     const root = document.documentElement;
@@ -183,24 +159,16 @@ export const ThemeManager = () => {
     }
 
     try {
-      const db = await initializeDB();
-      const transaction = db.transaction(["themes"], "readwrite");
-      const store = transaction.objectStore("themes");
-      
-      await new Promise<void>((resolve, reject) => {
-        const request = store.put({ id: "current", themeId: theme.id });
-        
-        request.onsuccess = () => {
-          setCurrentTheme(theme.id);
-          toast.success(`Tema ${theme.name} aplicado com sucesso!`);
-          resolve();
-        };
-        
-        request.onerror = () => {
-          toast.error("Erro ao salvar tema");
-          reject(new Error("Failed to save theme"));
-        };
+      await mysqlService.saveTheme({
+        id: theme.id,
+        name: theme.name,
+        colors: theme.colors,
+        gradient: theme.gradient,
+        is_active: true
       });
+      
+      setCurrentTheme(theme.id);
+      toast.success(`Tema ${theme.name} aplicado com sucesso!`);
     } catch (error) {
       console.error("Error applying theme:", error);
       toast.error("Erro ao aplicar tema");
@@ -210,20 +178,11 @@ export const ThemeManager = () => {
   useEffect(() => {
     const loadSavedTheme = async () => {
       try {
-        const db = await initializeDB();
-        const transaction = db.transaction(["themes"], "readonly");
-        const store = transaction.objectStore("themes");
-        
-        const request = store.get("current");
-        
-        request.onsuccess = () => {
-          if (request.result) {
-            const savedTheme = themes.find(t => t.id === request.result.themeId);
-            if (savedTheme) {
-              applyTheme(savedTheme);
-            }
-          }
-        };
+        const activeTheme = await mysqlService.getActiveTheme();
+        if (activeTheme) {
+          const themeToApply = themes.find(t => t.id === activeTheme.id) || themes[0];
+          applyTheme(themeToApply);
+        }
       } catch (error) {
         console.error("Error loading saved theme:", error);
       }

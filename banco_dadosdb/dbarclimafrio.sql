@@ -69,6 +69,16 @@ CREATE TABLE IF NOT EXISTS pix_config (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE current_timestamp
 );
 
+-- Tabela de temas
+CREATE TABLE IF NOT EXISTS themes (
+    id VARCHAR(50) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    colors JSON,
+    gradient VARCHAR(255),
+    is_active BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Inserir configuração inicial da loja
 INSERT INTO store_config (store_name, logo_url, pix_links_enabled) VALUES
 ('ArclimaFrio', 'https://example.com/logo.png', FALSE);
@@ -80,3 +90,13 @@ INSERT INTO pix_config (enabled, use_custom_keys, use_pix_pay, use_pix_up, maint
 -- Inserir usuário admin padrão (senha: admin123)
 INSERT INTO users (username, password, role, active) VALUES
 ('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', TRUE);
+
+-- Inserir tema padrão
+INSERT INTO themes (id, name, colors, is_active) VALUES
+('default', 'ArclimaFrio Padrão', '{
+    "primary": "#0066CC",
+    "secondary": "#004999",
+    "accent": "#0088FF",
+    "background": "#FFFFFF",
+    "text": "#000000"
+}', TRUE);
