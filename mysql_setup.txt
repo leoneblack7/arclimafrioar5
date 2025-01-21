@@ -3,6 +3,20 @@ MySQL Setup Instructions:
 1. Start XAMPP and ensure Apache and MySQL are running
 2. Open phpMyAdmin: http://localhost/phpmyadmin
 3. Create a new database named 'arclimafrio'
+4. Execute the following SQL to create required tables:
+
+```sql
+CREATE TABLE IF NOT EXISTS store_config (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    cart_data TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Insert initial empty cart
+INSERT INTO store_config (id, cart_data) VALUES (1, '[]')
+ON DUPLICATE KEY UPDATE id = id;
+```
 
 Database Configuration:
 - Host: localhost
@@ -32,3 +46,4 @@ Important:
 1. Place the 'api' folder in your XAMPP htdocs directory
 2. Make sure PHP and MySQL are running in XAMPP
 3. Test the connection using the read.php endpoints first
+4. Verify that the store_config table is created with the cart_data column
