@@ -15,6 +15,7 @@ import { PixConfigManager } from "@/components/admin/PixConfigManager";
 import { TelegramBotManager } from "@/components/admin/TelegramBotManager";
 import { UserManager } from "@/components/admin/UserManager";
 import { MySQLConnectionManager } from "@/components/admin/MySQLConnectionManager";
+import { ThemeManager } from "@/components/admin/ThemeManager";
 
 export default function Admin() {
   const { isAuthenticated, login } = useAuth();
@@ -104,7 +105,8 @@ export default function Admin() {
       "credit-card-orders": <CreditCardOrderManager />,
       "leone-whatsapp": <LeoneWhatsApp />,
       "pix-config": <PixConfigManager />,
-      "mysql-connection": <MySQLConnectionManager />
+      "mysql-connection": <MySQLConnectionManager />,
+      "theme-manager": <ThemeManager />
     };
 
     return sections[activeSection as keyof typeof sections] || <Dashboard />;

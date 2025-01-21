@@ -15,6 +15,7 @@ import {
   Settings,
   User,
   Database,
+  Palette,
 } from "lucide-react";
 
 interface AdminSidebarProps {
@@ -39,6 +40,7 @@ export const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarPro
     { id: "telegram-bot", label: "Telegram Bot", icon: MessageCircle },
     { id: "user-management", label: "Gerenciar Usuário", icon: User },
     { id: "mysql-connection", label: "Conexão MySQL", icon: Database },
+    { id: "theme-manager", label: "Temas", icon: Palette },
   ];
 
   return (
