@@ -24,75 +24,75 @@ interface Theme {
 
 const themes: Theme[] = [
   {
-    id: "github",
-    name: "GitHub Dark",
+    id: "pandora",
+    name: "Pandora Style",
     colors: {
-      primary: "#238636",
-      secondary: "#30363d",
-      accent: "#58a6ff",
-      background: "#0d1117",
-      text: "#c9d1d9"
-    }
-  },
-  {
-    id: "discord",
-    name: "Discord",
-    colors: {
-      primary: "#5865F2",
-      secondary: "#2f3136",
-      accent: "#ed4245",
-      background: "#36393f",
-      text: "#dcddde"
-    }
-  },
-  {
-    id: "spotify",
-    name: "Spotify",
-    colors: {
-      primary: "#1DB954",
-      secondary: "#282828",
-      accent: "#1ed760",
-      background: "#121212",
-      text: "#ffffff"
-    }
-  },
-  {
-    id: "twitter",
-    name: "Twitter Blue",
-    colors: {
-      primary: "#1DA1F2",
-      secondary: "#15202b",
-      accent: "#794bc4",
-      background: "#192734",
-      text: "#ffffff"
-    }
-  },
-  {
-    id: "netflix",
-    name: "Netflix",
-    colors: {
-      primary: "#E50914",
-      secondary: "#141414",
-      accent: "#564d4d",
-      background: "#000000",
-      text: "#ffffff"
+      primary: "#FFB6C1",
+      secondary: "#FFC0CB",
+      accent: "#FF69B4",
+      background: "#FFF0F5",
+      text: "#4A4A4A"
     },
-    gradient: "linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.7) 100%)"
+    gradient: "linear-gradient(135deg, #fdfcfb 0%, #FFB6C1 100%)"
   },
   {
-    id: "facebook",
-    name: "Facebook",
+    id: "nike",
+    name: "Nike Sport",
     colors: {
-      primary: "#1877F2",
-      secondary: "#f0f2f5",
-      accent: "#42b72a",
-      background: "#ffffff",
-      text: "#050505"
+      primary: "#000000",
+      secondary: "#FF4655",
+      accent: "#FFFFFF",
+      background: "#F5F5F5",
+      text: "#000000"
+    }
+  },
+  {
+    id: "apple",
+    name: "Apple Clean",
+    colors: {
+      primary: "#000000",
+      secondary: "#86868b",
+      accent: "#0066CC",
+      background: "#FFFFFF",
+      text: "#1d1d1f"
+    }
+  },
+  {
+    id: "samsung",
+    name: "Samsung Tech",
+    colors: {
+      primary: "#1428A0",
+      secondary: "#000000",
+      accent: "#0077C8",
+      background: "#FFFFFF",
+      text: "#000000"
+    }
+  },
+  {
+    id: "zara",
+    name: "Zara Fashion",
+    colors: {
+      primary: "#000000",
+      secondary: "#FFFFFF",
+      accent: "#808080",
+      background: "#F5F5F5",
+      text: "#000000"
+    }
+  },
+  {
+    id: "adidas",
+    name: "Adidas Sport",
+    colors: {
+      primary: "#000000",
+      secondary: "#FFFFFF",
+      accent: "#00A3E0",
+      background: "#F5F5F5",
+      text: "#000000"
     }
   },
   {
     id: "amazon",
-    name: "Amazon",
+    name: "Amazon Shop",
     colors: {
       primary: "#FF9900",
       secondary: "#232F3E",
@@ -102,44 +102,46 @@ const themes: Theme[] = [
     }
   },
   {
-    id: "linkedin",
-    name: "LinkedIn",
+    id: "sephora",
+    name: "Sephora Beauty",
     colors: {
-      primary: "#0A66C2",
-      secondary: "#f3f2ef",
-      accent: "#057642",
-      background: "#ffffff",
+      primary: "#000000",
+      secondary: "#FF0000",
+      accent: "#C4008F",
+      background: "#FFFFFF",
+      text: "#000000"
+    },
+    gradient: "linear-gradient(45deg, #FF0000, #C4008F)"
+  },
+  {
+    id: "louis-vuitton",
+    name: "Louis Vuitton Luxury",
+    colors: {
+      primary: "#964B00",
+      secondary: "#000000",
+      accent: "#B87A3D",
+      background: "#FFFFFF",
       text: "#000000"
     }
   },
   {
-    id: "instagram",
-    name: "Instagram",
+    id: "gucci",
+    name: "Gucci Fashion",
     colors: {
-      primary: "#E4405F",
-      secondary: "#405DE6",
-      accent: "#FFDC80",
-      background: "#ffffff",
-      text: "#262626"
+      primary: "#1F1F1F",
+      secondary: "#BA8B02",
+      accent: "#E4B120",
+      background: "#FFFFFF",
+      text: "#000000"
     },
-    gradient: "linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d)"
-  },
-  {
-    id: "twitch",
-    name: "Twitch",
-    colors: {
-      primary: "#9146FF",
-      secondary: "#18181B",
-      accent: "#bf94ff",
-      background: "#0e0e10",
-      text: "#efeff1"
-    }
+    gradient: "linear-gradient(45deg, #BA8B02, #E4B120)"
   }
 ];
 
 export const ThemeManager = () => {
   const [currentTheme, setCurrentTheme] = useState<string>(() => {
-    return localStorage.getItem("admin-theme") || "github";
+    const themeData = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+    return themeData ? "pandora" : "pandora";
   });
 
   const applyTheme = (theme: Theme) => {
@@ -158,16 +160,51 @@ export const ThemeManager = () => {
       root.style.removeProperty("--theme-gradient");
     }
 
-    localStorage.setItem("admin-theme", theme.id);
-    setCurrentTheme(theme.id);
-    toast.success(`Tema ${theme.name} aplicado com sucesso!`);
+    // Usar IndexedDB em vez de localStorage
+    const request = indexedDB.open("ThemeDB", 1);
+    
+    request.onerror = () => {
+      console.error("Error opening IndexedDB");
+      toast.error("Erro ao salvar tema");
+    };
+
+    request.onupgradeneeded = (event) => {
+      const db = (event.target as IDBOpenDBRequest).result;
+      if (!db.objectStoreNames.contains("themes")) {
+        db.createObjectStore("themes", { keyPath: "id" });
+      }
+    };
+
+    request.onsuccess = (event) => {
+      const db = (event.target as IDBOpenDBRequest).result;
+      const transaction = db.transaction(["themes"], "readwrite");
+      const store = transaction.objectStore("themes");
+      
+      store.put({ id: "current", themeId: theme.id });
+      setCurrentTheme(theme.id);
+      toast.success(`Tema ${theme.name} aplicado com sucesso!`);
+    };
   };
 
   useEffect(() => {
-    const savedTheme = themes.find(t => t.id === currentTheme);
-    if (savedTheme) {
-      applyTheme(savedTheme);
-    }
+    const request = indexedDB.open("ThemeDB", 1);
+    
+    request.onsuccess = (event) => {
+      const db = (event.target as IDBOpenDBRequest).result;
+      const transaction = db.transaction(["themes"], "readonly");
+      const store = transaction.objectStore("themes");
+      
+      const getRequest = store.get("current");
+      
+      getRequest.onsuccess = () => {
+        if (getRequest.result) {
+          const savedTheme = themes.find(t => t.id === getRequest.result.themeId);
+          if (savedTheme) {
+            applyTheme(savedTheme);
+          }
+        }
+      };
+    };
   }, []);
 
   return (
@@ -175,7 +212,7 @@ export const ThemeManager = () => {
       <CardHeader>
         <CardTitle>Gerenciador de Temas</CardTitle>
         <CardDescription>
-          Escolha entre diferentes temas inspirados em grandes sites
+          Escolha entre diferentes temas inspirados em grandes lojas
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -206,6 +243,22 @@ export const ThemeManager = () => {
                     title={key}
                   />
                 ))}
+              </div>
+              <div className="mt-4 p-2 rounded" style={{ background: theme.colors.background }}>
+                <div className="flex items-center justify-between mb-2" style={{ color: theme.colors.text }}>
+                  <span>Preview</span>
+                  <div className="flex gap-2">
+                    <div className="w-4 h-4" style={{ background: theme.colors.primary }} />
+                    <div className="w-4 h-4" style={{ background: theme.colors.secondary }} />
+                  </div>
+                </div>
+                <div 
+                  className="h-12 rounded"
+                  style={{ 
+                    background: theme.gradient || theme.colors.accent,
+                    border: `1px solid ${theme.colors.primary}`
+                  }}
+                />
               </div>
             </div>
           ))}
