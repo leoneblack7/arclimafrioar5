@@ -25,139 +25,112 @@ interface Theme {
 
 const themes: Theme[] = [
   {
-    id: "pandora",
-    name: "Pandora Style",
+    id: "default",
+    name: "ArclimaFrio Padrão",
     colors: {
-      primary: "#FFB6C1",
-      secondary: "#FFC0CB",
-      accent: "#FF69B4",
-      background: "#FFF0F5",
-      text: "#4A4A4A"
+      primary: "#0066CC",
+      secondary: "#004999",
+      accent: "#0088FF",
+      background: "#FFFFFF",
+      text: "#000000"
+    }
+  },
+  {
+    id: "modern-tech",
+    name: "Tecnologia Moderna",
+    colors: {
+      primary: "#6E59A5",
+      secondary: "#1A1F2C",
+      accent: "#D6BCFA",
+      background: "#F1F0FB",
+      text: "#1A1F2C"
     },
-    gradient: "linear-gradient(135deg, #fdfcfb 0%, #FFB6C1 100%)"
+    gradient: "linear-gradient(90deg, hsla(277, 75%, 84%, 1) 0%, hsla(297, 50%, 51%, 1) 100%)"
   },
   {
-    id: "nike",
-    name: "Nike Sport",
+    id: "eco-fresh",
+    name: "Eco Fresh",
     colors: {
-      primary: "#000000",
-      secondary: "#FF4655",
-      accent: "#FFFFFF",
-      background: "#F5F5F5",
-      text: "#000000"
-    }
-  },
-  {
-    id: "apple",
-    name: "Apple Clean",
-    colors: {
-      primary: "#000000",
-      secondary: "#86868b",
-      accent: "#0066CC",
-      background: "#FFFFFF",
-      text: "#1d1d1f"
-    }
-  },
-  {
-    id: "samsung",
-    name: "Samsung Tech",
-    colors: {
-      primary: "#1428A0",
-      secondary: "#000000",
-      accent: "#0077C8",
-      background: "#FFFFFF",
-      text: "#000000"
-    }
-  },
-  {
-    id: "zara",
-    name: "Zara Fashion",
-    colors: {
-      primary: "#000000",
-      secondary: "#FFFFFF",
-      accent: "#808080",
-      background: "#F5F5F5",
-      text: "#000000"
-    }
-  },
-  {
-    id: "adidas",
-    name: "Adidas Sport",
-    colors: {
-      primary: "#000000",
-      secondary: "#FFFFFF",
-      accent: "#00A3E0",
-      background: "#F5F5F5",
-      text: "#000000"
-    }
-  },
-  {
-    id: "amazon",
-    name: "Amazon Shop",
-    colors: {
-      primary: "#FF9900",
-      secondary: "#232F3E",
-      accent: "#37475A",
-      background: "#EAEDED",
-      text: "#111111"
-    }
-  },
-  {
-    id: "sephora",
-    name: "Sephora Beauty",
-    colors: {
-      primary: "#000000",
-      secondary: "#FF0000",
-      accent: "#C4008F",
-      background: "#FFFFFF",
-      text: "#000000"
+      primary: "#4CAF50",
+      secondary: "#2E7D32",
+      accent: "#81C784",
+      background: "#F2FCE2",
+      text: "#1B5E20"
     },
-    gradient: "linear-gradient(45deg, #FF0000, #C4008F)"
+    gradient: "linear-gradient(184.1deg, rgba(249,255,182,1) 44.7%, rgba(226,255,172,1) 67.2%)"
   },
   {
-    id: "louis-vuitton",
-    name: "Louis Vuitton Luxury",
+    id: "sunset-breeze",
+    name: "Brisa do Pôr do Sol",
     colors: {
-      primary: "#964B00",
-      secondary: "#000000",
-      accent: "#B87A3D",
-      background: "#FFFFFF",
-      text: "#000000"
-    }
-  },
-  {
-    id: "gucci",
-    name: "Gucci Fashion",
-    colors: {
-      primary: "#1F1F1F",
-      secondary: "#BA8B02",
-      accent: "#E4B120",
-      background: "#FFFFFF",
-      text: "#000000"
+      primary: "#FF9800",
+      secondary: "#F57C00",
+      accent: "#FFB74D",
+      background: "#FFF3E0",
+      text: "#E65100"
     },
-    gradient: "linear-gradient(45deg, #BA8B02, #E4B120)"
+    gradient: "linear-gradient(to right, #ffc3a0 0%, #ffafbd 100%)"
+  },
+  {
+    id: "ocean-wave",
+    name: "Onda do Oceano",
+    colors: {
+      primary: "#0288D1",
+      secondary: "#01579B",
+      accent: "#4FC3F7",
+      background: "#E1F5FE",
+      text: "#01579B"
+    },
+    gradient: "linear-gradient(to top, #accbee 0%, #e7f0fd 100%)"
+  },
+  // ... Continuing with more themes
+  {
+    id: "luxury-gold",
+    name: "Luxo Dourado",
+    colors: {
+      primary: "#FFD700",
+      secondary: "#B8860B",
+      accent: "#DAA520",
+      background: "#FFFAF0",
+      text: "#8B4513"
+    },
+    gradient: "linear-gradient(to right, #BF953F, #FCF6BA, #B38728, #FBF5B7)"
+  },
+  // Add more themes here...
+  {
+    id: "nordic-frost",
+    name: "Gelo Nórdico",
+    colors: {
+      primary: "#90CAF9",
+      secondary: "#64B5F6",
+      accent: "#42A5F5",
+      background: "#E3F2FD",
+      text: "#1565C0"
+    },
+    gradient: "linear-gradient(109.6deg, rgba(223,234,247,1) 11.2%, rgba(244,248,252,1) 91.1%)"
   }
 ];
 
 export const ThemeManager = () => {
   const [currentTheme, setCurrentTheme] = useState<string>("default");
+  const [previewFrame, setPreviewFrame] = useState<HTMLIFrameElement | null>(null);
+
+  useEffect(() => {
+    const loadSavedTheme = async () => {
+      try {
+        const activeTheme = await mysqlService.getActiveTheme();
+        if (activeTheme) {
+          setCurrentTheme(activeTheme.id);
+        }
+      } catch (error) {
+        console.error("Error loading saved theme:", error);
+      }
+    };
+
+    loadSavedTheme();
+  }, []);
 
   const applyTheme = async (theme: Theme) => {
-    const root = document.documentElement;
-    const { colors } = theme;
-
-    root.style.setProperty("--primary", colors.primary);
-    root.style.setProperty("--secondary", colors.secondary);
-    root.style.setProperty("--accent", colors.accent);
-    root.style.setProperty("--background", colors.background);
-    root.style.setProperty("--text", colors.text);
-
-    if (theme.gradient) {
-      root.style.setProperty("--theme-gradient", theme.gradient);
-    } else {
-      root.style.removeProperty("--theme-gradient");
-    }
-
     try {
       await mysqlService.saveTheme({
         id: theme.id,
@@ -169,34 +142,35 @@ export const ThemeManager = () => {
       
       setCurrentTheme(theme.id);
       toast.success(`Tema ${theme.name} aplicado com sucesso!`);
+      
+      // Update preview iframe if it exists
+      if (previewFrame?.contentWindow) {
+        const doc = previewFrame.contentWindow.document;
+        const style = doc.createElement('style');
+        style.textContent = `
+          :root {
+            --primary: ${theme.colors.primary};
+            --secondary: ${theme.colors.secondary};
+            --accent: ${theme.colors.accent};
+            --background: ${theme.colors.background};
+            --text: ${theme.colors.text};
+            ${theme.gradient ? `--theme-gradient: ${theme.gradient};` : ''}
+          }
+        `;
+        doc.head.appendChild(style);
+      }
     } catch (error) {
       console.error("Error applying theme:", error);
       toast.error("Erro ao aplicar tema");
     }
   };
 
-  useEffect(() => {
-    const loadSavedTheme = async () => {
-      try {
-        const activeTheme = await mysqlService.getActiveTheme();
-        if (activeTheme) {
-          const themeToApply = themes.find(t => t.id === activeTheme.id) || themes[0];
-          applyTheme(themeToApply);
-        }
-      } catch (error) {
-        console.error("Error loading saved theme:", error);
-      }
-    };
-
-    loadSavedTheme();
-  }, []);
-
   return (
     <Card className="w-full">
       <CardHeader>
         <CardTitle>Gerenciador de Temas</CardTitle>
         <CardDescription>
-          Escolha entre diferentes temas inspirados em grandes lojas
+          Escolha entre diferentes temas para personalizar sua loja
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -218,6 +192,30 @@ export const ThemeManager = () => {
               <h3 className="font-semibold mb-2" style={{ color: theme.colors.text }}>
                 {theme.name}
               </h3>
+              
+              {/* Theme Preview */}
+              <div className="relative w-full h-48 rounded-lg overflow-hidden mb-4 bg-white shadow-lg">
+                <div className="absolute top-0 w-full h-12" style={{ background: theme.colors.primary }}>
+                  <div className="flex items-center h-full px-4">
+                    <div className="w-24 h-6 rounded" style={{ background: theme.colors.accent }}></div>
+                  </div>
+                </div>
+                <div className="absolute top-16 left-4 right-4">
+                  <div className="w-full h-8 rounded mb-2" style={{ background: theme.colors.secondary }}></div>
+                  <div className="flex gap-2 mb-4">
+                    {[1, 2, 3].map((i) => (
+                      <div
+                        key={i}
+                        className="w-1/3 h-16 rounded"
+                        style={{ background: theme.colors.accent }}
+                      ></div>
+                    ))}
+                  </div>
+                  <div className="w-3/4 h-4 rounded mb-2" style={{ background: theme.colors.text }}></div>
+                  <div className="w-1/2 h-4 rounded" style={{ background: theme.colors.text }}></div>
+                </div>
+              </div>
+
               <div className="flex gap-2">
                 {Object.entries(theme.colors).map(([key, color]) => (
                   <div
@@ -227,22 +225,6 @@ export const ThemeManager = () => {
                     title={key}
                   />
                 ))}
-              </div>
-              <div className="mt-4 p-2 rounded" style={{ background: theme.colors.background }}>
-                <div className="flex items-center justify-between mb-2" style={{ color: theme.colors.text }}>
-                  <span>Preview</span>
-                  <div className="flex gap-2">
-                    <div className="w-4 h-4" style={{ background: theme.colors.primary }} />
-                    <div className="w-4 h-4" style={{ background: theme.colors.secondary }} />
-                  </div>
-                </div>
-                <div 
-                  className="h-12 rounded"
-                  style={{ 
-                    background: theme.gradient || theme.colors.accent,
-                    border: `1px solid ${theme.colors.primary}`
-                  }}
-                />
               </div>
             </div>
           ))}
