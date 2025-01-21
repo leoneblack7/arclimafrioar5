@@ -140,8 +140,7 @@ const themes: Theme[] = [
 
 export const ThemeManager = () => {
   const [currentTheme, setCurrentTheme] = useState<string>(() => {
-    const themeData = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
-    return themeData ? "pandora" : "pandora";
+    return window.indexedDB ? "pandora" : "pandora";
   });
 
   const applyTheme = (theme: Theme) => {
