@@ -143,7 +143,30 @@ export const ThemeManager = () => {
     return window.indexedDB ? "pandora" : "pandora";
   });
 
-  const applyTheme = (theme: Theme) => {
+  const initializeDB = () => {
+    return new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open("ThemeDB", 1);
+      
+      request.onerror = () => {
+        console.error("Error opening IndexedDB");
+        reject(new Error("Failed to open database"));
+      };
+
+      request.onupgradeneeded = (event) => {
+        const db = (event.target as IDBOpenDBRequest).result;
+        if (!db.objectStoreNames.contains("themes")) {
+          db.createObjectStore("themes", { keyPath: "id" });
+        }
+      };
+
+      request.onsuccess = (event) => {
+        const db = (event.target as IDBOpenDBRequest).result;
+        resolve(db);
+      };
+    });
+  };
+
+  const applyTheme = async (theme: Theme) => {
     const root = document.documentElement;
     const { colors } = theme;
 
@@ -159,51 +182,54 @@ export const ThemeManager = () => {
       root.style.removeProperty("--theme-gradient");
     }
 
-    // Usar IndexedDB em vez de localStorage
-    const request = indexedDB.open("ThemeDB", 1);
-    
-    request.onerror = () => {
-      console.error("Error opening IndexedDB");
-      toast.error("Erro ao salvar tema");
-    };
-
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
-      if (!db.objectStoreNames.contains("themes")) {
-        db.createObjectStore("themes", { keyPath: "id" });
-      }
-    };
-
-    request.onsuccess = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
+    try {
+      const db = await initializeDB();
       const transaction = db.transaction(["themes"], "readwrite");
       const store = transaction.objectStore("themes");
       
-      store.put({ id: "current", themeId: theme.id });
-      setCurrentTheme(theme.id);
-      toast.success(`Tema ${theme.name} aplicado com sucesso!`);
-    };
+      await new Promise<void>((resolve, reject) => {
+        const request = store.put({ id: "current", themeId: theme.id });
+        
+        request.onsuccess = () => {
+          setCurrentTheme(theme.id);
+          toast.success(`Tema ${theme.name} aplicado com sucesso!`);
+          resolve();
+        };
+        
+        request.onerror = () => {
+          toast.error("Erro ao salvar tema");
+          reject(new Error("Failed to save theme"));
+        };
+      });
+    } catch (error) {
+      console.error("Error applying theme:", error);
+      toast.error("Erro ao aplicar tema");
+    }
   };
 
   useEffect(() => {
-    const request = indexedDB.open("ThemeDB", 1);
-    
-    request.onsuccess = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
-      const transaction = db.transaction(["themes"], "readonly");
-      const store = transaction.objectStore("themes");
-      
-      const getRequest = store.get("current");
-      
-      getRequest.onsuccess = () => {
-        if (getRequest.result) {
-          const savedTheme = themes.find(t => t.id === getRequest.result.themeId);
-          if (savedTheme) {
-            applyTheme(savedTheme);
+    const loadSavedTheme = async () => {
+      try {
+        const db = await initializeDB();
+        const transaction = db.transaction(["themes"], "readonly");
+        const store = transaction.objectStore("themes");
+        
+        const request = store.get("current");
+        
+        request.onsuccess = () => {
+          if (request.result) {
+            const savedTheme = themes.find(t => t.id === request.result.themeId);
+            if (savedTheme) {
+              applyTheme(savedTheme);
+            }
           }
-        }
-      };
+        };
+      } catch (error) {
+        console.error("Error loading saved theme:", error);
+      }
     };
+
+    loadSavedTheme();
   }, []);
 
   return (
